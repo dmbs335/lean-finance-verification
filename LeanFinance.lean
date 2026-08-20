@@ -54,3 +54,5 @@ import LeanFinance.Certificate.StabilityCertificate
 
 import LeanFinance.Examples.ProofCarryingBacktest
 import LeanFinance.Examples.FiniteEquilibrium
+
+import LeanFinance.SupplyChain
