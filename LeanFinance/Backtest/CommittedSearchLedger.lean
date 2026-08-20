@@ -35,17 +35,25 @@ structure CommittedSearchLedger where
 def LedgerLinks (previous current : RegisteredTrial) : Prop :=
   current.previousCommitment = some previous.commitment
 
-/-- Structural validity of the committed ledger. This checks entry binding,
-    commitment linkage, and monotone registration time. -/
+/-- Validity of all entries after an already validated predecessor. -/
+def ValidCommittedSuffix
+    (previous : RegisteredTrial) : List RegisteredTrial → Prop
+  | [] => True
+  | current :: rest =>
+      current.Bound ∧
+      LedgerLinks previous current ∧
+      previous.registeredAt ≤ current.registeredAt ∧
+      ValidCommittedSuffix current rest
+
+/-- Structural validity of a complete committed ledger. The first entry has no
+    predecessor, which prevents a suffix of some unrelated history from being
+    silently reinterpreted as a fresh ledger root. -/
 def ValidCommittedChain : List RegisteredTrial → Prop
   | [] => True
-  | [entry] => entry.Bound
-  | first :: second :: rest =>
+  | first :: rest =>
+      first.previousCommitment = none ∧
       first.Bound ∧
-      second.Bound ∧
-      LedgerLinks first second ∧
-      first.registeredAt ≤ second.registeredAt ∧
-      ValidCommittedChain (second :: rest)
+      ValidCommittedSuffix first rest
 
 def CommittedSearchLedger.Valid (ledger : CommittedSearchLedger) : Prop :=
   ValidCommittedChain ledger.entries
@@ -104,7 +112,8 @@ def AnchorAvailableAt
   anchor.anchoredAt ≤ decision.decisionTime
 
 /-- The selected strategy/parameter pair must have appeared in the ledger no
-    later than the decision time. -/
+    later than the decision time. This is meaningful together with an external
+    pre-decision anchor for the complete ledger prefix. -/
 def ChoicePreRegistered
     (ledger : CommittedSearchLedger)
     (decision : Decision) : Prop :=
