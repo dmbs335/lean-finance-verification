@@ -6,6 +6,7 @@ import LeanFinance.GameTheory.Payoff
 import LeanFinance.GameTheory.Constraint
 import LeanFinance.GameTheory.BestResponse
 import LeanFinance.GameTheory.Equilibrium
+import LeanFinance.GameTheory.FiniteGame
 import LeanFinance.GameTheory.Belief
 import LeanFinance.GameTheory.BayesianGame
 
@@ -46,5 +47,7 @@ import LeanFinance.Certificate.DataCertificate
 import LeanFinance.Certificate.UniverseCertificate
 import LeanFinance.Certificate.BacktestCertificate
 import LeanFinance.Certificate.Verification
+import LeanFinance.Certificate.EquilibriumCertificate
 
 import LeanFinance.Examples.ProofCarryingBacktest
+import LeanFinance.Examples.FiniteEquilibrium
