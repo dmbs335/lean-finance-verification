@@ -75,9 +75,36 @@ theorem appendOnly_trans
     _ = first.entries ++ (middleSuffix ++ finalSuffix) :=
       List.append_assoc _ _ _
 
+/-- Last chain commitment, used to bind the complete ledger to an external
+    timestamped anchor. -/
+def lastCommitment : List RegisteredTrial → Option (ArtifactRef .searchLedger)
+  | [] => none
+  | [entry] => some entry.commitment
+  | _ :: rest => lastCommitment rest
+
+/-- Externally published commitment to a complete ledger prefix. `anchoredAt`
+    records when the commitment became externally observable. -/
+structure LedgerAnchor where
+  commitment : ArtifactRef .searchLedger
+  entryCount : Nat
+  anchoredAt : Timestamp
+  deriving Repr
+
+/-- The anchor commits to both the ledger length and its terminal chain digest. -/
+def AnchorsLedger
+    (anchor : LedgerAnchor)
+    (ledger : CommittedSearchLedger) : Prop :=
+  anchor.commitment.Valid ∧
+    anchor.entryCount = ledger.entries.length ∧
+    lastCommitment ledger.entries = some anchor.commitment
+
+def AnchorAvailableAt
+    (anchor : LedgerAnchor)
+    (decision : Decision) : Prop :=
+  anchor.anchoredAt ≤ decision.decisionTime
+
 /-- The selected strategy/parameter pair must have appeared in the ledger no
-    later than the decision time. This rules out post-hoc registration inside
-    the formal model. -/
+    later than the decision time. -/
 def ChoicePreRegistered
     (ledger : CommittedSearchLedger)
     (decision : Decision) : Prop :=
@@ -93,6 +120,19 @@ structure PreRegistrationCertificate
   validLedger : ledger.Valid
   choicePreRegistered : ChoicePreRegistered ledger decision
 
+/-- Stronger certificate requiring the full ledger prefix to have been anchored
+    no later than the decision. This closes the "construct the whole ledger
+    after seeing the result" loophole inside the formal contract, assuming the
+    external timestamp/commitment evidence is authentic. -/
+structure AnchoredPreRegistrationCertificate
+    (ledger : CommittedSearchLedger)
+    (decision : Decision) where
+  anchor : LedgerAnchor
+  validLedger : ledger.Valid
+  anchorsLedger : AnchorsLedger anchor ledger
+  anchorAvailable : AnchorAvailableAt anchor decision
+  choicePreRegistered : ChoicePreRegistered ledger decision
+
 theorem PreRegistrationCertificate.registeredBeforeDecision
     (ledger : CommittedSearchLedger)
     (decision : Decision)
@@ -104,5 +144,12 @@ theorem PreRegistrationCertificate.registeredBeforeDecision
   rcases certificate.choicePreRegistered with
     ⟨trial, member, _strategyMatches, parameterMatches, registeredBefore⟩
   exact ⟨trial, member, parameterMatches, registeredBefore⟩
+
+theorem AnchoredPreRegistrationCertificate.anchor_before_decision
+    (ledger : CommittedSearchLedger)
+    (decision : Decision)
+    (certificate : AnchoredPreRegistrationCertificate ledger decision) :
+    certificate.anchor.anchoredAt ≤ decision.decisionTime :=
+  certificate.anchorAvailable
 
 end LeanFinance.Backtest
