@@ -59,6 +59,12 @@ namespace CapacityAddition
 def ReadyAt (project : CapacityAddition) (t : Timestamp) : Prop :=
   project.completionTime ≤ t ∧ project.qualificationTime ≤ t
 
+instance instDecidableReadyAt
+    (project : CapacityAddition)
+    (t : Timestamp) : Decidable (project.ReadyAt t) := by
+  unfold ReadyAt
+  infer_instance
+
 /-- Effective, rather than nameplate, capacity contributed at time `t`. -/
 def capacityAt (project : CapacityAddition) (t : Timestamp) : Nat :=
   if project.ReadyAt t then project.units else 0
@@ -97,6 +103,12 @@ def UsableAt (supply : AlternateSupply) (t : Timestamp) : Prop :=
   supply.qualificationTime ≤ t ∧
   supply.switchingReadyTime ≤ t ∧
   supply.ipCompatible = true
+
+instance instDecidableUsableAt
+    (supply : AlternateSupply)
+    (t : Timestamp) : Decidable (supply.UsableAt t) := by
+  unfold UsableAt
+  infer_instance
 
 def capacityAt (supply : AlternateSupply) (t : Timestamp) : Nat :=
   if supply.UsableAt t then supply.units else 0
@@ -190,7 +202,7 @@ theorem not_capacityBottleneck_of_sufficient
     (finalDemand : Nat)
     (sufficient : CapacitySufficientAt node t finalDemand) :
     ¬ IsCapacityBottleneckAt node t finalDemand :=
-  not_lt_of_ge sufficient
+  Nat.not_lt_of_ge sufficient
 
 theorem scarcityUnitsAt_eq_zero_of_sufficient
     (node : SupplyNode)
