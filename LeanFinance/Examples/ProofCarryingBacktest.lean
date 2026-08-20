@@ -2,7 +2,7 @@ import LeanFinance.Certificate.Verification
 
 namespace LeanFinance.Examples
 
-open Backtest Certificate
+open Backtest Certificate ResearchIntegrity
 
 def sampleDataset : Dataset :=
   {
@@ -41,6 +41,41 @@ def sampleDataCertificate : DataCertificate :=
       simp at member
       subst dataset
       decide
+  }
+
+def sampleSecurity : Security :=
+  { id := "TOY" }
+
+def sampleMembership : UniverseMembership :=
+  {
+    security := sampleSecurity
+    includedAt := 1
+    excludedAt := none
+  }
+
+def sampleUniverse : UniverseCertificate :=
+  {
+    snapshot :=
+      {
+        asOf := 20
+        memberships := [sampleMembership]
+      }
+    active := by decide
+  }
+
+def sampleCostModel : CostModel :=
+  {
+    modelId := "linear-impact-v1"
+    versionHash := "sha256:cost-model"
+    lockedAt := 16
+  }
+
+def sampleCommitment : ResearchCommitment :=
+  {
+    strategyId := sampleStrategy.strategyId
+    codeHash := sampleStrategy.codeHash
+    parameterHash := sampleStrategy.parameterHash
+    committedAt := 17
   }
 
 def sampleFeature : FeatureLineage :=
@@ -86,6 +121,9 @@ def sampleCertificate : BacktestCertificate :=
   {
     strategy := sampleStrategy
     data := sampleDataCertificate
+    universe := sampleUniverse
+    costModel := sampleCostModel
+    commitment := sampleCommitment
     features := [sampleFeature]
     searchLedger := sampleSearchLedger
     experiment := sampleExperiment
@@ -108,6 +146,10 @@ def sampleCertificate : BacktestCertificate :=
       exact sampleDataCertificate.containsHash_of_member
         sampleDataset
         (by simp [sampleDataCertificate])
+    universeAligned := rfl
+    costModelValid := by decide
+    commitmentMatches := by decide
+    commitmentValid := by decide
     claimWellFormed := by decide
     resultAfterDecision := by decide
   }

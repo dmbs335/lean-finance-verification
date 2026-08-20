@@ -10,6 +10,18 @@ structure VerifiedResearchClaim (certificate : BacktestCertificate) : Prop where
   dataWellFormed :
     ∀ dataset, dataset ∈ certificate.data.datasets →
       dataset.WellFormed
+  universeValid : certificate.universe.snapshot.Valid
+  universeAligned :
+    certificate.universe.snapshot.asOf = certificate.data.decisionTime
+  costModelValid :
+    certificate.costModel.ValidAt certificate.data.decisionTime
+  commitmentMatches :
+    certificate.commitment.Matches
+      certificate.strategy.strategyId
+      certificate.strategy.codeHash
+      certificate.strategy.parameterHash
+  commitmentValid :
+    certificate.commitment.ValidAt certificate.data.decisionTime
   reproducible : Backtest.Reproducible certificate.experiment
   searchRecorded :
     Backtest.RecordsParameterHash
@@ -38,6 +50,11 @@ theorem certificate_sound
   {
     noFutureInformation := certificate.noFutureInformation
     dataWellFormed := certificate.data.wellFormed
+    universeValid := certificate.universe.active
+    universeAligned := certificate.universeAligned
+    costModelValid := certificate.costModelValid
+    commitmentMatches := certificate.commitmentMatches
+    commitmentValid := certificate.commitmentValid
     reproducible := certificate.reproducible
     searchRecorded := certificate.searchRecorded
     featuresValid := certificate.featuresValid
@@ -69,5 +86,14 @@ theorem verifiedClaim_featureInputBound
     (inputMember : inputHash ∈ feature.inputDatasetHashes) :
     certificate.data.ContainsHash inputHash :=
   verified.featureInputsBound feature featureMember inputHash inputMember
+
+theorem verifiedClaim_universeMemberActive
+    {certificate : BacktestCertificate}
+    (verified : VerifiedResearchClaim certificate)
+    (membership : Backtest.UniverseMembership)
+    (member : membership ∈ certificate.universe.snapshot.memberships) :
+    membership.ActiveAt certificate.data.decisionTime := by
+  rw [← verified.universeAligned]
+  exact verified.universeValid membership member
 
 end LeanFinance.Certificate

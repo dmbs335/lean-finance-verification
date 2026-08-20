@@ -33,9 +33,15 @@ import LeanFinance.Backtest.FeatureLineage
 import LeanFinance.Backtest.SearchLedger
 import LeanFinance.Backtest.Reproducibility
 import LeanFinance.Backtest.Certificate
+import LeanFinance.Backtest.Universe
+import LeanFinance.Backtest.CostModel
+
+import LeanFinance.ResearchIntegrity.Noninterference
+import LeanFinance.ResearchIntegrity.Commitment
 
 import LeanFinance.Certificate.StrategyCertificate
 import LeanFinance.Certificate.DataCertificate
+import LeanFinance.Certificate.UniverseCertificate
 import LeanFinance.Certificate.BacktestCertificate
 import LeanFinance.Certificate.Verification
 
