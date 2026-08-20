@@ -1,8 +1,8 @@
 # Lean Finance Verification
 
 A Lean 4 research framework for **proof-carrying financial research**: market models,
-constraint-driven dynamics, inverse-game abstractions, and machine-checkable backtest
-certificates.
+constraint-driven dynamics, inverse-game abstractions, allocation policies, and
+machine-checkable backtest certificates.
 
 ## What this repository verifies
 
@@ -16,24 +16,35 @@ Current certificate properties include:
 - every derived feature was generated no later than the decision time;
 - the selected parameter set appears in the declared search ledger;
 - code, data, parameters, environment, and result are bound by non-empty hashes;
-- a verified claim carries the proofs required by the certificate type.
+- a verified claim carries the proofs required by the certificate type;
+- a fragility-aware allocation declaration equals the deterministic policy output;
+- accepted allocation signals preserve their point-in-time source lineage and typed
+  trend, fragility, and volatility classifications;
+- the allocation policy preserves its strategic core and never exceeds its declared
+  unlevered exposure ceiling.
 
 These properties do **not** prove that a strategy is profitable or that an empirical
-model is statistically correct. They prove the narrower research-integrity claims
-encoded by the certificate.
+model is statistically correct. They prove the narrower research-integrity and policy
+safety claims encoded by the certificate.
 
 ## Formal layers
 
 ```text
 LeanFinance/
-├── GameTheory/     heterogeneous players, beliefs, feasibility, best responses
-├── Market/         order flow, linear price impact, Kyle-style quoting, liquidity
-├── Constraints/    margin, VaR, redemption, and short-cover triggers
-├── Dynamics/       market-state and equilibrium-regime transitions
-├── Inference/      latent state and inverse-game problem definitions
-├── Backtest/       point-in-time data, lineage, search ledger, reproducibility
-└── Certificate/    data, strategy, backtest, and verified-claim certificates
+├── GameTheory/       heterogeneous players, beliefs, feasibility, best responses
+├── Market/           order flow, linear price impact, Kyle-style quoting, liquidity
+├── Constraints/      margin, VaR, redemption, and short-cover triggers
+├── Dynamics/         market-state and equilibrium-regime transitions
+├── Inference/        latent state and inverse-game problem definitions
+├── Allocation/       core/tactical policy, point-in-time signals, safety certificates
+├── StrategyEcology/  causal interactions, identification, intervention certificates
+├── SupplyChain/      dynamic bottlenecks, qualification delays, rent capture
+├── Backtest/         point-in-time data, lineage, search ledger, reproducibility
+└── Certificate/      data, strategy, backtest, and verified-claim certificates
 ```
+
+The allocation policy and its explicit non-guarantees are documented in
+`docs/fragility-aware-allocation.md`.
 
 ## Build
 
@@ -48,10 +59,10 @@ GitHub Actions runs the same build on `main`, feature branches, and pull request
 ## Research roadmap
 
 1. Replace integer-valued toy primitives with reusable ordered-ring abstractions.
-2. Formalize a finite Bayesian market game and executable equilibrium checker.
-3. Add forced-flow composition and equilibrium-transition safety theorems.
+2. Formalize finite market games and executable equilibrium checkers.
+3. Extend forced-flow, allocation, and equilibrium-transition safety theorems.
 4. Define a serialization format for certificates emitted by empirical pipelines.
-5. Build a reference proof-carrying backtest end to end.
+5. Build reference proof-carrying backtests and allocation decisions end to end.
 
 ## Scope
 
