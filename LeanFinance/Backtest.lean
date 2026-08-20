@@ -10,3 +10,4 @@ import LeanFinance.Backtest.Artifact
 import LeanFinance.Backtest.CommittedSearchLedger
 import LeanFinance.Backtest.LineageClosure
 import LeanFinance.Backtest.IntegrityCertificate
+import LeanFinance.Examples.ProofCarryingBacktest
