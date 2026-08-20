@@ -23,6 +23,12 @@ structure BacktestCertificate where
   featuresValid :
     ∀ feature, feature ∈ features →
       feature.ValidAt data.decisionTime
+  featureInputsBound :
+    ∀ feature, feature ∈ features →
+      ∀ inputHash, inputHash ∈ feature.inputDatasetHashes →
+        data.ContainsHash inputHash
+  claimWellFormed : claim.WellFormed
+  resultAfterDecision : data.decisionTime <= claim.result.generatedAt
 
 def BacktestCertificate.toDecision
     (certificate : BacktestCertificate) : Backtest.Decision :=
