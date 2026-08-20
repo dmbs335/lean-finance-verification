@@ -33,6 +33,11 @@ namespace BottleneckClaim
 def Valid (claim : BottleneckClaim) : Prop :=
   claim.available < claim.required
 
+instance instDecidableValid (claim : BottleneckClaim) :
+    Decidable claim.Valid := by
+  unfold Valid
+  infer_instance
+
 /-- Decidable checker used at the empirical/formal boundary. -/
 def check (claim : BottleneckClaim) : Bool :=
   decide claim.Valid
