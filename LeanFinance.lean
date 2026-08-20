@@ -52,5 +52,7 @@ import LeanFinance.Certificate.Verification
 import LeanFinance.Certificate.EquilibriumCertificate
 import LeanFinance.Certificate.StabilityCertificate
 
+import LeanFinance.StrategyEcology
+
 import LeanFinance.Examples.ProofCarryingBacktest
 import LeanFinance.Examples.FiniteEquilibrium
