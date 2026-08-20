@@ -1,14 +1,19 @@
-import LeanFinance.Market.KyleModel
-import LeanFinance.GameTheory.Equilibrium
+import LeanFinance.Core
 
-namespace LeanFinance
+namespace LeanFinance.Market
 
-structure MarketEquilibrium where
-  price : Rat
-  impact : Rat
+structure DemandSupply where
+  demand : Nat
+  supply : Nat
+  deriving Repr
 
+def ClearsAt (_price : Scalar) (book : DemandSupply) : Prop :=
+  book.demand = book.supply
 
-def consistentPrice (eq : MarketEquilibrium) : Prop :=
-  eq.impact >= 0
+theorem clearing_is_balanced
+    (price : Scalar)
+    (book : DemandSupply)
+    (h : ClearsAt price book) : book.demand = book.supply :=
+  h
 
-end LeanFinance
+end LeanFinance.Market

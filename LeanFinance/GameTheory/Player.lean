@@ -1,18 +1,31 @@
+import LeanFinance.Core
+
 namespace LeanFinance.GameTheory
 
+inductive PlayerKind
+  | retail
+  | discretionaryFund
+  | hedgeFund
+  | cta
+  | volatilityFund
+  | marketMaker
+  | optionsDealer
+  | etfIndexFund
+  | pensionFund
+  | insuranceCompany
+  | leveragedFund
+  | corporateIssuer
+  | shortSeller
+  | policyActor
+  deriving DecidableEq, Repr
+
 structure Player where
-  id : Nat
-  riskAversion : Rat
-  leverageLimit : Rat
+  id : PlayerId
+  kind : PlayerKind
+  riskAversion : Nat
+  leverageLimit : Nat
   horizon : Nat
-
-structure MarketState where
-  price : Rat
-  volatility : Rat
-  liquidity : Rat
-
-structure Constraint where
-  active : Bool
-  shadowPrice : Rat
+  benchmark : String
+  deriving Repr
 
 end LeanFinance.GameTheory

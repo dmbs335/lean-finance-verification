@@ -1,13 +1,27 @@
-namespace LeanFinance
+namespace LeanFinance.Constraints
 
-structure VaRConstraint where
-  confidence : Rat
-  limit : Rat
+structure VaRState where
+  measuredRisk : Nat
+  riskLimit : Nat
+  riskyPosition : Nat
+  deriving Repr
 
-structure RiskState where
-  estimatedVaR : Rat
+def VaRBreach (state : VaRState) : Prop :=
+  state.riskLimit < state.measuredRisk
 
- def riskBreached (c : VaRConstraint) (s : RiskState) : Prop :=
-  s.estimatedVaR > c.limit
+def VaRReduction (state : VaRState) : Nat :=
+  if VaRBreach state then state.riskyPosition else 0
 
-end LeanFinance
+theorem no_var_breach_no_reduction
+    (state : VaRState)
+    (h : ¬ VaRBreach state) :
+    VaRReduction state = 0 := by
+  simp [VaRReduction, h]
+
+theorem var_breach_reduces_position
+    (state : VaRState)
+    (h : VaRBreach state) :
+    VaRReduction state = state.riskyPosition := by
+  simp [VaRReduction, h]
+
+end LeanFinance.Constraints

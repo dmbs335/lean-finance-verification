@@ -1,19 +1,30 @@
-import LeanFinance.GameTheory.Belief
-import LeanFinance.Market.OrderFlow
+import LeanFinance.Core
 
-namespace LeanFinance
+namespace LeanFinance.Inference
+
+structure ObservedMarketData where
+  timestamp : Timestamp
+  price : Scalar
+  volume : Nat
+  optionOpenInterest : Nat
+  shortInterest : Nat
+  fundFlow : Scalar
+  deriving Repr
 
 structure HiddenMarketState where
-  position : Rat
-  leverage : Rat
-  liquidityState : Rat
+  netPosition : Scalar
+  leverage : Nat
+  constraintSlack : Nat
+  higherOrderBelief : Scalar
+  regimeId : Nat
+  deriving Repr
 
-structure Observation where
-  price : Rat
-  volume : Rat
+structure StateEstimate where
+  state : HiddenMarketState
+  confidenceBps : Nat
+  deriving Repr
 
+def StateEstimate.Valid (estimate : StateEstimate) : Prop :=
+  estimate.confidenceBps ≤ 10000
 
-def compatible (s : HiddenMarketState) (o : Observation) : Prop :=
-  True
-
-end LeanFinance
+end LeanFinance.Inference

@@ -1,13 +1,25 @@
-namespace LeanFinance
+import LeanFinance.Dynamics.Regime
 
-structure EquilibriumState where
-  price : Rat
-  stability : Rat
+namespace LeanFinance.Dynamics
 
-structure EquilibriumTransition where
-  move : EquilibriumState → EquilibriumState
+def EvolveEquilibrium
+    (state : EquilibriumState)
+    (shock : MarketShock)
+    (nextRegime : Regime)
+    (nextConstraints : List String) : EquilibriumState :=
+  { market := transition state.market shock
+    regime := nextRegime
+    activeConstraints := nextConstraints }
 
- def transition (t : EquilibriumTransition) (e : EquilibriumState) : EquilibriumState :=
-  t.move e
+def RegimeChanged
+    (before after : EquilibriumState) : Prop :=
+  before.regime ≠ after.regime
 
-end LeanFinance
+theorem equal_regime_is_not_a_regime_change
+    (before after : EquilibriumState)
+    (h : before.regime = after.regime) :
+    ¬ RegimeChanged before after := by
+  intro hChanged
+  exact hChanged h
+
+end LeanFinance.Dynamics

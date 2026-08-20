@@ -1,11 +1,19 @@
-structure Experiment where
+import LeanFinance.Core
+
+namespace LeanFinance.Backtest
+
+structure ExperimentManifest where
   name : String
-  codeVersion : String
-  dataVersion : String
-  parameterVersion : String
+  codeHash : ContentHash
+  dataHashes : List ContentHash
+  parameterHash : ContentHash
+  environmentHash : ContentHash
+  deriving Repr
 
+def Reproducible (manifest : ExperimentManifest) : Prop :=
+  NonEmptyString manifest.codeHash ∧
+    manifest.dataHashes ≠ [] ∧
+    NonEmptyString manifest.parameterHash ∧
+    NonEmptyString manifest.environmentHash
 
-def Reproducible (e : Experiment) : Prop :=
-  e.codeVersion.length > 0 ∧
-  e.dataVersion.length > 0 ∧
-  e.parameterVersion.length > 0
+end LeanFinance.Backtest

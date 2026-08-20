@@ -1,12 +1,20 @@
+import LeanFinance.Core
+import LeanFinance.GameTheory.Action
+
 namespace LeanFinance.GameTheory
 
-import LeanFinance.GameTheory.Action
-import LeanFinance.GameTheory.Payoff
-
-/-- An action is a best response when no alternative action improves payoff. -/
 def IsBestResponse
-  (chosen : Action)
-  (utility : Action → Rat) : Prop :=
-  ∀ a, utility chosen >= utility a
+    (feasible : Action → Prop)
+    (payoff : Action → Scalar)
+    (chosen : Action) : Prop :=
+  feasible chosen ∧
+    ∀ alternative, feasible alternative → payoff alternative ≤ payoff chosen
+
+theorem best_response_is_feasible
+    (feasible : Action → Prop)
+    (payoff : Action → Scalar)
+    (chosen : Action)
+    (h : IsBestResponse feasible payoff chosen) : feasible chosen :=
+  h.1
 
 end LeanFinance.GameTheory

@@ -1,12 +1,18 @@
+import LeanFinance.Core
+import LeanFinance.GameTheory.Player
+import LeanFinance.GameTheory.Action
+import LeanFinance.GameTheory.Belief
+
 namespace LeanFinance.GameTheory
 
 structure BayesianGame where
-  players : List Nat
-  types : List Nat
-  actions : List Nat
+  players : List Player
+  actions : List Action
+  beliefs : List Belief
+  payoff : Player → Belief → Action → Scalar
+  feasible : Player → Action → Prop
 
-/-- Placeholder for Bayesian equilibrium conditions. -/
-def BayesianEquilibrium (g : BayesianGame) : Prop :=
-  g.players.length >= 0
+structure StrategyProfile where
+  actionOf : PlayerId → Action
 
 end LeanFinance.GameTheory

@@ -1,16 +1,27 @@
-import LeanFinance.GameTheory.Constraint
-
-namespace LeanFinance
-
-structure MarginConstraint where
-  collateral : Rat
-  maintenanceMargin : Rat
+namespace LeanFinance.Constraints
 
 structure MarginState where
-  equity : Rat
-  requiredMargin : Rat
+  equity : Nat
+  requiredMargin : Nat
+  position : Nat
+  deriving Repr
 
- def marginBreached (s : MarginState) : Prop :=
-  s.equity < s.requiredMargin
+def MarginBreach (state : MarginState) : Prop :=
+  state.equity < state.requiredMargin
 
-end LeanFinance
+def ForcedLiquidation (state : MarginState) : Nat :=
+  if MarginBreach state then state.position else 0
+
+theorem no_breach_no_forced_liquidation
+    (state : MarginState)
+    (h : ¬ MarginBreach state) :
+    ForcedLiquidation state = 0 := by
+  simp [ForcedLiquidation, h]
+
+theorem breach_liquidates_position
+    (state : MarginState)
+    (h : MarginBreach state) :
+    ForcedLiquidation state = state.position := by
+  simp [ForcedLiquidation, h]
+
+end LeanFinance.Constraints

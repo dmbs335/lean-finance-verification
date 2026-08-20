@@ -1,0 +1,252 @@
+[
+  {
+    "path": ".github/workflows/lean.yml",
+    "sha256": "66a7478fb9dad8f4854ff55e5f93aa3c0604d40063c9c3f68056a31da6890692",
+    "bytes": 356
+  },
+  {
+    "path": ".gitignore",
+    "sha256": "c0c14f32b7be3ac4237b06615662e5388799977b3689e8b3e3b6923fd32467e2",
+    "bytes": 41
+  },
+  {
+    "path": "LeanFinance/Backtest/Certificate.lean",
+    "sha256": "36548ed1ff9ac40bb5dabbf2e4a1b3d5887df2fb6d7fcd02c9d695594edd0bb0",
+    "bytes": 389
+  },
+  {
+    "path": "LeanFinance/Backtest/Dataset.lean",
+    "sha256": "2d37365beb53e6507912a477396e9f1de819b18948cfc04df225a374f72a8624",
+    "bytes": 433
+  },
+  {
+    "path": "LeanFinance/Backtest/Decision.lean",
+    "sha256": "5e02a764a526a409e586db2ad7ce9042804bf01670016c8d012e9a0e829382ea",
+    "bytes": 681
+  },
+  {
+    "path": "LeanFinance/Backtest/FeatureLineage.lean",
+    "sha256": "09807e1b0bdfdad5aeed422ddd3349a39c3d64d635b60d79dc7fcf8babd59617",
+    "bytes": 500
+  },
+  {
+    "path": "LeanFinance/Backtest/NoFutureInformation.lean",
+    "sha256": "9fe9ec9428ff46a0e29b1484c9895501bdb0ad45144069bf71e4a5ee4b5608a7",
+    "bytes": 530
+  },
+  {
+    "path": "LeanFinance/Backtest/Provenance.lean",
+    "sha256": "b1f0e9e91207f569d4ec59f2fc22fdc377dab00ac37cb414435d6d836de6cfc0",
+    "bytes": 551
+  },
+  {
+    "path": "LeanFinance/Backtest/Reproducibility.lean",
+    "sha256": "bcb1d23d309a4e4f29b6801f149113ad8c3337aeb5d74e3a4ec8a64106626310",
+    "bytes": 493
+  },
+  {
+    "path": "LeanFinance/Backtest/SearchLedger.lean",
+    "sha256": "50f76df01effe81ac99c424f2aff3e08408bbf973284c55a7cadab78a1451344",
+    "bytes": 660
+  },
+  {
+    "path": "LeanFinance/Backtest.lean",
+    "sha256": "fd298177fb209d6834856981303d635558d043b0989659b166d07cd36c967b34",
+    "bytes": 328
+  },
+  {
+    "path": "LeanFinance/Certificate/BacktestCertificate.lean",
+    "sha256": "55543fd87f301104fa3f1197b64335ec1be1b45054f192785f22cbcc0b22fd9d",
+    "bytes": 863
+  },
+  {
+    "path": "LeanFinance/Certificate/DataCertificate.lean",
+    "sha256": "656ef1ce34680c02cbf82a7fb3fd744450db628a2aa66999592b1f2f0c35cf8d",
+    "bytes": 210
+  },
+  {
+    "path": "LeanFinance/Certificate/StrategyCertificate.lean",
+    "sha256": "87a67053ee428b235ccc2fa2214ebb332c8cbbfa38b75b053ec59a46e9efb0c1",
+    "bytes": 350
+  },
+  {
+    "path": "LeanFinance/Certificate/Verification.lean",
+    "sha256": "44443837f18061f9ea2a0b6062f8a440da48cb4fd4f8376636001f44a12b0928",
+    "bytes": 856
+  },
+  {
+    "path": "LeanFinance/Certificate.lean",
+    "sha256": "ffedee3bd433dc6897a085295cfc8842e58bdec8241daf931f3a37306edfb09b",
+    "bytes": 193
+  },
+  {
+    "path": "LeanFinance/Constraints/MarginCall.lean",
+    "sha256": "917c929d36138b879eba3458096931f415e855ab5cdb0ea7d71b6a652023cf62",
+    "bytes": 699
+  },
+  {
+    "path": "LeanFinance/Constraints/Redemption.lean",
+    "sha256": "8ab1e1f12b8609b16debf4492a00686c6399c9bcce369ea8d0dc778254b7e080",
+    "bytes": 756
+  },
+  {
+    "path": "LeanFinance/Constraints/ShortSqueeze.lean",
+    "sha256": "c8a9d5019aa33732cb3c46d04786c5d135d2b6d6f16c7c38221f3ac0cfaa2f80",
+    "bytes": 708
+  },
+  {
+    "path": "LeanFinance/Constraints/VaR.lean",
+    "sha256": "115998a6a0e07a392aca0f17bf44f52346dd1703fdb72e72a5325c1c7adf3e53",
+    "bytes": 660
+  },
+  {
+    "path": "LeanFinance/Constraints.lean",
+    "sha256": "8d97ef9c98833a3658bd6d5e7d7229f03c289f164a0c69c51039546800a08feb",
+    "bytes": 163
+  },
+  {
+    "path": "LeanFinance/Core.lean",
+    "sha256": "f9946a58a0521d26268adc0ddef187d4fc82561b10cf9ddbcd19d55930950a02",
+    "bytes": 227
+  },
+  {
+    "path": "LeanFinance/Dynamics/EquilibriumTransition.lean",
+    "sha256": "33a9ad96b290f1c7fb9fbbf42d82a04489a41be7bb5302ec4d2da29bb69c7f33",
+    "bytes": 669
+  },
+  {
+    "path": "LeanFinance/Dynamics/Regime.lean",
+    "sha256": "de6ba32360d4d90afc0d0f42adac13183f4c67a0822f2ee34a24ac13241cb429",
+    "bytes": 321
+  },
+  {
+    "path": "LeanFinance/Dynamics/StateTransition.lean",
+    "sha256": "0e6a3634bde2a3c04ee499670a2cd51729dce2e221ab9b0652d090bc56260343",
+    "bytes": 930
+  },
+  {
+    "path": "LeanFinance/Dynamics.lean",
+    "sha256": "969f90afb661e0e1e861ec50dcdf9eaa2d8c846d91572afddfc8446ac4a2106a",
+    "bytes": 129
+  },
+  {
+    "path": "LeanFinance/GameTheory/Action.lean",
+    "sha256": "27ccc04c15d4c82c73a9c0ad6a3380c431d3a54c9e5a70e1b8f8f06be2c6310c",
+    "bytes": 306
+  },
+  {
+    "path": "LeanFinance/GameTheory/BayesianGame.lean",
+    "sha256": "9c37a362e1c9928e162f2bec2bda39a20414c82d794944835c78f796091aba9f",
+    "bytes": 456
+  },
+  {
+    "path": "LeanFinance/GameTheory/Belief.lean",
+    "sha256": "6a45bf9f1459bb579cd54bd4dc590a64e76f658daa1e42020c752008c9afd6f2",
+    "bytes": 341
+  },
+  {
+    "path": "LeanFinance/GameTheory/BestResponse.lean",
+    "sha256": "ea3bdbb29bb83d8b67ff9cc34e7801ae17b208e86f0781c17cac4af75f7efc4f",
+    "bytes": 544
+  },
+  {
+    "path": "LeanFinance/GameTheory/Constraint.lean",
+    "sha256": "07915f983cc05c66992985d0611ecb2e227787e3471f20d93eb8a954695c5e1a",
+    "bytes": 1013
+  },
+  {
+    "path": "LeanFinance/GameTheory/Equilibrium.lean",
+    "sha256": "511c908ddac5b5fbbc15b07679c81281da947354f828126f5a8e2dd45188ab2e",
+    "bytes": 858
+  },
+  {
+    "path": "LeanFinance/GameTheory/Payoff.lean",
+    "sha256": "a3c8bdbf50d5a64fb151859acf7993ace1b84fe1174974bf96c15b67f9a41fd9",
+    "bytes": 823
+  },
+  {
+    "path": "LeanFinance/GameTheory/Player.lean",
+    "sha256": "5d97f91ba0844202c3d7ad60426130cd65aa63b06037d7554100f22f6e75df69",
+    "bytes": 525
+  },
+  {
+    "path": "LeanFinance/GameTheory.lean",
+    "sha256": "5f37706e1cecf68da379d35995e08029d7672962683846c744f3cb53dcbbe80e",
+    "bytes": 317
+  },
+  {
+    "path": "LeanFinance/Inference/HiddenState.lean",
+    "sha256": "548c163341882db707036d52a8f56de712c9a8bb196680de5135e91cfde08334",
+    "bytes": 616
+  },
+  {
+    "path": "LeanFinance/Inference/InverseGame.lean",
+    "sha256": "dac165e15e89a66b730d0d4ece6678845657be3aa228210a3ec099b45840e25f",
+    "bytes": 760
+  },
+  {
+    "path": "LeanFinance/Inference.lean",
+    "sha256": "32639cfb7b7c74f860df900a9a56a5cc5deae0971cf6098f95b576d1f3dedb51",
+    "bytes": 82
+  },
+  {
+    "path": "LeanFinance/Market/EquilibriumPrice.lean",
+    "sha256": "b45e003c54ece9daabd66f4752801622eef396bd439f0cb3276fd1670b6253b4",
+    "bytes": 388
+  },
+  {
+    "path": "LeanFinance/Market/KyleModel.lean",
+    "sha256": "030a78b8bf9d963c304fd384d1bdef420598926982888fc220c37f4eb290c354",
+    "bytes": 540
+  },
+  {
+    "path": "LeanFinance/Market/Liquidity.lean",
+    "sha256": "da50b52aef4df9c174c0edfd8042ff2990e1a8000d7c246c0d3a099463c70988",
+    "bytes": 264
+  },
+  {
+    "path": "LeanFinance/Market/MarketMaker.lean",
+    "sha256": "3c82d77db34a6f8bf88dce618562aab1ea8ba88acd99d284445421cba7a2aa9d",
+    "bytes": 351
+  },
+  {
+    "path": "LeanFinance/Market/Order.lean",
+    "sha256": "6fd27ecd89d61e1b49087f7b3ade3d08b0065eeb86066f0d7a7ef178e20aa51e",
+    "bytes": 493
+  },
+  {
+    "path": "LeanFinance/Market/OrderFlow.lean",
+    "sha256": "0b9aa4579a18d44c4931f5799dc0d839690f344af538a4fc292124841def0293",
+    "bytes": 430
+  },
+  {
+    "path": "LeanFinance/Market/PriceFormation.lean",
+    "sha256": "14fb01b9841257cf2ceae116d488f5a85f7f8e0c4e415a6023b7ffa9df315572",
+    "bytes": 639
+  },
+  {
+    "path": "LeanFinance/Market.lean",
+    "sha256": "883ec2b7bf36a275c3cc1eed1d039a8cba4d8c7f9cb7cb9efe3e2535e33f7888",
+    "bytes": 262
+  },
+  {
+    "path": "LeanFinance.lean",
+    "sha256": "994872100624140478170a0de8308ad3d5ff98d71bc2edd61ac8be0024e7bcbd",
+    "bytes": 227
+  },
+  {
+    "path": "README.md",
+    "sha256": "1c05c03be1ab5d72b597d58b05c3134a9b34d77a60f79a58af22ccc22d795556",
+    "bytes": 2423
+  },
+  {
+    "path": "lakefile.toml",
+    "sha256": "94cf0b3fa96b0b68db347e9b978b75cb45ddc4e1ea7ccedbd11189ed2a03f637",
+    "bytes": 121
+  },
+  {
+    "path": "lean-toolchain",
+    "sha256": "302cd63c54178885b89e669f33b38f12f4dd7ae7e5cac537b3203e3768d8fb2b",
+    "bytes": 25
+  }
+]

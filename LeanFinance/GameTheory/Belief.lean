@@ -1,11 +1,16 @@
+import LeanFinance.Core
+
 namespace LeanFinance.GameTheory
 
 structure Belief where
-  playerId : Nat
-  confidence : Rat
+  playerId : PlayerId
+  fundamental : Scalar
+  expectedMarketBelief : Scalar
+  expectedHigherOrderBelief : Scalar
+  confidenceBps : Nat
+  deriving Repr
 
-/-- A simple representation of private belief strength. -/
-def Belief.valid (b : Belief) : Prop :=
-  0 <= b.confidence ∧ b.confidence <= 1
+def Belief.Valid (belief : Belief) : Prop :=
+  belief.confidenceBps ≤ 10000
 
 end LeanFinance.GameTheory
