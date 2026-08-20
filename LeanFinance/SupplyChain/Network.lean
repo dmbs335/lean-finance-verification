@@ -182,12 +182,28 @@ def IsCapacityBottleneckAt
     (finalDemand : Nat) : Prop :=
   effectiveCapacityAt node t < requiredFlow node finalDemand
 
+instance instDecidableCapacityBottleneckAt
+    (node : SupplyNode)
+    (t : Timestamp)
+    (finalDemand : Nat) :
+    Decidable (IsCapacityBottleneckAt node t finalDemand) := by
+  unfold IsCapacityBottleneckAt
+  infer_instance
+
 /-- Capacity sufficiency is the exact negating inequality used by certificates. -/
 def CapacitySufficientAt
     (node : SupplyNode)
     (t : Timestamp)
     (finalDemand : Nat) : Prop :=
   requiredFlow node finalDemand ≤ effectiveCapacityAt node t
+
+instance instDecidableCapacitySufficientAt
+    (node : SupplyNode)
+    (t : Timestamp)
+    (finalDemand : Nat) :
+    Decidable (CapacitySufficientAt node t finalDemand) := by
+  unfold CapacitySufficientAt
+  infer_instance
 
 /-- Units of unmet required flow at a node. -/
 def scarcityUnitsAt
