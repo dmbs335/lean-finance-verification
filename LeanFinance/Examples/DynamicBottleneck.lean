@@ -74,6 +74,7 @@ def hbmBottleneckCertificate :
         have datasetMatches : dataset = bottleneckDataset := by
           simpa [bottleneckDecision] using used
         subst dataset
+        change (5 : Timestamp) ≤ 5
         decide
       · intro feature used
         simp [bottleneckDecision] at used
