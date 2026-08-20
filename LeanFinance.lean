@@ -20,9 +20,11 @@ import LeanFinance.Market.EquilibriumPrice
 
 import LeanFinance.Constraints.MarginCall
 import LeanFinance.Constraints.VaR
+import LeanFinance.Constraints.ForcedFlow
 
 import LeanFinance.Dynamics.StateTransition
 import LeanFinance.Dynamics.EquilibriumTransition
+import LeanFinance.Dynamics.StrategicFeedback
 
 import LeanFinance.Inference.HiddenState
 import LeanFinance.Inference.Identification
@@ -48,6 +50,7 @@ import LeanFinance.Certificate.UniverseCertificate
 import LeanFinance.Certificate.BacktestCertificate
 import LeanFinance.Certificate.Verification
 import LeanFinance.Certificate.EquilibriumCertificate
+import LeanFinance.Certificate.StabilityCertificate
 
 import LeanFinance.Examples.ProofCarryingBacktest
 import LeanFinance.Examples.FiniteEquilibrium
