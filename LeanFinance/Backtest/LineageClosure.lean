@@ -51,7 +51,7 @@ def DecisionLineageClosed
     (decision : Decision) : Prop :=
   ∀ lineage,
     lineage ∈ decision.features →
-    ∃ feature,
+    ∃ feature : DerivedFeature,
       feature ∈ catalog.features ∧
       feature.lineage = lineage ∧
       ArtifactAvailableAt catalog decision.decisionTime feature.outputHash
@@ -62,7 +62,7 @@ theorem DecisionLineageClosed.feature_has_recursive_proof
     (closed : DecisionLineageClosed catalog decision)
     (lineage : FeatureLineage)
     (used : lineage ∈ decision.features) :
-    ∃ feature,
+    ∃ feature : DerivedFeature,
       feature.lineage = lineage ∧
       ArtifactAvailableAt catalog decision.decisionTime feature.outputHash := by
   rcases closed lineage used with ⟨feature, _member, sameLineage, available⟩
