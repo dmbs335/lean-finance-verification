@@ -2,4 +2,4 @@ import LeanFinance.ComplexSystems.State
 import LeanFinance.ComplexSystems.Allocation
 import LeanFinance.ComplexSystems.Claim
 import LeanFinance.ComplexSystems.Certificate
-import LeanFinance.Examples.FragilityAwareAllocation
+import LeanFinance.Examples.ComplexSystemsRiskPolicy
