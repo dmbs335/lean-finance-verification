@@ -81,7 +81,12 @@ theorem used_feature_has_recursive_lineage
       derived.lineage = feature ∧
       ArtifactAvailableAt certificate.lineageCatalog
         claim.decision.decisionTime derived.outputHash :=
-  certificate.lineageClosed.feature_has_recursive_proof feature used
+  DecisionLineageClosed.feature_has_recursive_proof
+    certificate.lineageCatalog
+    claim.decision
+    certificate.lineageClosed
+    feature
+    used
 
 end ProofCarryingBacktestCertificate
 
