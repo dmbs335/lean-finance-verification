@@ -24,6 +24,8 @@ import LeanFinance.Dynamics.StateTransition
 import LeanFinance.Dynamics.EquilibriumTransition
 
 import LeanFinance.Inference.HiddenState
+import LeanFinance.Inference.Identification
+import LeanFinance.Inference.InverseGame
 
 import LeanFinance.Backtest.Dataset
 import LeanFinance.Backtest.Provenance
