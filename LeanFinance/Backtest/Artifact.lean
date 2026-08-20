@@ -22,32 +22,42 @@ inductive ArtifactKind where
   | searchLedger
   deriving Repr, DecidableEq
 
-/-- A digest indexed by its artifact domain. The kind is part of the type, so a
-    dataset digest cannot be substituted for a code digest without an explicit
-    conversion at the trusted boundary. -/
+/-- A digest indexed by its artifact domain. `schemaId` identifies the canonical
+    serialization hashed by the external adapter; this prevents a digest from
+    being silently reinterpreted under a different encoding contract. -/
 structure ArtifactRef (kind : ArtifactKind) where
   algorithm : HashAlgorithm
+  schemaId : String
   digest : ContentHash
   deriving Repr, DecidableEq
 
 namespace ArtifactRef
 
-/-- The formal layer requires a concrete digest value. Cryptographic correctness
-    of that digest remains an adapter obligation. -/
+/-- The formal layer requires both a canonicalization contract and a concrete
+    digest value. Cryptographic correctness of that digest remains an adapter
+    obligation. -/
 def Valid {kind : ArtifactKind} (artifact : ArtifactRef kind) : Prop :=
-  NonEmptyString artifact.digest
+  NonEmptyString artifact.schemaId ∧ NonEmptyString artifact.digest
+
+theorem valid_schema_nonempty
+    {kind : ArtifactKind}
+    (artifact : ArtifactRef kind)
+    (valid : artifact.Valid) :
+    artifact.schemaId ≠ "" :=
+  valid.1
 
 theorem valid_digest_nonempty
     {kind : ArtifactKind}
     (artifact : ArtifactRef kind)
     (valid : artifact.Valid) :
     artifact.digest ≠ "" :=
-  valid
+  valid.2
 
 end ArtifactRef
 
 /-- A domain-separated experiment manifest. Compared with the legacy manifest,
-    each field carries both its hash algorithm and its artifact domain. -/
+    each field carries its hash algorithm, canonical schema, and artifact
+    domain. -/
 structure BoundExperimentManifest where
   name : String
   code : ArtifactRef .sourceCode
