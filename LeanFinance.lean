@@ -8,6 +8,7 @@ import LeanFinance.GameTheory.BestResponse
 import LeanFinance.GameTheory.Equilibrium
 import LeanFinance.GameTheory.FiniteGame
 import LeanFinance.GameTheory.Belief
+import LeanFinance.GameTheory.HigherOrderBeliefs
 import LeanFinance.GameTheory.BayesianGame
 
 import LeanFinance.Market.Order
@@ -56,3 +57,4 @@ import LeanFinance.StrategyEcology
 
 import LeanFinance.Examples.ProofCarryingBacktest
 import LeanFinance.Examples.FiniteEquilibrium
+import LeanFinance.Examples.HigherOrderBeliefs

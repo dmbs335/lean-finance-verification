@@ -11,6 +11,7 @@ structure Evidence where
 /-- An interaction edge carries its estimand context, moment certificate,
     interval ordering, and explicit evidence for the causal-design assumptions. -/
 structure CausalEdgeCertificate (Strategy Regime : Type) where
+  kernel : CausalKernel Strategy Regime
   source : Strategy
   target : Strategy
   context : InteractionContext Regime
@@ -18,6 +19,8 @@ structure CausalEdgeCertificate (Strategy Regime : Type) where
   lowerBound : Scalar
   upperBound : Scalar
   orderedBounds : lowerBound <= estimate ∧ estimate <= upperBound
+  kernelEffectMatches :
+    kernel.effect target source context = estimate
   iv : ScalarIVCertificate
   effectMatches : iv.effect = estimate
   exogeneity : Evidence
@@ -52,6 +55,32 @@ theorem CausalEdgeCertificate.negativeEstimate
     (negative : CertifiesNegative certificate) :
     certificate.estimate < 0 :=
   lt_of_le_of_lt certificate.orderedBounds.2 negative
+
+theorem CausalEdgeCertificate.positiveKernelEffect
+    {Strategy Regime : Type}
+    (certificate : CausalEdgeCertificate Strategy Regime)
+    (positive : CertifiesPositive certificate) :
+    0 < certificate.kernel.effect
+      certificate.target certificate.source certificate.context := by
+  rw [certificate.kernelEffectMatches]
+  exact certificate.positiveEstimate positive
+
+theorem CausalEdgeCertificate.negativeKernelEffect
+    {Strategy Regime : Type}
+    (certificate : CausalEdgeCertificate Strategy Regime)
+    (negative : CertifiesNegative certificate) :
+    certificate.kernel.effect
+      certificate.target certificate.source certificate.context < 0 := by
+  rw [certificate.kernelEffectMatches]
+  exact certificate.negativeEstimate negative
+
+theorem CausalEdgeCertificate.certifiesOpportunityCreation
+    {Strategy Regime : Type}
+    (certificate : CausalEdgeCertificate Strategy Regime)
+    (positive : CertifiesPositive certificate) :
+    OpportunityCreatedBy certificate.kernel
+      certificate.target certificate.source certificate.context :=
+  certificate.positiveKernelEffect positive
 
 theorem CausalEdgeCertificate.effectUnique
     {Strategy Regime : Type}

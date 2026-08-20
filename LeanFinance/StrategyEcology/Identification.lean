@@ -19,7 +19,8 @@ def addRow {Source : Type u}
     constructive content needed for the rank-deficiency result. -/
 structure LinearObservation (Source : Type u) (Instrument : Type v) where
   observe : KernelRow Source → Instrument → Scalar
-  mapZero : ∀ instrument, observe zeroRow instrument = 0
+  mapZero : ∀ instrument,
+    observe (zeroRow (Source := Source)) instrument = 0
   mapAdd : ∀ left right instrument,
     observe (addRow left right) instrument =
       observe left instrument + observe right instrument
@@ -56,7 +57,7 @@ theorem zero_observationallyEquivalent_nullDirection
     (direction : KernelRow Source)
     (nullDirection : NullDirection system direction) :
     Inference.ObservationallyEquivalent
-      system.observe zeroRow direction := by
+      system.observe (zeroRow (Source := Source)) direction := by
   funext instrument
   rw [system.mapZero]
   rw [nullDirection instrument]
@@ -76,13 +77,13 @@ theorem coordinate_not_identified_of_nullDirection
   apply Inference.not_identified_of_counterexample
     system.observe
     (coordinate source)
-    zeroRow
+    (zeroRow (Source := Source))
     direction
   · exact zero_observationallyEquivalent_nullDirection
       system direction nullDirection
   · intro equalCoordinate
     apply nonzeroCoordinate
-    change 0 = direction source at equalCoordinate
+    change (0 : Scalar) = direction source at equalCoordinate
     exact equalCoordinate.symm
 
 /-- Scalar reduced-form moment equation used by a local IV edge estimate. -/

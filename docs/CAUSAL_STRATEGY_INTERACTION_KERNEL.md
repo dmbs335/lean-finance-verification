@@ -34,11 +34,13 @@ The current Lean layer proves:
    identified;
 6. a relevant scalar IV moment equation identifies at most one edge effect;
 7. a zero first stage with a zero reduced form fits every scalar effect;
-8. a proof-carrying edge certificate exposes interval ordering, relevance,
-   moment fit, and explicit evidence for exogeneity, exclusion, no anticipation,
+8. a proof-carrying edge certificate binds the estimated IV effect to a
+   directed kernel coordinate and exposes interval ordering, relevance, moment
+   fit, and explicit evidence for exogeneity, exclusion, no anticipation,
    genome stability, exposure validity, and market clearing;
-9. a strictly positive lower bound implies a positive point estimate, and a
-   strictly negative upper bound implies a negative point estimate.
+9. a strictly positive lower bound implies a positive kernel effect and a
+   certified opportunity-creation edge, while a strictly negative upper bound
+   implies a negative kernel effect.
 
 ## Trust boundary
 

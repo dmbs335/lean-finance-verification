@@ -13,6 +13,9 @@ structure InverseGameState where
 def coarseObservation (state : InverseGameState) : Nat :=
   state.publicFlowBucket
 
+def publicFlowTarget (state : InverseGameState) : Nat :=
+  state.publicFlowBucket
+
 def hiddenPayoffTarget (state : InverseGameState) : Nat :=
   state.hiddenPayoffType
 
@@ -45,6 +48,17 @@ theorem hiddenPayoff_not_identified_by_coarseObservation :
   · rfl
   · decide
 
+/-- The public-flow bucket itself is, trivially but importantly, identified by
+    the coarse observation. -/
+theorem publicFlow_identified_by_coarseObservation :
+    Identified coarseObservation publicFlowTarget := by
+  apply identified_of_factorization
+    coarseObservation
+    publicFlowTarget
+    (fun observation => observation)
+  intro state
+  rfl
+
 structure ConstraintObservation where
   publicFlowBucket : Nat
   constraintBinding : Bool
@@ -56,6 +70,28 @@ def enrichedObservation
     publicFlowBucket := state.publicFlowBucket
     constraintBinding := state.constraintBinding
   }
+
+def forgetConstraintObservation
+    (observation : ConstraintObservation) : Nat :=
+  observation.publicFlowBucket
+
+theorem coarseObservation_refinedBy_enrichedObservation
+    (state : InverseGameState) :
+    coarseObservation state =
+      forgetConstraintObservation (enrichedObservation state) :=
+  rfl
+
+/-- Adding a valid constraint proxy refines the flow observation and therefore
+    preserves identification of every target already identified by flow. -/
+theorem publicFlow_identified_by_enrichedObservation :
+    Identified enrichedObservation publicFlowTarget :=
+  identified_of_observation_refinement
+    coarseObservation
+    enrichedObservation
+    forgetConstraintObservation
+    publicFlowTarget
+    coarseObservation_refinedBy_enrichedObservation
+    publicFlow_identified_by_coarseObservation
 
 /-- Constraint activity becomes point identified once the public observation
     explicitly contains a valid binding-constraint proxy. -/
