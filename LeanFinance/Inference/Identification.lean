@@ -99,8 +99,12 @@ theorem identified_of_observation_refinement
     Identified fine target := by
   intro left right sameFineObservation
   apply identified left right
-  unfold ObservationallyEquivalent at sameFineObservation ⊢
-  rw [refines left, refines right, sameFineObservation]
+  change fine left = fine right at sameFineObservation
+  change coarse left = coarse right
+  calc
+    coarse left = forget (fine left) := refines left
+    _ = forget (fine right) := congrArg forget sameFineObservation
+    _ = coarse right := (refines right).symm
 
 /-- Any deterministic post-processing of an identified target remains
     identified. -/
