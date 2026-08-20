@@ -1,3 +1,4 @@
+import Init.Data.List.Lemmas
 import LeanFinance.Types
 
 namespace LeanFinance.ResearchIntegrity
@@ -25,22 +26,25 @@ theorem visibleAt_futureOnlyAfter_eq_nil
     {decisionTime : Time}
     (futureOnly : FutureOnlyAfter future decisionTime) :
     visibleAt future decisionTime = [] := by
-  induction future with
-  | nil => rfl
-  | cons artifact rest inductionHypothesis =>
-      have artifactUnavailable : ¬ artifact.availableAt <= decisionTime := by
-        exact Nat.not_le_of_lt (futureOnly artifact (by simp))
-      have restFutureOnly : FutureOnlyAfter rest decisionTime := by
-        intro candidate member
-        exact futureOnly candidate (by simp [member])
-      simp [visibleAt, artifactUnavailable, inductionHypothesis restFutureOnly]
+  unfold visibleAt
+  apply List.filter_eq_nil_iff.mpr
+  intro artifact member
+  have unavailable : ¬ artifact.availableAt <= decisionTime :=
+    Nat.not_le_of_lt (futureOnly artifact member)
+  simp [unavailable]
 
 theorem visibleAt_append_future
     (history future : ResearchHistory)
     (decisionTime : Time)
     (futureOnly : FutureOnlyAfter future decisionTime) :
     visibleAt (history ++ future) decisionTime = visibleAt history decisionTime := by
-  simp [visibleAt, visibleAt_futureOnlyAfter_eq_nil futureOnly]
+  unfold visibleAt
+  rw [List.filter_append]
+  have futureFiltered :
+      future.filter (fun artifact => decide (artifact.availableAt <= decisionTime)) = [] := by
+    simpa [visibleAt] using visibleAt_futureOnlyAfter_eq_nil futureOnly
+  rw [futureFiltered]
+  simp
 
 structure DecisionProcedure where
   decide : ResearchHistory → String
