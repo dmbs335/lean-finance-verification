@@ -10,12 +10,13 @@ namespace LeanFinance.Backtest
 
 The certificate does not prove profitability. It binds the claimed result to a
 specific code/data/parameter/environment manifest, requires the selected trial
-to have been preregistered, closes feature provenance recursively, and enforces
-point-in-time admissibility. -/
+to have been preregistered in a ledger anchored before the decision, closes
+feature provenance recursively, and enforces point-in-time admissibility. -/
 structure ProofCarryingBacktestCertificate
     (claim : BacktestClaim) where
   manifest : BoundExperimentManifest
   ledger : CommittedSearchLedger
+  ledgerAnchor : LedgerAnchor
   lineageCatalog : LineageCatalog
   manifestBound : StronglyReproducible manifest
   resultBound : manifest.result.digest = claim.resultHash
@@ -29,6 +30,8 @@ structure ProofCarryingBacktestCertificate
   noFutureInformation : NoFutureInformation claim.decision
   lineageClosed : DecisionLineageClosed lineageCatalog claim.decision
   ledgerValid : ledger.Valid
+  ledgerAnchored : AnchorsLedger ledgerAnchor ledger
+  anchorAvailable : AnchorAvailableAt ledgerAnchor claim.decision
   selectedTrialPreRegistered :
     ∃ trial,
       trial ∈ ledger.entries ∧
@@ -51,6 +54,12 @@ theorem selected_parameter_registered_before_decision
       _codeMatches, registeredBefore⟩
   refine ⟨trial, member, ?_, registeredBefore⟩
   exact trialParameter.trans certificate.parameterBound
+
+theorem ledger_was_anchored_before_decision
+    (claim : BacktestClaim)
+    (certificate : ProofCarryingBacktestCertificate claim) :
+    certificate.ledgerAnchor.anchoredAt ≤ claim.decision.decisionTime :=
+  certificate.anchorAvailable
 
 theorem used_dataset_is_manifest_bound
     (claim : BacktestClaim)
