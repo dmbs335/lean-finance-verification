@@ -7,5 +7,5 @@ import LeanFinance.Inference
 import LeanFinance.Backtest
 import LeanFinance.Certificate
 import LeanFinance.StrategyEcology
-import LeanFinance.SupplyChain
 import LeanFinance.ComplexSystems
+import LeanFinance.SupplyChain
