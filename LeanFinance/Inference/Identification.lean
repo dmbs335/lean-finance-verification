@@ -81,6 +81,27 @@ theorem identified_of_factorization
   intro left right sameObservation
   rw [factor left, factor right, sameObservation]
 
+/-- A finer public observation cannot destroy identification. If the coarse
+    observation can be recovered by forgetting part of the fine observation,
+    every target identified under the coarse observation remains identified
+    under the refinement. -/
+theorem identified_of_observation_refinement
+    {Theta : Type u}
+    {CoarseObservation : Type v}
+    {FineObservation : Type x}
+    {Target : Type w}
+    (coarse : Theta → CoarseObservation)
+    (fine : Theta → FineObservation)
+    (forget : FineObservation → CoarseObservation)
+    (target : Theta → Target)
+    (refines : ∀ state, coarse state = forget (fine state))
+    (identified : Identified coarse target) :
+    Identified fine target := by
+  intro left right sameFineObservation
+  apply identified left right
+  unfold ObservationallyEquivalent at sameFineObservation ⊢
+  rw [refines left, refines right, sameFineObservation]
+
 /-- Any deterministic post-processing of an identified target remains
     identified. -/
 theorem identified_postprocess
