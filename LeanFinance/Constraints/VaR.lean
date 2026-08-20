@@ -9,6 +9,10 @@ structure VaRState where
 def VaRBreach (state : VaRState) : Prop :=
   state.riskLimit < state.measuredRisk
 
+instance decidableVaRBreach (state : VaRState) : Decidable (VaRBreach state) := by
+  unfold VaRBreach
+  infer_instance
+
 def VaRReduction (state : VaRState) : Nat :=
   if VaRBreach state then state.riskyPosition else 0
 
