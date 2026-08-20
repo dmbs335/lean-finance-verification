@@ -1,21 +1,28 @@
+import LeanFinance.Core
 import LeanFinance.Market.OrderFlow
 
 namespace LeanFinance.Market
 
-structure PriceImpact where
-  lambda : Scalar
+structure LinearPriceImpact where
+  coefficient : Scalar
   deriving Repr
 
-def PriceImpact.WellFormed (impact : PriceImpact) : Prop :=
-  0 <= impact.lambda
-
-def priceChange (impact : PriceImpact) (flow : OrderFlow) : Scalar :=
-  impact.lambda * flow.totalFlow
+def priceChange
+    (impact : LinearPriceImpact)
+    (flow : OrderFlow) : Scalar :=
+  impact.coefficient * flow.total
 
 def nextPrice
     (currentPrice : Scalar)
-    (impact : PriceImpact)
+    (impact : LinearPriceImpact)
     (flow : OrderFlow) : Scalar :=
   currentPrice + priceChange impact flow
+
+theorem zero_flow_no_price_change
+    (impact : LinearPriceImpact)
+    (flow : OrderFlow)
+    (h : flow.total = 0) :
+    priceChange impact flow = 0 := by
+  simp [priceChange, h]
 
 end LeanFinance.Market

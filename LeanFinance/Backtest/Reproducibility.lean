@@ -1,24 +1,19 @@
+import LeanFinance.Core
+
 namespace LeanFinance.Backtest
 
-structure Experiment where
+structure ExperimentManifest where
   name : String
-  codeVersion : String
-  dataVersion : String
-  parameterVersion : String
-  environmentHash : String
-  deriving DecidableEq, Repr
+  codeHash : ContentHash
+  dataHashes : List ContentHash
+  parameterHash : ContentHash
+  environmentHash : ContentHash
+  deriving Repr
 
-def Reproducible (experiment : Experiment) : Prop :=
-  experiment.name ≠ "" ∧
-  experiment.codeVersion ≠ "" ∧
-  experiment.dataVersion ≠ "" ∧
-  experiment.parameterVersion ≠ "" ∧
-  experiment.environmentHash ≠ ""
-
-theorem Reproducible.codeVersionPresent
-    {experiment : Experiment}
-    (reproducible : Reproducible experiment) :
-    experiment.codeVersion ≠ "" :=
-  reproducible.2.1
+def Reproducible (manifest : ExperimentManifest) : Prop :=
+  NonEmptyString manifest.codeHash ∧
+    manifest.dataHashes ≠ [] ∧
+    NonEmptyString manifest.parameterHash ∧
+    NonEmptyString manifest.environmentHash
 
 end LeanFinance.Backtest

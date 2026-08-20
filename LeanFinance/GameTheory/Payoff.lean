@@ -1,26 +1,29 @@
+import LeanFinance.Core
 import LeanFinance.GameTheory.Player
 import LeanFinance.GameTheory.Action
 
 namespace LeanFinance.GameTheory
 
-abbrev StrategyProfile := PlayerId → Action
+structure PayoffModel where
+  valueWeight : Scalar
+  inventoryPenalty : Scalar
+  benchmarkPenalty : Scalar
+  deriving Repr
 
-def StrategyProfile.update
-    (profile : StrategyProfile)
-    (playerId : PlayerId)
-    (action : Action) : StrategyProfile :=
-  fun candidateId => if candidateId = playerId then action else profile candidateId
+def signedQuantity (action : Action) : Scalar :=
+  match action.side with
+  | Side.buy => Int.ofNat action.quantity
+  | Side.hold => 0
+  | Side.sell => -Int.ofNat action.quantity
 
-/-- Reduced-form utility. More specialized market modules may refine this into
-    information, inventory, benchmark, funding, and constraint components. -/
-structure Payoff where
-  utility : Player → StrategyProfile → Scalar
-
-def Payoff.deviationUtility
-    (payoff : Payoff)
+def utility
+    (model : PayoffModel)
     (player : Player)
-    (profile : StrategyProfile)
-    (alternative : Action) : Scalar :=
-  payoff.utility player (profile.update player.id alternative)
+    (fundamental price inventory benchmarkGap : Scalar)
+    (action : Action) : Scalar :=
+  let q := signedQuantity action
+  model.valueWeight * (fundamental - price) * q
+    - (Int.ofNat player.riskAversion + model.inventoryPenalty) * inventory * q
+    - model.benchmarkPenalty * benchmarkGap * q
 
 end LeanFinance.GameTheory

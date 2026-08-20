@@ -1,17 +1,15 @@
-import LeanFinance.Types
+import LeanFinance.Core
 
 namespace LeanFinance.Market
 
 structure MarketMaker where
   inventory : Scalar
-  riskLimit : Scalar
+  inventoryLimit : Nat
+  capital : Nat
   deriving Repr
 
-def MarketMaker.WellFormed (maker : MarketMaker) : Prop :=
-  0 <= maker.riskLimit
-
-def inventoryConstraint (maker : MarketMaker) : Prop :=
-  -maker.riskLimit <= maker.inventory ∧
-  maker.inventory <= maker.riskLimit
+def InventoryFeasible (maker : MarketMaker) : Prop :=
+  -Int.ofNat maker.inventoryLimit ≤ maker.inventory ∧
+    maker.inventory ≤ Int.ofNat maker.inventoryLimit
 
 end LeanFinance.Market

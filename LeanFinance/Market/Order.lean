@@ -1,25 +1,19 @@
-import LeanFinance.GameTheory.Player
+import LeanFinance.Core
+import LeanFinance.GameTheory.Action
 
 namespace LeanFinance.Market
 
-inductive OrderSide
-  | buy
-  | sell
-  deriving DecidableEq, Repr
-
 structure Order where
-  traderId : GameTheory.PlayerId
-  quantity : Scalar
-  limitPrice : Scalar
-  side : OrderSide
+  trader : PlayerId
+  action : GameTheory.Action
+  limitPrice : Option Scalar
+  submittedAt : Timestamp
   deriving Repr
 
-def Order.WellFormed (order : Order) : Prop :=
-  0 < order.quantity ∧ 0 <= order.limitPrice
-
 def Order.signedQuantity (order : Order) : Scalar :=
-  match order.side with
-  | .buy => order.quantity
-  | .sell => -order.quantity
+  match order.action.side with
+  | GameTheory.Side.buy => Int.ofNat order.action.quantity
+  | GameTheory.Side.hold => 0
+  | GameTheory.Side.sell => -Int.ofNat order.action.quantity
 
 end LeanFinance.Market

@@ -1,11 +1,7 @@
-import LeanFinance.Types
+import LeanFinance.Core
 
 namespace LeanFinance.GameTheory
 
-abbrev PlayerId := Nat
-
-/-- Economic role rather than legal entity. One institution may instantiate
-    several players when it operates multiple strategy books. -/
 inductive PlayerKind
   | retail
   | discretionaryFund
@@ -14,9 +10,9 @@ inductive PlayerKind
   | volatilityFund
   | marketMaker
   | optionsDealer
-  | indexFund
+  | etfIndexFund
   | pensionFund
-  | insurer
+  | insuranceCompany
   | leveragedFund
   | corporateIssuer
   | shortSeller
@@ -26,12 +22,10 @@ inductive PlayerKind
 structure Player where
   id : PlayerId
   kind : PlayerKind
-  riskAversion : Scalar
-  leverageLimit : Scalar
-  horizon : Time
+  riskAversion : Nat
+  leverageLimit : Nat
+  horizon : Nat
+  benchmark : String
   deriving Repr
-
-def Player.WellFormed (p : Player) : Prop :=
-  0 <= p.riskAversion ∧ 0 <= p.leverageLimit ∧ 0 < p.horizon
 
 end LeanFinance.GameTheory

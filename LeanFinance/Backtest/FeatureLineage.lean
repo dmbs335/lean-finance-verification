@@ -1,20 +1,20 @@
-import LeanFinance.Types
+import LeanFinance.Core
 
 namespace LeanFinance.Backtest
 
 structure FeatureLineage where
   featureName : String
-  inputDatasetHashes : List String
-  generatedAt : Time
-  codeHash : String
-  deriving DecidableEq, Repr
+  inputHashes : List ContentHash
+  generatedAt : Timestamp
+  codeHash : ContentHash
+  deriving Repr
 
-def FeatureLineage.ValidAt
+def FeatureAvailableAt
     (lineage : FeatureLineage)
-    (decisionTime : Time) : Prop :=
-  lineage.generatedAt <= decisionTime ∧
-  lineage.featureName ≠ "" ∧
-  lineage.codeHash ≠ "" ∧
-  lineage.inputDatasetHashes ≠ []
+    (decisionTime : Timestamp) : Prop :=
+  lineage.generatedAt ≤ decisionTime
+
+def FeatureBoundToInputs (lineage : FeatureLineage) : Prop :=
+  lineage.inputHashes ≠ [] ∧ NonEmptyString lineage.codeHash
 
 end LeanFinance.Backtest

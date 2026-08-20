@@ -1,22 +1,16 @@
-import LeanFinance.Types
+import LeanFinance.Core
+import LeanFinance.Backtest.Decision
 
 namespace LeanFinance.Backtest
 
-/-- Empirical output. Formal verification does not assert profitability; it
-    certifies the process and assumptions attached to this result. -/
-structure BacktestResult where
-  observations : Nat
-  grossReturnBps : Int
-  netReturnBps : Int
-  generatedAt : Time
-  deriving DecidableEq, Repr
-
 structure BacktestClaim where
-  description : String
-  result : BacktestResult
-  deriving DecidableEq, Repr
+  decision : Decision
+  resultHash : ContentHash
+  metricName : String
+  metricValue : Scalar
+  deriving Repr
 
-def BacktestClaim.WellFormed (claim : BacktestClaim) : Prop :=
-  claim.description ≠ "" ∧ 0 < claim.result.observations
+def BacktestClaim.Bound (claim : BacktestClaim) : Prop :=
+  NonEmptyString claim.resultHash ∧ NonEmptyString claim.metricName
 
 end LeanFinance.Backtest

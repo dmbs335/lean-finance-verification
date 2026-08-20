@@ -1,30 +1,28 @@
-import LeanFinance.Types
+import LeanFinance.Core
+import LeanFinance.Backtest.Decision
 
 namespace LeanFinance.Backtest
 
 structure SearchEntry where
-  hypothesis : String
-  parameterHash : String
-  createdAt : Time
-  deriving DecidableEq, Repr
+  hypothesisId : String
+  parameterHash : ContentHash
+  codeHash : ContentHash
+  registeredAt : Timestamp
+  deriving Repr
 
 structure SearchLedger where
   entries : List SearchEntry
   deriving Repr
 
-def ContainsRecord (ledger : SearchLedger) (entry : SearchEntry) : Prop :=
-  entry ∈ ledger.entries
-
-def RecordsParameterHash
+def ContainsParameter
     (ledger : SearchLedger)
-    (parameterHash : String) : Prop :=
-  ∃ entry, entry ∈ ledger.entries ∧ entry.parameterHash = parameterHash
+    (parameterHash : ContentHash) : Prop :=
+  ∃ entry,
+    entry ∈ ledger.entries ∧ entry.parameterHash = parameterHash
 
-theorem containsRecord_of_mem
-    {ledger : SearchLedger}
-    {entry : SearchEntry}
-    (member : entry ∈ ledger.entries) :
-    ContainsRecord ledger entry :=
-  member
+def DecisionRegistered
+    (ledger : SearchLedger)
+    (decision : Decision) : Prop :=
+  ContainsParameter ledger decision.parameterHash
 
 end LeanFinance.Backtest

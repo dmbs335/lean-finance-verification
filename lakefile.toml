@@ -1,0 +1,6 @@
+name = "lean_finance_verification"
+version = "0.1.0"
+defaultTargets = ["LeanFinance"]
+
+[[lean_lib]]
+name = "LeanFinance"

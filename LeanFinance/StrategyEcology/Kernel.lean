@@ -1,4 +1,4 @@
-import LeanFinance.Types
+import LeanFinance.Core
 
 namespace LeanFinance.StrategyEcology
 
@@ -34,7 +34,7 @@ inductive ShockProvenance where
 
 /-- The conditions under which one directed strategy interaction is evaluated. -/
 structure InteractionContext (Regime : Type) where
-  horizon : Time
+  horizon : Timestamp
   regime : Regime
   metric : FitnessMetric
   treatment : TreatmentType

@@ -1,28 +1,39 @@
-import LeanFinance.Types
-
 namespace LeanFinance.GameTheory
 
-/-- Observable or inferred exposure state against which a mandate is checked. -/
-structure Exposure where
-  leverage : Scalar
-  risk : Scalar
-  absolutePosition : Scalar
+structure ConstraintState where
+  equity : Nat
+  requiredMargin : Nat
+  measuredRisk : Nat
+  riskLimit : Nat
+  grossExposure : Nat
+  leverageLimit : Nat
   deriving Repr
 
-structure Constraint where
-  leverageLimit : Scalar
-  riskLimit : Scalar
-  positionLimit : Scalar
-  deriving Repr
+def MarginFeasible (state : ConstraintState) : Prop :=
+  state.requiredMargin ≤ state.equity
 
-def Constraint.WellFormed (constraint : Constraint) : Prop :=
-  0 <= constraint.leverageLimit ∧
-  0 <= constraint.riskLimit ∧
-  0 <= constraint.positionLimit
+def RiskFeasible (state : ConstraintState) : Prop :=
+  state.measuredRisk ≤ state.riskLimit
 
-def Feasible (exposure : Exposure) (constraint : Constraint) : Prop :=
-  exposure.leverage <= constraint.leverageLimit ∧
-  exposure.risk <= constraint.riskLimit ∧
-  exposure.absolutePosition <= constraint.positionLimit
+def LeverageFeasible (state : ConstraintState) : Prop :=
+  state.grossExposure ≤ state.leverageLimit
+
+def Feasible (state : ConstraintState) : Prop :=
+  MarginFeasible state ∧ RiskFeasible state ∧ LeverageFeasible state
+
+theorem feasible_implies_margin
+    (state : ConstraintState)
+    (h : Feasible state) : MarginFeasible state :=
+  h.1
+
+theorem feasible_implies_risk
+    (state : ConstraintState)
+    (h : Feasible state) : RiskFeasible state :=
+  h.2.1
+
+theorem feasible_implies_leverage
+    (state : ConstraintState)
+    (h : Feasible state) : LeverageFeasible state :=
+  h.2.2
 
 end LeanFinance.GameTheory

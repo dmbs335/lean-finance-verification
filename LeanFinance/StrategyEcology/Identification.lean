@@ -1,4 +1,4 @@
-import LeanFinance.Types
+import LeanFinance.Core
 import LeanFinance.Inference.Identification
 
 namespace LeanFinance.StrategyEcology

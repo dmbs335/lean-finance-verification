@@ -1,33 +1,30 @@
-import LeanFinance.Types
+import LeanFinance.Core
 
 namespace LeanFinance.Inference
 
-structure HiddenMarketState where
-  position : Scalar
-  leverage : Scalar
-  liquidityState : Scalar
-  constraintSlack : Scalar
+structure ObservedMarketData where
+  timestamp : Timestamp
+  price : Scalar
+  volume : Nat
+  optionOpenInterest : Nat
+  shortInterest : Nat
+  fundFlow : Scalar
   deriving Repr
 
-structure Observation where
-  price : Scalar
-  volume : Scalar
-  orderFlow : Scalar
-  deriving DecidableEq, Repr
+structure HiddenMarketState where
+  netPosition : Scalar
+  leverage : Nat
+  constraintSlack : Nat
+  higherOrderBelief : Scalar
+  regimeId : Nat
+  deriving Repr
 
-structure ObservationModel where
-  predict : HiddenMarketState → Observation
+structure StateEstimate where
+  state : HiddenMarketState
+  confidenceBps : Nat
+  deriving Repr
 
-def Compatible
-    (model : ObservationModel)
-    (state : HiddenMarketState)
-    (observation : Observation) : Prop :=
-  model.predict state = observation
-
-theorem predictedObservationCompatible
-    (model : ObservationModel)
-    (state : HiddenMarketState) :
-    Compatible model state (model.predict state) :=
-  rfl
+def StateEstimate.Valid (estimate : StateEstimate) : Prop :=
+  estimate.confidenceBps ≤ 10000
 
 end LeanFinance.Inference

@@ -1,23 +1,29 @@
+import LeanFinance.GameTheory.BayesianGame
 import LeanFinance.GameTheory.BestResponse
 
 namespace LeanFinance.GameTheory
 
-def NashEquilibrium
-    (payoff : Payoff)
-    (players : List Player)
+def IsBayesNashEquilibrium
+    (game : BayesianGame)
     (profile : StrategyProfile) : Prop :=
-  ∀ player, player ∈ players → IsBestResponse payoff player profile
+  ∀ player, player ∈ game.players →
+    ∃ belief,
+      belief ∈ game.beliefs ∧
+      belief.playerId = player.id ∧
+      IsBestResponse
+        (game.feasible player)
+        (game.payoff player belief)
+        (profile.actionOf player.id)
 
-theorem NashEquilibrium.noProfitableDeviation
-    {payoff : Payoff}
-    {players : List Player}
-    {profile : StrategyProfile}
-    (equilibrium : NashEquilibrium payoff players profile)
-    {player : Player}
-    (member : player ∈ players)
-    (alternative : Action) :
-    payoff.utility player profile >=
-      payoff.deviationUtility player profile alternative :=
-  equilibrium player member alternative
+theorem equilibrium_actions_are_feasible
+    (game : BayesianGame)
+    (profile : StrategyProfile)
+    (hEq : IsBayesNashEquilibrium game profile)
+    (player : Player)
+    (hPlayer : player ∈ game.players) :
+    game.feasible player (profile.actionOf player.id) := by
+  cases hEq player hPlayer with
+  | intro _belief hBelief =>
+      exact hBelief.2.2.1
 
 end LeanFinance.GameTheory

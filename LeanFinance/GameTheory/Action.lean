@@ -1,23 +1,20 @@
-import LeanFinance.Types
-
 namespace LeanFinance.GameTheory
 
-/-- A one-asset action. Multi-asset profiles are represented by a function
-    from player identifiers to actions. -/
-inductive Action
-  | buy (quantity : Scalar)
-  | sell (quantity : Scalar)
+inductive Side
+  | buy
   | hold
+  | sell
   deriving DecidableEq, Repr
 
-def Action.signedQuantity : Action → Scalar
-  | .buy quantity => quantity
-  | .sell quantity => -quantity
-  | .hold => 0
+structure Action where
+  side : Side
+  quantity : Nat
+  deriving DecidableEq, Repr
 
-def Action.WellFormed : Action → Prop
-  | .buy quantity => 0 <= quantity
-  | .sell quantity => 0 <= quantity
-  | .hold => True
+namespace Action
 
+def zero : Action :=
+  { side := Side.hold, quantity := 0 }
+
+end Action
 end LeanFinance.GameTheory

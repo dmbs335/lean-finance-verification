@@ -1,60 +1,9 @@
-import LeanFinance.Types
-
-import LeanFinance.GameTheory.Player
-import LeanFinance.GameTheory.Action
-import LeanFinance.GameTheory.Payoff
-import LeanFinance.GameTheory.Constraint
-import LeanFinance.GameTheory.BestResponse
-import LeanFinance.GameTheory.Equilibrium
-import LeanFinance.GameTheory.FiniteGame
-import LeanFinance.GameTheory.Belief
-import LeanFinance.GameTheory.HigherOrderBeliefs
-import LeanFinance.GameTheory.BayesianGame
-
-import LeanFinance.Market.Order
-import LeanFinance.Market.OrderFlow
-import LeanFinance.Market.PriceFormation
-import LeanFinance.Market.Liquidity
-import LeanFinance.Market.KyleModel
-import LeanFinance.Market.MarketMaker
-import LeanFinance.Market.EquilibriumPrice
-
-import LeanFinance.Constraints.MarginCall
-import LeanFinance.Constraints.VaR
-import LeanFinance.Constraints.ForcedFlow
-
-import LeanFinance.Dynamics.StateTransition
-import LeanFinance.Dynamics.EquilibriumTransition
-import LeanFinance.Dynamics.StrategicFeedback
-
-import LeanFinance.Inference.HiddenState
-import LeanFinance.Inference.Identification
-import LeanFinance.Inference.InverseGame
-
-import LeanFinance.Backtest.Dataset
-import LeanFinance.Backtest.Provenance
-import LeanFinance.Backtest.Decision
-import LeanFinance.Backtest.NoFutureInformation
-import LeanFinance.Backtest.FeatureLineage
-import LeanFinance.Backtest.SearchLedger
-import LeanFinance.Backtest.Reproducibility
-import LeanFinance.Backtest.Certificate
-import LeanFinance.Backtest.Universe
-import LeanFinance.Backtest.CostModel
-
-import LeanFinance.ResearchIntegrity.Noninterference
-import LeanFinance.ResearchIntegrity.Commitment
-
-import LeanFinance.Certificate.StrategyCertificate
-import LeanFinance.Certificate.DataCertificate
-import LeanFinance.Certificate.UniverseCertificate
-import LeanFinance.Certificate.BacktestCertificate
-import LeanFinance.Certificate.Verification
-import LeanFinance.Certificate.EquilibriumCertificate
-import LeanFinance.Certificate.StabilityCertificate
-
+import LeanFinance.Core
+import LeanFinance.GameTheory
+import LeanFinance.Market
+import LeanFinance.Constraints
+import LeanFinance.Dynamics
+import LeanFinance.Inference
+import LeanFinance.Backtest
+import LeanFinance.Certificate
 import LeanFinance.StrategyEcology
-
-import LeanFinance.Examples.ProofCarryingBacktest
-import LeanFinance.Examples.FiniteEquilibrium
-import LeanFinance.Examples.HigherOrderBeliefs

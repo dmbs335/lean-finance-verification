@@ -1,28 +1,27 @@
-import LeanFinance.Types
-
 namespace LeanFinance.Constraints
 
-structure MarginConstraint where
-  collateral : Scalar
-  maintenanceMargin : Scalar
-  deriving Repr
-
 structure MarginState where
-  equity : Scalar
-  requiredMargin : Scalar
+  equity : Nat
+  requiredMargin : Nat
+  position : Nat
   deriving Repr
 
-def marginBreached (state : MarginState) : Prop :=
+def MarginBreach (state : MarginState) : Prop :=
   state.equity < state.requiredMargin
 
-def forcedLiquidationRequired (state : MarginState) : Prop :=
-  marginBreached state
+def ForcedLiquidation (state : MarginState) : Nat :=
+  if MarginBreach state then state.position else 0
 
-theorem noForcedLiquidationWhenSatisfied
+theorem no_breach_no_forced_liquidation
     (state : MarginState)
-    (satisfied : state.requiredMargin <= state.equity) :
-    ¬ forcedLiquidationRequired state := by
-  intro breached
-  exact (not_lt_of_ge satisfied) breached
+    (h : ¬ MarginBreach state) :
+    ForcedLiquidation state = 0 := by
+  simp [ForcedLiquidation, h]
+
+theorem breach_liquidates_position
+    (state : MarginState)
+    (h : MarginBreach state) :
+    ForcedLiquidation state = state.position := by
+  simp [ForcedLiquidation, h]
 
 end LeanFinance.Constraints

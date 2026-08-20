@@ -1,20 +1,20 @@
-import LeanFinance.Types
+import LeanFinance.Core
 
 namespace LeanFinance.Backtest
 
 structure Dataset where
   id : String
-  snapshotAt : Time
-  availableAt : Time
-  contentHash : String
-  deriving DecidableEq, Repr
+  observedAt : Timestamp
+  availableAt : Timestamp
+  contentHash : ContentHash
+  deriving Repr
 
-def Dataset.AvailableBy (dataset : Dataset) (decisionTime : Time) : Prop :=
-  dataset.availableAt <= decisionTime
+def DatasetAvailableAt
+    (dataset : Dataset)
+    (decisionTime : Timestamp) : Prop :=
+  dataset.availableAt ≤ decisionTime
 
-def Dataset.WellFormed (dataset : Dataset) : Prop :=
-  dataset.snapshotAt <= dataset.availableAt ∧
-  dataset.id ≠ "" ∧
-  dataset.contentHash ≠ ""
+def DatasetHashBound (dataset : Dataset) : Prop :=
+  NonEmptyString dataset.contentHash
 
 end LeanFinance.Backtest

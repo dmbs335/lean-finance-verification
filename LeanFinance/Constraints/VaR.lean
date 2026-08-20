@@ -1,30 +1,27 @@
-import LeanFinance.Types
-
 namespace LeanFinance.Constraints
 
-structure VaRConstraint where
-  confidence : Scalar
-  limit : Scalar
+structure VaRState where
+  measuredRisk : Nat
+  riskLimit : Nat
+  riskyPosition : Nat
   deriving Repr
 
-structure RiskState where
-  estimatedVaR : Scalar
-  deriving Repr
+def VaRBreach (state : VaRState) : Prop :=
+  state.riskLimit < state.measuredRisk
 
-def VaRConstraint.WellFormed (constraint : VaRConstraint) : Prop :=
-  0 <= constraint.confidence ∧
-  constraint.confidence <= 1 ∧
-  0 <= constraint.limit
+def VaRReduction (state : VaRState) : Nat :=
+  if VaRBreach state then state.riskyPosition else 0
 
-def riskBreached (constraint : VaRConstraint) (state : RiskState) : Prop :=
-  constraint.limit < state.estimatedVaR
+theorem no_var_breach_no_reduction
+    (state : VaRState)
+    (h : ¬ VaRBreach state) :
+    VaRReduction state = 0 := by
+  simp [VaRReduction, h]
 
-theorem noRiskBreachWhenUnderLimit
-    (constraint : VaRConstraint)
-    (state : RiskState)
-    (underLimit : state.estimatedVaR <= constraint.limit) :
-    ¬ riskBreached constraint state := by
-  intro breached
-  exact (not_lt_of_ge underLimit) breached
+theorem var_breach_reduces_position
+    (state : VaRState)
+    (h : VaRBreach state) :
+    VaRReduction state = state.riskyPosition := by
+  simp [VaRReduction, h]
 
 end LeanFinance.Constraints

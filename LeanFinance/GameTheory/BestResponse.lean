@@ -1,14 +1,20 @@
-import LeanFinance.GameTheory.Payoff
+import LeanFinance.Core
+import LeanFinance.GameTheory.Action
 
 namespace LeanFinance.GameTheory
 
-/-- No unilateral action yields strictly greater utility. -/
 def IsBestResponse
-    (payoff : Payoff)
-    (player : Player)
-    (profile : StrategyProfile) : Prop :=
-  ∀ alternative,
-    payoff.utility player profile >=
-      payoff.deviationUtility player profile alternative
+    (feasible : Action → Prop)
+    (payoff : Action → Scalar)
+    (chosen : Action) : Prop :=
+  feasible chosen ∧
+    ∀ alternative, feasible alternative → payoff alternative ≤ payoff chosen
+
+theorem best_response_is_feasible
+    (feasible : Action → Prop)
+    (payoff : Action → Scalar)
+    (chosen : Action)
+    (h : IsBestResponse feasible payoff chosen) : feasible chosen :=
+  h.1
 
 end LeanFinance.GameTheory

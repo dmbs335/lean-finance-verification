@@ -1,23 +1,23 @@
+import LeanFinance.Core
 import LeanFinance.Market.PriceFormation
 
 namespace LeanFinance.Market
 
 structure KyleModel where
-  impact : PriceImpact
-  privateSignalVariance : Scalar
-  noiseVariance : Scalar
+  priorPrice : Scalar
+  impact : LinearPriceImpact
   deriving Repr
 
-def KyleModel.WellFormed (model : KyleModel) : Prop :=
-  model.impact.WellFormed ∧
-  0 <= model.privateSignalVariance ∧
-  0 < model.noiseVariance
+def KyleModel.quote
+    (model : KyleModel)
+    (flow : OrderFlow) : Scalar :=
+  nextPrice model.priorPrice model.impact flow
 
-def kylePriceImpact (model : KyleModel) (flow : OrderFlow) : Scalar :=
-  priceChange model.impact flow
-
-theorem kylePriceImpact_def (model : KyleModel) (flow : OrderFlow) :
-    kylePriceImpact model flow = model.impact.lambda * flow.totalFlow :=
-  rfl
+theorem quote_at_zero_flow
+    (model : KyleModel)
+    (flow : OrderFlow)
+    (h : flow.total = 0) :
+    model.quote flow = model.priorPrice := by
+  simp [KyleModel.quote, nextPrice, priceChange, h]
 
 end LeanFinance.Market

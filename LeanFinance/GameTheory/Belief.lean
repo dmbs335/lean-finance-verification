@@ -1,17 +1,16 @@
-import LeanFinance.GameTheory.Player
+import LeanFinance.Core
 
 namespace LeanFinance.GameTheory
 
-/-- First-, second-, and third-order expectations for a player. -/
 structure Belief where
   playerId : PlayerId
-  fundamentalExpectation : Scalar
-  marketExpectation : Scalar
-  higherOrderExpectation : Scalar
-  confidence : Scalar
+  fundamental : Scalar
+  expectedMarketBelief : Scalar
+  expectedHigherOrderBelief : Scalar
+  confidenceBps : Nat
   deriving Repr
 
-def Belief.WellFormed (belief : Belief) : Prop :=
-  0 <= belief.confidence ∧ belief.confidence <= 1
+def Belief.Valid (belief : Belief) : Prop :=
+  belief.confidenceBps ≤ 10000
 
 end LeanFinance.GameTheory

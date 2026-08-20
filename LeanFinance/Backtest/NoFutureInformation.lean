@@ -3,14 +3,18 @@ import LeanFinance.Backtest.Decision
 namespace LeanFinance.Backtest
 
 def NoFutureInformation (decision : Decision) : Prop :=
-  UsesDataBeforeDecision decision
+  UsesDataBeforeDecision decision ∧ UsesFeaturesBeforeDecision decision
 
-theorem noFutureInformation_sound
+theorem no_future_information_data
     (decision : Decision)
-    (certificate : NoFutureInformation decision)
-    (dataset : Dataset)
-    (used : dataset ∈ decision.datasets) :
-    dataset.availableAt <= decision.decisionTime :=
-  certificate dataset used
+    (h : NoFutureInformation decision) :
+    UsesDataBeforeDecision decision :=
+  h.1
+
+theorem no_future_information_features
+    (decision : Decision)
+    (h : NoFutureInformation decision) :
+    UsesFeaturesBeforeDecision decision :=
+  h.2
 
 end LeanFinance.Backtest

@@ -1,20 +1,20 @@
-import LeanFinance.Types
+import LeanFinance.Core
 
 namespace LeanFinance.Market
 
-/-- Decomposes order flow into informational, noise, and mechanically forced
-    components. -/
 structure OrderFlow where
   informed : Scalar
   noise : Scalar
   forced : Scalar
   deriving Repr
 
-def OrderFlow.totalFlow (flow : OrderFlow) : Scalar :=
+def OrderFlow.total (flow : OrderFlow) : Scalar :=
   flow.informed + flow.noise + flow.forced
 
-theorem OrderFlow.totalFlow_def (flow : OrderFlow) :
-    flow.totalFlow = flow.informed + flow.noise + flow.forced :=
-  rfl
+theorem total_without_forced
+    (flow : OrderFlow)
+    (h : flow.forced = 0) :
+    flow.total = flow.informed + flow.noise := by
+  simp [OrderFlow.total, h]
 
 end LeanFinance.Market

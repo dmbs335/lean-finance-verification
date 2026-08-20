@@ -1,98 +1,59 @@
 # Lean Finance Verification
 
-A Lean 4 research framework for machine-checkable claims about financial
-market models, inverse games, and quantitative research pipelines.
+A Lean 4 research framework for **proof-carrying financial research**: market models,
+constraint-driven dynamics, inverse-game abstractions, and machine-checkable backtest
+certificates.
 
-## What this project verifies
+## What this repository verifies
 
-The project deliberately does **not** prove that a strategy is profitable or
-will continue to work. It verifies narrower, auditable claims such as:
+The project deliberately separates empirical estimation from formal claims. Python,
+Rust, or another external system may estimate parameters and produce artifacts; Lean
+checks the logical contract attached to those artifacts.
 
-- every dataset used by a decision was available at that decision time;
-- datasets, code, parameters, environments, and cost models are identified;
-- feature lineage was generated before the decision and is bound to certified
-  dataset hashes;
-- the tested parameterization appears in the disclosed search ledger;
-- the strategy and parameterization match a pre-evaluation commitment;
-- every security in a certified universe was active at the decision time;
-- future-only research artifacts cannot alter a point-in-time decision;
-- a backtest result is bound to those proofs as a proof-carrying certificate.
+Current certificate properties include:
 
-The formal core also contains composable definitions for heterogeneous
-players, beliefs, best responses, Bayesian games, order flow, Kyle-style price
-impact, funding constraints, equilibrium transitions, and hidden-state
-observation models.
+- every dataset used by a decision was available at the decision time;
+- every derived feature was generated no later than the decision time;
+- the selected parameter set appears in the declared search ledger;
+- code, data, parameters, environment, and result are bound by non-empty hashes;
+- a verified claim carries the proofs required by the certificate type.
 
-## Build
+These properties do **not** prove that a strategy is profitable or that an empirical
+model is statistically correct. They prove the narrower research-integrity claims
+encoded by the certificate.
 
-The repository pins Lean `v4.30.0`.
-
-```bash
-lake build
-lake exe leanFinance
-```
-
-GitHub Actions is configured to run the build on pushes and pull requests.
-
-## Architecture
+## Formal layers
 
 ```text
 LeanFinance/
-├── GameTheory/       # players, beliefs, payoff, best response, equilibrium
-├── Market/           # orders, order flow, liquidity, Kyle price formation
-├── Constraints/      # margin and VaR activation
-├── Dynamics/         # market and equilibrium transitions
-├── Inference/        # latent states, observational equivalence, identification
-├── Backtest/         # point-in-time data, universe, lineage, costs, result
-├── ResearchIntegrity/# commitments and future-artifact noninterference
-└── Certificate/      # proof-carrying strategy, data, universe, backtest objects
+├── GameTheory/     heterogeneous players, beliefs, feasibility, best responses
+├── Market/         order flow, linear price impact, Kyle-style quoting, liquidity
+├── Constraints/    margin, VaR, redemption, and short-cover triggers
+├── Dynamics/       market-state and equilibrium-regime transitions
+├── Inference/      latent state and inverse-game problem definitions
+├── Backtest/       point-in-time data, lineage, search ledger, reproducibility
+└── Certificate/    data, strategy, backtest, and verified-claim certificates
 ```
 
-## Core soundness statement
+## Build
 
-`LeanFinance.Certificate.certificate_sound` proves that every constructed
-`BacktestCertificate` entails all of the following:
+Lean is pinned in `lean-toolchain`.
 
-1. no future information was used;
-2. all datasets are well-formed and content-addressed;
-3. the point-in-time universe is valid and aligned with the decision;
-4. the transaction-cost model was locked before the decision;
-5. code and parameters match a valid prior commitment;
-6. the experiment is reproducibly identified;
-7. the selected parameterization is recorded in the search ledger;
-8. feature lineages are timely and bound to certified inputs;
-9. the empirical claim is nonempty and generated after the decision.
+```bash
+lake build
+```
 
-A certificate can only be constructed by supplying proofs for these
-obligations.
-
-## Inverse-game identification
-
-The inverse-game layer distinguishes full primitive recovery from recovery of
-an identifiable target. `Identified observe target` means the target is
-constant on every observational-equivalence class.
-
-The formal core proves:
-
-- a target that factors through public observations is identified;
-- post-processing preserves identification;
-- one equal-observation/different-target pair proves non-identifiability;
-- aggregate flow alone need not identify hidden payoff type;
-- an enriched observation can identify constraint activation.
-
-See `docs/INVERSE_GAME_IDENTIFICATION.md`.
+GitHub Actions runs the same build on `main`, feature branches, and pull requests.
 
 ## Research roadmap
 
-1. Add a finite-game solver interface with certificates for computed best
-   responses and equilibria.
-2. Formalize forced-liquidation propagation and equilibrium instability.
-3. Define certificate serialization and an external verifier protocol.
-4. Connect Python estimators to a proof-producing certificate compiler.
-5. Add corporate-action, benchmark, hypothesis-completeness, and signed archive
-   guarantees.
-6. Build identified-set inference for partially observed strategic markets.
+1. Replace integer-valued toy primitives with reusable ordered-ring abstractions.
+2. Formalize a finite Bayesian market game and executable equilibrium checker.
+3. Add forced-flow composition and equilibrium-transition safety theorems.
+4. Define a serialization format for certificates emitted by empirical pipelines.
+5. Build a reference proof-carrying backtest end to end.
 
-## Design rule
+## Scope
 
-> Empirical systems estimate; Lean checks the exact claim and its assumptions.
+This repository is research software. A Lean proof is only as strong as its formalized
+assumptions and the cryptographic/data-lineage evidence supplied to the checker.
