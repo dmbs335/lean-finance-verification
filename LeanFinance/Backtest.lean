@@ -6,3 +6,8 @@ import LeanFinance.Backtest.NoFutureInformation
 import LeanFinance.Backtest.SearchLedger
 import LeanFinance.Backtest.Reproducibility
 import LeanFinance.Backtest.Certificate
+import LeanFinance.Backtest.Artifact
+import LeanFinance.Backtest.CommittedSearchLedger
+import LeanFinance.Backtest.LineageClosure
+import LeanFinance.Backtest.IntegrityCertificate
+import LeanFinance.Examples.ProofCarryingBacktest
