@@ -60,7 +60,11 @@ def sampleUniverse : UniverseCertificate :=
         asOf := 20
         memberships := [sampleMembership]
       }
-    active := by decide
+    active := by
+      intro membership member
+      simp at member
+      subst membership
+      decide
   }
 
 def sampleCostModel : CostModel :=
