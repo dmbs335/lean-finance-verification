@@ -44,7 +44,9 @@ def check (claim : BottleneckClaim) : Bool :=
 
 theorem check_eq_true_iff_valid (claim : BottleneckClaim) :
     claim.check = true ↔ claim.Valid := by
-  simp [check, Valid]
+  by_cases valid : claim.Valid
+  · simp [check, valid]
+  · simp [check, valid]
 
 theorem check_sound
     (claim : BottleneckClaim)
