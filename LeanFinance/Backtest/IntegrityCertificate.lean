@@ -86,7 +86,7 @@ theorem used_feature_has_recursive_lineage
     (certificate : ProofCarryingBacktestCertificate claim)
     (feature : FeatureLineage)
     (used : feature ∈ claim.decision.features) :
-    ∃ derived,
+    ∃ derived : DerivedFeature,
       derived.lineage = feature ∧
       ArtifactAvailableAt certificate.lineageCatalog
         claim.decision.decisionTime derived.outputHash :=
