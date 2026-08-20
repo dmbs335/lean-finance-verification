@@ -13,7 +13,7 @@ specific code/data/parameter/environment manifest, requires the selected trial
 to have been preregistered, closes feature provenance recursively, and enforces
 point-in-time admissibility. -/
 structure ProofCarryingBacktestCertificate
-    (claim : BacktestClaim) : Prop where
+    (claim : BacktestClaim) where
   manifest : BoundExperimentManifest
   ledger : CommittedSearchLedger
   lineageCatalog : LineageCatalog
