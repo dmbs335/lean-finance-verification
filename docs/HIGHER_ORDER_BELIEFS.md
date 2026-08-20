@@ -30,5 +30,5 @@ fine observation. More public information may distinguish additional states;
 it cannot merge states that the coarser observation already separated.
 
 Future work should replace the three-level truncation with recursive belief
-objects, noisy private/public signals, common-knowledge operators, and global
--game threshold equilibria.
+objects, noisy private/public signals, common-knowledge operators, and
+threshold equilibria for global games.
