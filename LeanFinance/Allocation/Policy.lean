@@ -2,6 +2,10 @@ import LeanFinance.Core
 
 namespace LeanFinance.Allocation
 
+/-- Stable identifier for the deterministic allocation contract. -/
+def policyStrategyId : StrategyId :=
+  "core-trend-fragility-allocation"
+
 /-- Coarse medium-horizon trend state used by the allocation policy. -/
 inductive TrendState where
   | rising
@@ -102,6 +106,30 @@ def allocationDecision (input : PolicyInput) : AllocationDecision :=
       targetRiskBps input.trend input.fragility input.volatility
   }
 
+/-- Buy and sell are defined relative to the certified target, not from a
+    separate crash-timing oracle. -/
+inductive RebalanceDirection where
+  | buy
+  | hold
+  | sell
+  deriving Repr, DecidableEq
+
+/-- Compare current exposure with the deterministic target. -/
+def rebalanceDirection
+    (currentRiskBps targetRiskBps : Nat) : RebalanceDirection :=
+  if currentRiskBps < targetRiskBps then
+    .buy
+  else if targetRiskBps < currentRiskBps then
+    .sell
+  else
+    .hold
+
+/-- Compute the direction directly from policy input. -/
+def allocationDirection
+    (currentRiskBps : Nat)
+    (input : PolicyInput) : RebalanceDirection :=
+  rebalanceDirection currentRiskBps (allocationDecision input).riskBps
+
 /-- A weakening relation is explicit rather than inferred from constructor order. -/
 inductive TrendWeakens : TrendState → TrendState → Prop where
   | risingStays : TrendWeakens .rising .rising
@@ -195,6 +223,28 @@ theorem worsening_volatility_never_increases
     targetTacticalUnits trend fragility newVolatility ≤
       targetTacticalUnits trend fragility oldVolatility := by
   cases worsens <;> cases trend <;> cases fragility <;> decide
+
+/-- Exposure below target always produces a buy instruction. -/
+theorem rebalanceDirection_buy_of_below
+    (currentRisk targetRisk : Nat)
+    (below : currentRisk < targetRisk) :
+    rebalanceDirection currentRisk targetRisk = .buy := by
+  simp [rebalanceDirection, below]
+
+/-- Exposure above target always produces a sell instruction. -/
+theorem rebalanceDirection_sell_of_above
+    (currentRisk targetRisk : Nat)
+    (above : targetRisk < currentRisk) :
+    rebalanceDirection currentRisk targetRisk = .sell := by
+  have notBelow : ¬ currentRisk < targetRisk := by
+    intro below
+    exact Nat.lt_asymm below above
+  simp [rebalanceDirection, notBelow, above]
+
+/-- Exposure exactly at target produces no trade. -/
+theorem rebalanceDirection_hold_at_target (targetRisk : Nat) :
+    rebalanceDirection targetRisk targetRisk = .hold := by
+  simp [rebalanceDirection]
 
 /-- The fully favorable state uses all capital without leverage. -/
 theorem favorable_state_is_fully_invested :

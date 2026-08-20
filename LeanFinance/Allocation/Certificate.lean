@@ -15,10 +15,10 @@ structure AllocationCertificate where
 
 namespace AllocationCertificate
 
-/-- Non-empty identifiers bind the decision to a strategy, parameter set, and
-    policy implementation. -/
+/-- The strategy identifier is exact, while parameter and policy artifacts must
+    be bound by non-empty hashes. -/
 def Bound (certificate : AllocationCertificate) : Prop :=
-  NonEmptyString certificate.strategyId ∧
+  certificate.strategyId = policyStrategyId ∧
   NonEmptyString certificate.parameterHash ∧
   NonEmptyString certificate.policyCodeHash
 
@@ -40,6 +40,7 @@ instance instDecidablePolicyCorrect (certificate : AllocationCertificate) :
     not future profitability or statistical calibration. -/
 def Valid (certificate : AllocationCertificate) : Prop :=
   certificate.signals.PointInTimeAt certificate.decisionTime ∧
+  certificate.signals.MatchesInput certificate.input ∧
   certificate.Bound ∧
   certificate.PolicyCorrect
 
@@ -87,14 +88,23 @@ theorem point_in_time (verified : VerifiedAllocation) :
       verified.certificate.decisionTime :=
   verified.sound.1
 
+theorem signal_values_match (verified : VerifiedAllocation) :
+    verified.certificate.signals.MatchesInput
+      verified.certificate.input :=
+  verified.sound.2.1
+
 theorem bound (verified : VerifiedAllocation) :
     verified.certificate.Bound :=
-  verified.sound.2.1
+  verified.sound.2.2.1
+
+theorem strategy_is_policy_id (verified : VerifiedAllocation) :
+    verified.certificate.strategyId = policyStrategyId :=
+  verified.bound.1
 
 theorem policy_correct (verified : VerifiedAllocation) :
     verified.certificate.declaredDecision =
       allocationDecision verified.certificate.input :=
-  verified.sound.2.2
+  verified.sound.2.2.2
 
 /-- Every verified allocation preserves the strategic core. -/
 theorem preserves_core (verified : VerifiedAllocation) :
@@ -151,6 +161,38 @@ theorem falling_keeps_core
   simpa [falling] using falling_preserves_core
     verified.certificate.input.fragility
     verified.certificate.input.volatility
+
+/-- Rebalance direction is derived from current exposure and the certified
+    target, so it cannot disagree with the verified allocation. -/
+def rebalanceFrom
+    (verified : VerifiedAllocation)
+    (currentRiskBps : Nat) : RebalanceDirection :=
+  rebalanceDirection currentRiskBps
+    verified.certificate.declaredDecision.riskBps
+
+theorem buys_when_below_target
+    (verified : VerifiedAllocation)
+    (currentRiskBps : Nat)
+    (below :
+      currentRiskBps < verified.certificate.declaredDecision.riskBps) :
+    verified.rebalanceFrom currentRiskBps = .buy := by
+  unfold rebalanceFrom
+  exact rebalanceDirection_buy_of_below _ _ below
+
+theorem sells_when_above_target
+    (verified : VerifiedAllocation)
+    (currentRiskBps : Nat)
+    (above :
+      verified.certificate.declaredDecision.riskBps < currentRiskBps) :
+    verified.rebalanceFrom currentRiskBps = .sell := by
+  unfold rebalanceFrom
+  exact rebalanceDirection_sell_of_above _ _ above
+
+theorem holds_at_target (verified : VerifiedAllocation) :
+    verified.rebalanceFrom
+      verified.certificate.declaredDecision.riskBps = .hold := by
+  unfold rebalanceFrom
+  exact rebalanceDirection_hold_at_target _
 
 end VerifiedAllocation
 

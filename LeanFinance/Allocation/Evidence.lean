@@ -55,17 +55,20 @@ theorem feature_linked_to_source
 
 end SignalEvidence
 
-/-- The policy uses separately evidenced trend, fragility, and volatility
-    classifications. -/
+/-- The policy uses separately evidenced and typed trend, fragility, and
+    volatility classifications. -/
 structure SignalBundle where
   trend : SignalEvidence
+  trendValue : TrendState
   fragility : SignalEvidence
+  fragilityValue : FragilityState
   volatility : SignalEvidence
+  volatilityValue : VolatilityState
   deriving Repr
 
 namespace SignalBundle
 
-/-- All three signals must satisfy the point-in-time contract. -/
+/-- All three signal artifacts must satisfy the point-in-time contract. -/
 def PointInTimeAt
     (signals : SignalBundle)
     (decisionTime : Timestamp) : Prop :=
@@ -78,6 +81,22 @@ instance instDecidablePointInTimeAt
     (decisionTime : Timestamp) :
     Decidable (signals.PointInTimeAt decisionTime) := by
   unfold PointInTimeAt
+  infer_instance
+
+/-- The typed signal values carried by the evidence bundle must be the exact
+    values consumed by the deterministic policy. -/
+def MatchesInput
+    (signals : SignalBundle)
+    (input : PolicyInput) : Prop :=
+  signals.trendValue = input.trend ∧
+  signals.fragilityValue = input.fragility ∧
+  signals.volatilityValue = input.volatility
+
+instance instDecidableMatchesInput
+    (signals : SignalBundle)
+    (input : PolicyInput) :
+    Decidable (signals.MatchesInput input) := by
+  unfold MatchesInput
   infer_instance
 
 theorem trend_valid
@@ -100,6 +119,27 @@ theorem volatility_valid
     (valid : signals.PointInTimeAt decisionTime) :
     signals.volatility.ValidAt decisionTime :=
   valid.2.2
+
+theorem trend_matches
+    (signals : SignalBundle)
+    (input : PolicyInput)
+    (matches : signals.MatchesInput input) :
+    signals.trendValue = input.trend :=
+  matches.1
+
+theorem fragility_matches
+    (signals : SignalBundle)
+    (input : PolicyInput)
+    (matches : signals.MatchesInput input) :
+    signals.fragilityValue = input.fragility :=
+  matches.2.1
+
+theorem volatility_matches
+    (signals : SignalBundle)
+    (input : PolicyInput)
+    (matches : signals.MatchesInput input) :
+    signals.volatilityValue = input.volatility :=
+  matches.2.2
 
 end SignalBundle
 
