@@ -140,7 +140,7 @@ theorem demoLineageClosed : DecisionLineageClosed demoCatalog demoDecision := by
 theorem demoLedgerValid : demoLedger.Valid := by
   simp [CommittedSearchLedger.Valid, ValidCommittedChain,
     ValidCommittedSuffix, demoLedger, demoTrial, RegisteredTrial.Bound,
-    ArtifactRef.Valid, NonEmptyString, demoCode, demoParameters,
+    ArtifactRef.Valid, NonEmptyString, demoDecision, demoCode, demoParameters,
     demoLedgerCommitment]
 
 theorem demoLedgerAnchored : AnchorsLedger demoAnchor demoLedger := by
@@ -172,7 +172,7 @@ def demoCertificate : ProofCarryingBacktestCertificate demoClaim :=
     selectedTrialPreRegistered := by
       refine ⟨demoTrial, ?_, rfl, rfl, rfl, ?_⟩
       · simp [demoLedger]
-      · simp [demoTrial, demoDecision] }
+      · simp [demoTrial, demoClaim, demoDecision] }
 
 theorem demo_selected_parameter_was_registered_before_decision :
     ∃ trial,
@@ -189,7 +189,7 @@ theorem demo_ledger_was_anchored_before_decision :
     demoClaim demoCertificate
 
 theorem demo_feature_has_recursive_point_in_time_lineage :
-    ∃ derived,
+    ∃ derived : DerivedFeature,
       derived.lineage = demoFeatureLineage ∧
       ArtifactAvailableAt demoCertificate.lineageCatalog
         demoClaim.decision.decisionTime derived.outputHash :=
