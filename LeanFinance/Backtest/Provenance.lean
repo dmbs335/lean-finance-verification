@@ -1,14 +1,30 @@
+import LeanFinance.Types
+
 namespace LeanFinance.Backtest
 
 structure Provenance where
   sourceId : String
-  collectedAt : Nat
-  availableAt : Nat
+  collectedAt : Time
+  availableAt : Time
+  datasetHash : String
+  deriving DecidableEq, Repr
 
-/-- Data must exist before it can influence a decision. -/
 def AvailableBefore
-    (p : Provenance)
-    (decisionTime : Nat) : Prop :=
-  p.availableAt <= decisionTime
+    (provenance : Provenance)
+    (decisionTime : Time) : Prop :=
+  provenance.availableAt <= decisionTime
+
+def Provenance.WellFormed (provenance : Provenance) : Prop :=
+  provenance.collectedAt <= provenance.availableAt ∧
+  provenance.sourceId ≠ "" ∧
+  provenance.datasetHash ≠ ""
+
+theorem availableBefore_mono
+    {provenance : Provenance}
+    {earlier later : Time}
+    (available : AvailableBefore provenance earlier)
+    (ordered : earlier <= later) :
+    AvailableBefore provenance later :=
+  Nat.le_trans available ordered
 
 end LeanFinance.Backtest

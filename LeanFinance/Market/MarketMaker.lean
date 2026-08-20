@@ -1,14 +1,17 @@
-import LeanFinance.Market.Order
-import LeanFinance.Market.Liquidity
+import LeanFinance.Types
 
-namespace LeanFinance
+namespace LeanFinance.Market
 
 structure MarketMaker where
-  inventory : Rat
-  riskLimit : Rat
+  inventory : Scalar
+  riskLimit : Scalar
+  deriving Repr
 
+def MarketMaker.WellFormed (maker : MarketMaker) : Prop :=
+  0 <= maker.riskLimit
 
-def inventoryConstraint (mm : MarketMaker) : Prop :=
-  |mm.inventory| <= mm.riskLimit
+def inventoryConstraint (maker : MarketMaker) : Prop :=
+  -maker.riskLimit <= maker.inventory ∧
+  maker.inventory <= maker.riskLimit
 
-end LeanFinance
+end LeanFinance.Market

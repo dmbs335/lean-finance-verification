@@ -1,11 +1,17 @@
+import LeanFinance.GameTheory.Player
+
 namespace LeanFinance.GameTheory
 
+/-- First-, second-, and third-order expectations for a player. -/
 structure Belief where
-  playerId : Nat
-  confidence : Rat
+  playerId : PlayerId
+  fundamentalExpectation : Scalar
+  marketExpectation : Scalar
+  higherOrderExpectation : Scalar
+  confidence : Scalar
+  deriving Repr
 
-/-- A simple representation of private belief strength. -/
-def Belief.valid (b : Belief) : Prop :=
-  0 <= b.confidence ∧ b.confidence <= 1
+def Belief.WellFormed (belief : Belief) : Prop :=
+  0 <= belief.confidence ∧ belief.confidence <= 1
 
 end LeanFinance.GameTheory

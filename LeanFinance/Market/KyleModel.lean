@@ -1,15 +1,23 @@
-import LeanFinance.Market.OrderFlow
 import LeanFinance.Market.PriceFormation
 
-namespace LeanFinance
+namespace LeanFinance.Market
 
 structure KyleModel where
-  lambda : Rat
-  privateSignalVariance : Rat
-  noiseVariance : Rat
+  impact : PriceImpact
+  privateSignalVariance : Scalar
+  noiseVariance : Scalar
+  deriving Repr
 
+def KyleModel.WellFormed (model : KyleModel) : Prop :=
+  model.impact.WellFormed ∧
+  0 <= model.privateSignalVariance ∧
+  0 < model.noiseVariance
 
-def kylePriceImpact (model : KyleModel) (flow : OrderFlow) : Rat :=
-  model.lambda * (flow.informed + flow.noise)
+def kylePriceImpact (model : KyleModel) (flow : OrderFlow) : Scalar :=
+  priceChange model.impact flow
 
-end LeanFinance
+theorem kylePriceImpact_def (model : KyleModel) (flow : OrderFlow) :
+    kylePriceImpact model flow = model.impact.lambda * flow.totalFlow :=
+  rfl
+
+end LeanFinance.Market

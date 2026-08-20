@@ -1,12 +1,14 @@
-namespace LeanFinance.GameTheory
-
-import LeanFinance.GameTheory.Action
 import LeanFinance.GameTheory.Payoff
 
-/-- An action is a best response when no alternative action improves payoff. -/
+namespace LeanFinance.GameTheory
+
+/-- No unilateral action yields strictly greater utility. -/
 def IsBestResponse
-  (chosen : Action)
-  (utility : Action → Rat) : Prop :=
-  ∀ a, utility chosen >= utility a
+    (payoff : Payoff)
+    (player : Player)
+    (profile : StrategyProfile) : Prop :=
+  ∀ alternative,
+    payoff.utility player profile >=
+      payoff.deviationUtility player profile alternative
 
 end LeanFinance.GameTheory

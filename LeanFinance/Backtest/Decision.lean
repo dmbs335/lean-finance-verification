@@ -1,10 +1,15 @@
 import LeanFinance.Backtest.Dataset
 
+namespace LeanFinance.Backtest
+
 structure Decision where
   strategyId : String
-  decisionTime : Nat
-  dataset : Dataset
+  decisionTime : Time
+  datasets : List Dataset
+  deriving Repr
 
+def UsesDataBeforeDecision (decision : Decision) : Prop :=
+  ∀ dataset, dataset ∈ decision.datasets →
+    dataset.AvailableBy decision.decisionTime
 
-def UsesDataBeforeDecision (d : Decision) : Prop :=
-  d.dataset.timestamp <= d.decisionTime
+end LeanFinance.Backtest

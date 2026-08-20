@@ -1,19 +1,33 @@
-import LeanFinance.GameTheory.Belief
-import LeanFinance.Market.OrderFlow
+import LeanFinance.Types
 
-namespace LeanFinance
+namespace LeanFinance.Inference
 
 structure HiddenMarketState where
-  position : Rat
-  leverage : Rat
-  liquidityState : Rat
+  position : Scalar
+  leverage : Scalar
+  liquidityState : Scalar
+  constraintSlack : Scalar
+  deriving Repr
 
 structure Observation where
-  price : Rat
-  volume : Rat
+  price : Scalar
+  volume : Scalar
+  orderFlow : Scalar
+  deriving DecidableEq, Repr
 
+structure ObservationModel where
+  predict : HiddenMarketState → Observation
 
-def compatible (s : HiddenMarketState) (o : Observation) : Prop :=
-  True
+def Compatible
+    (model : ObservationModel)
+    (state : HiddenMarketState)
+    (observation : Observation) : Prop :=
+  model.predict state = observation
 
-end LeanFinance
+theorem predictedObservationCompatible
+    (model : ObservationModel)
+    (state : HiddenMarketState) :
+    Compatible model state (model.predict state) :=
+  rfl
+
+end LeanFinance.Inference
