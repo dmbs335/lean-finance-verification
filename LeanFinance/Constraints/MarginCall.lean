@@ -9,6 +9,11 @@ structure MarginState where
 def MarginBreach (state : MarginState) : Prop :=
   state.equity < state.requiredMargin
 
+instance decidableMarginBreach
+    (state : MarginState) : Decidable (MarginBreach state) := by
+  unfold MarginBreach
+  infer_instance
+
 def ForcedLiquidation (state : MarginState) : Nat :=
   if MarginBreach state then state.position else 0
 

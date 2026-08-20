@@ -1,3 +1,4 @@
+import Init.Data.Int.Order
 import LeanFinance.Core
 
 namespace LeanFinance.StrategyEcology
@@ -126,7 +127,7 @@ theorem predation_asymmetric
     (interaction : Predation kernel predator prey context) :
     ¬ Predation kernel prey predator context := by
   intro reverseInteraction
-  exact lt_asymm interaction.1 reverseInteraction.2
+  exact Int.lt_asymm interaction.1 reverseInteraction.2
 
 theorem mutualism_not_competition
     {Strategy Regime : Type}
@@ -136,7 +137,7 @@ theorem mutualism_not_competition
     (interaction : Mutualism kernel left right context) :
     ¬ Competition kernel left right context := by
   intro competition
-  exact lt_asymm interaction.1 competition.1
+  exact Int.lt_asymm interaction.1 competition.1
 
 /-- A constructive witness that two contexts produce different effects rules
     out a single context-free scalar representing both effects. -/

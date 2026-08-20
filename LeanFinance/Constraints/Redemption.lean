@@ -9,6 +9,11 @@ structure RedemptionState where
 def RedemptionCovered (state : RedemptionState) : Prop :=
   state.requestedCash ≤ state.cashAvailable
 
+instance decidableRedemptionCovered
+    (state : RedemptionState) : Decidable (RedemptionCovered state) := by
+  unfold RedemptionCovered
+  infer_instance
+
 def RequiredSale (state : RedemptionState) : Nat :=
   if RedemptionCovered state then 0 else state.liquidPosition
 

@@ -9,6 +9,10 @@ structure ShortState where
 def MustCover (state : ShortState) : Prop :=
   state.borrowAvailable < state.shortPosition ∨ state.marginSlack = 0
 
+instance decidableMustCover (state : ShortState) : Decidable (MustCover state) := by
+  unfold MustCover
+  infer_instance
+
 def ForcedCover (state : ShortState) : Nat :=
   if MustCover state then state.shortPosition else 0
 

@@ -1,3 +1,4 @@
+import Init.Data.Int.Lemmas
 import LeanFinance.Core
 
 namespace LeanFinance.StrategyEcology
@@ -35,7 +36,7 @@ theorem genomeFixedScale_trans
   constructor
   · exact second.1.trans first.1
   · rw [second.2, first.2]
-    simp [add_assoc]
+    exact Int.add_assoc _ _ _
 
 structure ScaleIntervention (Genome : Type) where
   before : StrategyState Genome

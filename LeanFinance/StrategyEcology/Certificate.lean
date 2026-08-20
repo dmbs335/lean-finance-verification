@@ -47,14 +47,14 @@ theorem CausalEdgeCertificate.positiveEstimate
     (certificate : CausalEdgeCertificate Strategy Regime)
     (positive : CertifiesPositive certificate) :
     0 < certificate.estimate :=
-  lt_of_lt_of_le positive certificate.orderedBounds.1
+  Int.lt_of_lt_of_le positive certificate.orderedBounds.1
 
 theorem CausalEdgeCertificate.negativeEstimate
     {Strategy Regime : Type}
     (certificate : CausalEdgeCertificate Strategy Regime)
     (negative : CertifiesNegative certificate) :
     certificate.estimate < 0 :=
-  lt_of_le_of_lt certificate.orderedBounds.2 negative
+  Int.lt_of_le_of_lt certificate.orderedBounds.2 negative
 
 theorem CausalEdgeCertificate.positiveKernelEffect
     {Strategy Regime : Type}
