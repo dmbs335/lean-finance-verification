@@ -14,3 +14,5 @@ import LeanFinance.Epistemic.RobustSynthesis
 import LeanFinance.Epistemic.EvidenceTaxonomy
 import LeanFinance.Epistemic.ObservationBoundary
 import LeanFinance.Epistemic.TransitionSeparation
+import LeanFinance.Epistemic.VersionSpace
+import LeanFinance.Epistemic.VersionSpaceExample

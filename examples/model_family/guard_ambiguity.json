@@ -1,0 +1,50 @@
+{
+  "schema_version": "lfv-model-family-evidence-v1",
+  "name": "cost-model-guard-version-space",
+  "chosen_model": "narrow",
+  "models": [
+    {
+      "id": "narrow",
+      "consistent": true,
+      "description": "The inferred mutation action is enabled only in the observed state."
+    },
+    {
+      "id": "permissive",
+      "consistent": true,
+      "description": "The same observed trace is reproduced, but another unobserved state also permits a silent mutation."
+    }
+  ],
+  "worlds": [
+    {"id": "narrowHonest", "model": "narrow", "claim": true, "description": "Honest execution in the point-refined semantics."},
+    {"id": "narrowVisibleAttack", "model": "narrow", "claim": false, "description": "The point model exposes its only mutation through publication evidence."},
+    {"id": "permissiveHonest", "model": "permissive", "claim": true, "description": "Honest execution in the alternative consistent semantics."},
+    {"id": "permissiveVisibleAttack", "model": "permissive", "claim": false, "description": "A visible mutation under the permissive semantics."},
+    {"id": "permissiveSilentMutation", "model": "permissive", "claim": false, "description": "An unobserved control-plane state permits the mutation without changing publication evidence."}
+  ],
+  "channels": [
+    {
+      "id": "publication",
+      "cost": 1,
+      "description": "Selected-result publication evidence.",
+      "observations": {
+        "narrowHonest": "clean",
+        "narrowVisibleAttack": "flagged",
+        "permissiveHonest": "clean",
+        "permissiveVisibleAttack": "flagged",
+        "permissiveSilentMutation": "clean"
+      }
+    },
+    {
+      "id": "mutationReceipt",
+      "cost": 3,
+      "description": "Independent receipt at the cost-model mutation boundary.",
+      "observations": {
+        "narrowHonest": "absent",
+        "narrowVisibleAttack": "absent",
+        "permissiveHonest": "absent",
+        "permissiveVisibleAttack": "absent",
+        "permissiveSilentMutation": "present"
+      }
+    }
+  ]
+}
