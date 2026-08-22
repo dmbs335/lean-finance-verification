@@ -207,7 +207,7 @@ def render_lean(model: EvidenceModel, certificate: dict[str, Any]) -> str:
             right=history_ident[edge["right"]],
         )
     lines += [
-        "theorem cheaperCandidateCounterexample",
+        "def cheaperCandidateCounterexample",
         "    (candidate : Candidate)",
         "    (cheaper :",
         "      selectionCost model (decode candidate) <",
