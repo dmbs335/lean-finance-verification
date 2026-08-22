@@ -5,6 +5,9 @@ namespace LeanFinance.Generated.ObservedCostModelTampering.TransitionSeparation
 
 open LeanFinance.Epistemic
 
+set_option maxRecDepth 100000
+set_option maxHeartbeats 8000000
+
 abbrev WorkflowAction :=
   LeanFinance.Generated.ObservedCostModelTampering.Search.Action
 abbrev EvidenceHistory :=
