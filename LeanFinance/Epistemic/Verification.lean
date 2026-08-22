@@ -73,8 +73,7 @@ theorem identified_implies_verifiable
   intro left right sameEvidence
   have sameClaim : claim left = claim right :=
     identified left right sameEvidence
-  cases sameClaim
-  exact Iff.rfl
+  exact Iff.of_eq sameClaim
 
 theorem verifiable_iff_identified
     {History : Type u}
