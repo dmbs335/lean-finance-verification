@@ -1,0 +1,14 @@
+{
+  "schema_version": "lfv-evidence-taxonomy-config-v1",
+  "name": "research-integrity-obligation-taxonomy",
+  "honest_histories": [
+    "honest"
+  ],
+  "attack_histories": [
+    "undeclaredBaseline",
+    "hiddenSweep",
+    "futureLeak",
+    "costModelTampering",
+    "dualAttack"
+  ]
+}
