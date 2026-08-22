@@ -83,14 +83,18 @@ theorem enabled_preserved
         (embedAction action) =
       LeanFinance.Generated.WorkflowIntegrity.Search.enabled
         state trace action := by
+  have countPreserved :
+      (trace.map embedAction).count (embedAction action) =
+        trace.count action :=
+    list_count_map_of_injective
+      embedAction embedAction_injective trace action
   cases action <;>
     simp [
       LeanFinance.Generated.ObservedCostModelTampering.Search.enabled,
       LeanFinance.Generated.WorkflowIntegrity.Search.enabled,
       embedState,
       embedAction,
-      list_count_map_of_injective,
-      embedAction_injective]
+      countPreserved]
 
 /-- The observed cost-model extension is conservative over the entire original
     workflow: old traces, terminal states, claims, and legacy observations are
@@ -114,7 +118,6 @@ def conservativeRefinement :
           intro action _member
           cases action <;>
             simp [
-              LeanFinance.Generated.WorkflowIntegrity.Search.workflow,
               LeanFinance.Generated.ObservedCostModelTampering.Search.workflow,
               embedAction]
         enabledPreserved := enabled_preserved
@@ -153,9 +156,14 @@ theorem old_trace_claim_preserved
     (trace : List OriginalAction) :
     LeanFinance.Generated.ObservedCostModelTampering.Search.traceClaim
         (trace.map embedAction) =
-      LeanFinance.Generated.WorkflowIntegrity.Search.traceClaim trace :=
-  SemanticWorkflowRefinement.traceClaimPreserved
-    conservativeRefinement trace
+      LeanFinance.Generated.WorkflowIntegrity.Search.traceClaim trace := by
+  simpa [
+    LeanFinance.Generated.ObservedCostModelTampering.Search.traceClaim,
+    LeanFinance.Generated.WorkflowIntegrity.Search.traceClaim,
+    conservativeRefinement]
+    using
+      SemanticWorkflowRefinement.traceClaimPreserved
+        conservativeRefinement trace
 
 theorem old_trace_observation_preserved
     (trace : List OriginalAction) :
