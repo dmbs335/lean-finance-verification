@@ -56,6 +56,30 @@ def CEGISChain
       round.before = current ∧
         CEGISChain round.after rest finalSelection
 
+/-- The chain proposition is executable whenever channel equality is
+    executable. Proof fields inside a refinement round are irrelevant: the
+    decision procedure only compares the public `before`/`after` channel lists
+    and recursively checks adjacency. -/
+instance instDecidableCEGISChain
+    {History : Type u}
+    {Channel : Type v}
+    {Observation : Type w}
+    [DecidableEq Channel]
+    {model : BoundedEvidenceModel History Channel Observation}
+    (current : List Channel)
+    (rounds : List (CEGISRefinementRound model))
+    (finalSelection : List Channel) :
+    Decidable (CEGISChain current rounds finalSelection) := by
+  induction rounds generalizing current with
+  | nil =>
+      simp only [CEGISChain]
+      infer_instance
+  | cons round rest ih =>
+      simp only [CEGISChain]
+      letI : Decidable (CEGISChain round.after rest finalSelection) :=
+        ih round.after
+      infer_instance
+
 /-- A proof-carrying CEGIS transcript combines connected refinement rounds with
     an independently checked final verifier and optimality theorem. This
     interface accepts either explicit lower-cost counterexamples or exhaustive
