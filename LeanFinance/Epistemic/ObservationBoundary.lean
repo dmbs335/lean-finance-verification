@@ -6,14 +6,17 @@ namespace LeanFinance.Epistemic
 universe u v w x y
 
 /-- Evidence factors through an observation boundary when it is a deterministic
-    post-processing of the boundary state. -/
-def FactorsThroughBoundary
+    post-processing of the boundary state. The post-processing function is
+    retained as proof data so constructive counterexamples can be transported
+    through the factorization. -/
+structure FactorsThroughBoundary
     {History : Type u}
     {Boundary : Type v}
     {Evidence : Type w}
     (boundary : History → Boundary)
-    (evidence : History → Evidence) : Prop :=
-  ∃ postprocess : Boundary → Evidence,
+    (evidence : History → Evidence) where
+  postprocess : Boundary → Evidence
+  factor :
     ∀ history,
       evidence history = postprocess (boundary history)
 
@@ -30,14 +33,14 @@ theorem verifiable_boundary_of_factored_evidence
     (factors : FactorsThroughBoundary boundary evidence)
     (verified : Verifiable evidence claim) :
     Verifiable boundary claim := by
-  rcases factors with ⟨postprocess, factor⟩
   intro left right sameBoundary
   apply verified left right
   calc
-    evidence left = postprocess (boundary left) := factor left
-    _ = postprocess (boundary right) :=
-      congrArg postprocess sameBoundary
-    _ = evidence right := (factor right).symm
+    evidence left = factors.postprocess (boundary left) :=
+      factors.factor left
+    _ = factors.postprocess (boundary right) :=
+      congrArg factors.postprocess sameBoundary
+    _ = evidence right := (factors.factor right).symm
 
 /-- Downstream-evidence impossibility: if a claim is not verifiable at a
     boundary, no deterministic evidence derived solely from that boundary can
@@ -68,24 +71,22 @@ def factoredEvidenceCounterexample
     {claim : History → Prop}
     (counterexample : VerificationCounterexample boundary claim)
     (factors : FactorsThroughBoundary boundary evidence) :
-    VerificationCounterexample evidence claim := by
-  rcases factors with ⟨postprocess, factor⟩
-  exact
-    {
-      left := counterexample.left
-      right := counterexample.right
-      sameEvidence := by
-        calc
-          evidence counterexample.left =
-              postprocess (boundary counterexample.left) :=
-            factor counterexample.left
-          _ = postprocess (boundary counterexample.right) :=
-            congrArg postprocess counterexample.sameEvidence
-          _ = evidence counterexample.right :=
-            (factor counterexample.right).symm
-      leftClaim := counterexample.leftClaim
-      rightNotClaim := counterexample.rightNotClaim
-    }
+    VerificationCounterexample evidence claim :=
+  {
+    left := counterexample.left
+    right := counterexample.right
+    sameEvidence := by
+      calc
+        evidence counterexample.left =
+            factors.postprocess (boundary counterexample.left) :=
+          factors.factor counterexample.left
+        _ = factors.postprocess (boundary counterexample.right) :=
+          congrArg factors.postprocess counterexample.sameEvidence
+        _ = evidence counterexample.right :=
+          (factors.factor counterexample.right).symm
+    leftClaim := counterexample.leftClaim
+    rightNotClaim := counterexample.rightNotClaim
+  }
 
 /-- A claim decoder at the boundary is sufficient for verification. Together
     with the impossibility theorem, this isolates the exact epistemic role of a
