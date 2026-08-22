@@ -233,7 +233,9 @@ def _synthesize_action(
     return action, refinement
 
 
-def _validate_refined_model(raw: dict[str, Any]) -> tuple[WorkflowModel, Path, tempfile.TemporaryDirectory]:
+def _validate_refined_model(
+    raw: dict[str, Any],
+) -> tuple[WorkflowModel, Path, tempfile.TemporaryDirectory]:
     temporary = tempfile.TemporaryDirectory(prefix="lfv-trace-refinement-")
     path = Path(temporary.name) / "refined-model.json"
     write_canonical_json(path, raw)
@@ -292,6 +294,15 @@ def _replay_and_refine(
                 step.observed_after,
                 f"$.steps[{index}].observed_after",
             )
+
+    # Each synthesized action may lengthen a previously maximal attack trace by
+    # one event. Preserve bounded composition coverage rather than only making
+    # the one observed trace replayable.
+    raw["max_depth"] = max(
+        raw["max_depth"],
+        base_model.max_depth + len(refinements),
+        len(trace.steps),
+    )
 
     if first_original_gap is None:
         raise ValidationError(
