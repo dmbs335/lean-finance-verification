@@ -37,6 +37,13 @@ jobs:
         run: python -m unittest discover -s tools/workflow_cegis/tests -v
       - name: Test observed attack-trace refinement
         run: python -m unittest discover -s tools/trace_refinement/tests -v
+      - name: Test evidence-obligation taxonomy
+        run: python -m unittest discover -s tools/evidence_taxonomy/tests -v
+      - name: Check evidence taxonomy reproducibility
+        run: >-
+          python -m tools.evidence_taxonomy check-generated
+          --spec examples/evidence_taxonomy/cost_model_novelty.json
+          --report examples/evidence_taxonomy/generated/taxonomy.canonical.json
       - name: Check observed trace refinement reproducibility
         run: >-
           python -m tools.trace_refinement check-generated

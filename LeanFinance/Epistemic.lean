@@ -11,3 +11,4 @@ import LeanFinance.Epistemic.ModelRefinement
 import LeanFinance.Epistemic.EvidenceDebt
 import LeanFinance.Epistemic.Connectivity
 import LeanFinance.Epistemic.RobustSynthesis
+import LeanFinance.Epistemic.EvidenceTaxonomy

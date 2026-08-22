@@ -1,0 +1,21 @@
+{
+  "schema_version": "lfv-evidence-taxonomy-spec-v1",
+  "name": "cost-model-tampering-epistemic-novelty",
+  "evidence_model": "../trace_refinement/generated/evidence-model.canonical.json",
+  "reference_history": "honest",
+  "known_attacks": [
+    "undeclaredBaseline",
+    "hiddenSweep",
+    "futureLeak",
+    "dualAttack"
+  ],
+  "candidate_attacks": [
+    "costModelTampering",
+    "history16"
+  ],
+  "basis_channels": [
+    "selfReport",
+    "targetedReceipt_executeHiddenSweep",
+    "targetedReceipt_readFutureData"
+  ]
+}
