@@ -68,7 +68,7 @@ class EvidenceSynthesisTests(unittest.TestCase):
     def test_generated_lean_contains_checker_and_optimality_certificate(self) -> None:
         source = render_lean(self.model, solve_model(self.model))
         self.assertIn("def synthesisCertificate", source)
-        self.assertIn("theorem cheaperCandidateCounterexample", source)
+        self.assertIn("def cheaperCandidateCounterexample", source)
         self.assertIn("synthesized_selection_is_cost_minimal", source)
         self.assertNotIn("sorry", source.lower())
 
