@@ -1,8 +1,8 @@
 # Lean Finance Verification
 
 A Lean 4 research framework for **proof-carrying financial research**: market models,
-constraint-driven dynamics, inverse-game abstractions, industrial bottlenecks, and
-machine-checkable backtest certificates.
+constraint-driven dynamics, inverse-game abstractions, industrial bottlenecks,
+evidence-separation theory, and machine-checkable backtest certificates.
 
 ## What this repository verifies
 
@@ -25,9 +25,19 @@ Current certificate properties include:
 - an adapter handoff exposes a proof-carrying certificate rather than an opaque
   performance number.
 
+The epistemic layer additionally proves limits on verification itself:
+
+- deterministic post-processing cannot amplify the distinctions present in evidence;
+- a selected family of evidence channels verifies a claim exactly when it hits every
+  claim-disagreement separator set;
+- exploration completeness cannot be certified solely from a researcher's public
+  declaration;
+- in the formal search-history model, the declaration and independent executor log
+  form a mechanically proved minimal evidence cut set.
+
 These properties do **not** prove that a strategy is profitable, that raw data is true,
 or that an empirical model is statistically correct. They prove the narrower
-research-integrity claims encoded by the certificate.
+research-integrity and evidence-sufficiency claims encoded by the framework.
 
 ## Formal layers
 
@@ -38,6 +48,7 @@ LeanFinance/
 ├── Constraints/      margin, VaR, redemption, and short-cover triggers
 ├── Dynamics/         market-state and equilibrium-regime transitions
 ├── Inference/        latent state, identification, and inverse-game boundaries
+├── Epistemic/        verifiability, non-amplification, evidence cut sets, impossibility
 ├── StrategyEcology/  context-dependent causal strategy interactions
 ├── SupplyChain/      dynamic capacity, substitution, qualification, and rent claims
 ├── Backtest/         artifacts, PIT lineage, anchored search history, adapter contract
@@ -56,6 +67,19 @@ lake build
 GitHub Actions runs Python adapter tests, including a locally generated RFC 3161 test
 PKI and signed timestamp, checks that generated artifacts are byte-reproducible, and
 then runs the Lean build.
+
+## Evidence separation theory
+
+`LeanFinance/Epistemic/` treats a complete research process as a hidden history, an
+artifact bundle as an observation map, and an integrity statement as a proposition on
+histories. The core criterion is that a verifiable claim must be constant on every
+observational equivalence class.
+
+The layer mechanizes verification non-amplification, epistemic cut-set duality,
+constructive unverifiability witnesses, and a general no-self-certified-completeness
+theorem. See [`docs/EVIDENCE_SEPARATION_THEORY.md`](docs/EVIDENCE_SEPARATION_THEORY.md)
+for the formal statements, the minimal search-integrity cut set, and the proposed
+evidence-synthesis research program.
 
 ## Python reference adapter
 
@@ -91,9 +115,10 @@ signed timestamp issuance, verification, and trust assumptions.
 
 ## Research roadmap
 
-1. Replace integer-valued toy market primitives with reusable ordered-ring and
-   probabilistic abstractions.
-2. Formalize a finite Bayesian market game and executable equilibrium checker.
+1. Build bounded adversarial-history generators and synthesize minimum-cost evidence
+   cut sets from separator hypergraphs.
+2. Add costs for privacy leakage, operational burden, and external trust to evidence
+   selection.
 3. Connect forced-flow composition, constraint activation, and regime-transition
    safety theorems end to end.
 4. Add a second independent transparency-log anchor and require multi-provider quorum
@@ -104,7 +129,9 @@ signed timestamp issuance, verification, and trust assumptions.
 ## Scope
 
 This repository is research software. A Lean proof is only as strong as its formalized
-assumptions and the cryptographic, data-lineage, execution, external-anchor, and trust-
-material evidence supplied to the checker. RFC 3161 support verifies signed evidence
-but does not by itself prove TSA independence, revocation status, or long-term archival
-validity.
+history space, observation maps, assumptions, and the cryptographic, data-lineage,
+execution, external-anchor, and trust-material evidence supplied to the checker. RFC
+3161 support verifies signed evidence but does not by itself prove TSA independence,
+revocation status, or long-term archival validity. Evidence-separation theorems prove
+structural possibility and impossibility relative to modeled channels; they do not
+assert that an omitted real-world channel is trustworthy.
