@@ -15,8 +15,8 @@ inductive Candidate where
   | complete
   deriving Repr, DecidableEq
 
-def allEdges : Finset Edge :=
-  {.hidden, .future, .mutation}
+def allEdges : List Edge :=
+  [.hidden, .future, .mutation]
 
 def covers : Candidate → Edge → Prop
   | .none, _ => False
@@ -34,11 +34,17 @@ def cost : Candidate → Nat
   | .complete => 7
 
 def problem : FiniteCEGISProblem Edge Candidate :=
-  { allEdges := allEdges, covers := covers, cost := cost }
+  {
+    allEdges := allEdges
+    allEdgesNodup := by decide
+    covers := covers
+    cost := cost
+  }
 
 def finalMaster : ExactMasterState problem :=
   {
     discovered := allEdges
+    discoveredNodup := by decide
     selected := .complete
     feasible := by
       intro edge member
@@ -48,16 +54,16 @@ def finalMaster : ExactMasterState problem :=
       cases candidate with
       | none =>
           exfalso
-          have := feasible .hidden (by simp [allEdges])
-          simpa [problem, covers] using this
+          have impossible := feasible .hidden (by simp [allEdges])
+          simpa [problem, covers] using impossible
       | hiddenOnly =>
           exfalso
-          have := feasible .future (by simp [allEdges])
-          simpa [problem, covers] using this
+          have impossible := feasible .future (by simp [allEdges])
+          simpa [problem, covers] using impossible
       | hiddenFuture =>
           exfalso
-          have := feasible .mutation (by simp [allEdges])
-          simpa [problem, covers] using this
+          have impossible := feasible .mutation (by simp [allEdges])
+          simpa [problem, covers] using impossible
       | complete => simp [problem, cost]
   }
 
@@ -67,11 +73,12 @@ def transcript : FiniteCEGISTranscript problem :=
     discoveredWithinUniverse := by
       intro edge member
       exact member
+    distinctRoundBound := by decide
     oracleComplete := finalMaster.feasible
   }
 
 theorem three_distinct_rounds_are_enough :
-    transcript.distinctRoundCount ≤ allEdges.card :=
+    transcript.distinctRoundCount ≤ allEdges.length :=
   transcript.distinct_round_count_le_disagreement_edges
 
 theorem final_candidate_is_globally_sound :
