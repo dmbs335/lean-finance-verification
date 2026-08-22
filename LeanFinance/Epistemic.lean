@@ -22,3 +22,5 @@ import LeanFinance.Epistemic.MultiClaim
 import LeanFinance.Epistemic.MultiClaimExample
 import LeanFinance.Epistemic.SymbolicCoverage
 import LeanFinance.Epistemic.SymbolicCoverageExample
+import LeanFinance.Epistemic.ProviderQuorum
+import LeanFinance.Epistemic.ProviderQuorumExample
