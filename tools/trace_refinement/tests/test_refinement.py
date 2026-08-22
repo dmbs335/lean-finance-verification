@@ -134,7 +134,7 @@ class TraceRefinementTests(unittest.TestCase):
             raw = json.loads(TRACE.read_text(encoding="utf-8"))
             unknown = raw["steps"][2]
             unknown["observed_after"] = {
-                "costModelTampered": false
+                "costModelTampered": False
             }
             path.write_text(json.dumps(raw), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "no observed state delta"):
@@ -152,7 +152,7 @@ class TraceRefinementTests(unittest.TestCase):
                 {"event": "publishResult"},
                 {"event": "anchorLedger"},
             ]
-            raw["expected_claim"] = true
+            raw["expected_claim"] = True
             path.write_text(json.dumps(raw), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "no model refinement"):
                 build(BASE_MODEL, path)
