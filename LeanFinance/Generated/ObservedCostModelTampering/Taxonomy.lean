@@ -28,7 +28,8 @@ theorem undeclared_baseline_signature
     SeparatorSignatureAt observe .honest .undeclaredBaseline
         evidenceChannel ↔
       evidenceChannel = .selfReport := by
-  cases evidenceChannel <;> decide
+  cases evidenceChannel <;>
+    simp [SeparatorSignatureAt, Separates, observe]
 
 theorem hidden_sweep_signature
     (evidenceChannel : Channel) :
@@ -36,7 +37,8 @@ theorem hidden_sweep_signature
         evidenceChannel ↔
       evidenceChannel = .fullExecutorLog ∨
         evidenceChannel = .targetedReceipt_executeHiddenSweep := by
-  cases evidenceChannel <;> decide
+  cases evidenceChannel <;>
+    simp [SeparatorSignatureAt, Separates, observe]
 
 theorem future_leak_signature
     (evidenceChannel : Channel) :
@@ -44,14 +46,16 @@ theorem future_leak_signature
         evidenceChannel ↔
       evidenceChannel = .fullExecutorLog ∨
         evidenceChannel = .targetedReceipt_readFutureData := by
-  cases evidenceChannel <;> decide
+  cases evidenceChannel <;>
+    simp [SeparatorSignatureAt, Separates, observe]
 
 theorem cost_model_tampering_signature
     (evidenceChannel : Channel) :
     SeparatorSignatureAt observe .honest .costModelTampering
         evidenceChannel ↔
       evidenceChannel = .targetedReceipt_tamperCostModel := by
-  cases evidenceChannel <;> decide
+  cases evidenceChannel <;>
+    simp [SeparatorSignatureAt, Separates, observe]
 
 theorem dual_attack_signature
     (evidenceChannel : Channel) :
@@ -60,13 +64,15 @@ theorem dual_attack_signature
       evidenceChannel = .fullExecutorLog ∨
         evidenceChannel = .targetedReceipt_executeHiddenSweep ∨
         evidenceChannel = .targetedReceipt_readFutureData := by
-  cases evidenceChannel <;> decide
+  cases evidenceChannel <;>
+    simp [SeparatorSignatureAt, Separates, observe]
 
 /-- Different action orders can collapse into one evidence-obligation class. -/
 theorem dual_attack_order_variants_share_signature :
     SameSeparatorSignatureAt observe .honest .dualAttack .history16 := by
   intro evidenceChannel
-  cases evidenceChannel <;> decide
+  cases evidenceChannel <;>
+    simp [SeparatorSignatureAt, Separates, observe]
 
 theorem dual_attack_order_variants_are_distinct_histories :
     (History.dualAttack : History) ≠ .history16 := by
@@ -85,7 +91,8 @@ theorem hidden_signature_included_in_dual :
     SeparatorSignatureIncludedAt
       observe .honest .hiddenSweep .dualAttack := by
   intro evidenceChannel separates
-  cases evidenceChannel <;> decide
+  cases evidenceChannel <;>
+    simp [SeparatorSignatureAt, Separates, observe] at separates ⊢
 
 theorem dual_signature_not_included_in_hidden :
     ¬ SeparatorSignatureIncludedAt
@@ -94,29 +101,43 @@ theorem dual_signature_not_included_in_hidden :
   have futureSeparatesDual :
       SeparatorSignatureAt observe .honest .dualAttack
         .targetedReceipt_readFutureData := by
-    decide
+    simp [SeparatorSignatureAt, Separates, observe]
   have futureSeparatesHidden :=
     included .targetedReceipt_readFutureData futureSeparatesDual
-  exact (by decide :
-    ¬ SeparatorSignatureAt observe .honest .hiddenSweep
-      .targetedReceipt_readFutureData) futureSeparatesHidden
+  simpa [SeparatorSignatureAt, Separates, observe] using
+    futureSeparatesHidden
 
 /-- The cost-model mutation has no exact class among the known declaration,
     hidden-execution, future-data, or dual-attack obligations. -/
 theorem cost_model_tampering_is_signature_novel :
     EpistemicallyNovelAt
       observe .honest knownAttacks .costModelTampering := by
-  decide
+  intro previous member same
+  have previousCases :
+      previous = .undeclaredBaseline ∨
+        previous = .hiddenSweep ∨
+        previous = .futureLeak ∨
+        previous = .dualAttack := by
+    simpa [knownAttacks] using member
+  rcases previousCases with rfl | rfl | rfl | rfl <;>
+    have atTamper := same .targetedReceipt_tamperCostModel <;>
+    simp [SeparatorSignatureAt, Separates, observe] at atTamper
 
 /-- Its sole separator channel was irrelevant to every known attack. -/
 theorem cost_model_tampering_introduces_unseen_separator :
     IntroducesUnseenSeparatorAt
       observe .honest knownAttacks .costModelTampering := by
   refine ⟨.targetedReceipt_tamperCostModel, ?_, ?_⟩
-  · decide
-  · intro previous member
-    simp [knownAttacks] at member
-    rcases member with rfl | rfl | rfl | rfl <;> decide
+  · simp [SeparatorSignatureAt, Separates, observe]
+  · intro previous member previousSeparates
+    have previousCases :
+        previous = .undeclaredBaseline ∨
+          previous = .hiddenSweep ∨
+          previous = .futureLeak ∨
+          previous = .dualAttack := by
+      simpa [knownAttacks] using member
+    rcases previousCases with rfl | rfl | rfl | rfl <;>
+      simp [SeparatorSignatureAt, Separates, observe] at previousSeparates
 
 /-- The old exact evidence basis cannot see the control-plane mutation. -/
 theorem cost_model_tampering_is_basis_novel :
@@ -125,17 +146,21 @@ theorem cost_model_tampering_is_basis_novel :
   intro detected
   rcases detected with
     ⟨evidenceChannel, member, separates⟩
-  simp [legacyBasis] at member
-  rcases member with rfl | rfl | rfl <;> decide
+  have evidenceCases :
+      evidenceChannel = .selfReport ∨
+        evidenceChannel = .targetedReceipt_executeHiddenSweep ∨
+        evidenceChannel = .targetedReceipt_readFutureData := by
+    simpa [legacyBasis] using member
+  rcases evidenceCases with rfl | rfl | rfl <;>
+    simp [SeparatorSignatureAt, Separates, observe] at separates
 
 /-- Adding the targeted control-plane receipt closes that new obligation. -/
 theorem refined_basis_detects_cost_model_tampering :
     SelectionSeparatesAt
       observe refinedBasis .honest .costModelTampering := by
-  exact
-    ⟨.targetedReceipt_tamperCostModel,
-      by simp [refinedBasis],
-      by decide⟩
+  refine ⟨.targetedReceipt_tamperCostModel, ?_, ?_⟩
+  · simp [refinedBasis]
+  · simp [SeparatorSignatureAt, Separates, observe]
 
 /-- The observed trace satisfies the full strong-novelty criterion. -/
 theorem cost_model_tampering_is_new_observation_boundary :
