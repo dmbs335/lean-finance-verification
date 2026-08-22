@@ -1,0 +1,13 @@
+{
+  "schema_version": "lfv-pit-vendor-package-metadata-v1",
+  "package_id": "pit-fixture-package-v1",
+  "vendor_id": "fixture-vendor",
+  "license_id": "fixture-license-v1",
+  "redistribution_policy": "metadata-only",
+  "files": [
+    {"path": "vintages.csv", "kind": "vintages"},
+    {"path": "listings.csv", "kind": "listings"},
+    {"path": "prices.csv", "kind": "prices"},
+    {"path": "corporate_actions.csv", "kind": "corporate_actions"}
+  ]
+}

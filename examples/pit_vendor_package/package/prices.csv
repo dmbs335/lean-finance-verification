@@ -1,0 +1,13 @@
+asset,time,available_at,value,vintage
+ALPHA,10,11,100,prices-v1
+ALPHA,20,21,105,prices-v1
+ALPHA,30,31,110,prices-v1
+ALPHA,40,41,115,prices-v1
+BETA,10,11,100,prices-v1
+BETA,20,21,110,prices-v1
+BETA,30,31,90,prices-v1
+GAMMA,20,21,100,prices-v1
+GAMMA,30,31,108,prices-v1
+GAMMA,40,41,120,prices-v1
+ALPHA,40,45,116,prices-v2
+GAMMA,40,45,121,prices-v2
