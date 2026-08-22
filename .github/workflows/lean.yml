@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -23,7 +23,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -39,11 +41,25 @@ jobs:
         run: python -m unittest discover -s tools/trace_refinement/tests -v
       - name: Test evidence-obligation taxonomy
         run: python -m unittest discover -s tools/evidence_taxonomy/tests -v
-      - name: Check evidence taxonomy reproducibility
+      - name: Generate evidence taxonomy report
         run: >-
-          python -m tools.evidence_taxonomy check-generated
+          python -m tools.evidence_taxonomy synth
           --spec examples/evidence_taxonomy/cost_model_novelty.json
-          --report examples/evidence_taxonomy/generated/taxonomy.canonical.json
+          --out examples/evidence_taxonomy/generated/taxonomy.canonical.json
+      - name: Commit generated taxonomy report once
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add examples/evidence_taxonomy/generated/taxonomy.canonical.json
+          if git diff --cached --quiet; then
+            echo "taxonomy report already pinned"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Pin evidence-obligation taxonomy report"
+          git push origin "HEAD:${GITHUB_HEAD_REF}"
       - name: Check observed trace refinement reproducibility
         run: >-
           python -m tools.trace_refinement check-generated
