@@ -11,4 +11,5 @@ import LeanFinance.Backtest.CommittedSearchLedger
 import LeanFinance.Backtest.LineageClosure
 import LeanFinance.Backtest.IntegrityCertificate
 import LeanFinance.Backtest.AdapterContract
+import LeanFinance.Backtest.SearchProvenance
 import LeanFinance.Examples.ProofCarryingBacktest
