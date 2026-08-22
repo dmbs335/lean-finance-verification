@@ -1,0 +1,30 @@
+{
+  "schema_version": "lfv-robust-evidence-policy-v1",
+  "name": "single-provider-fault-resilience",
+  "required_connectivity": 2,
+  "channel_domains": {
+    "providerAReceipt1": "providerA",
+    "providerAReceipt2": "providerA",
+    "providerBReceipt": "providerB"
+  },
+  "faults": [
+    {
+      "id": "none",
+      "rank": 0,
+      "compromised_domains": [],
+      "description": "No evidence provider is compromised."
+    },
+    {
+      "id": "compromiseProviderA",
+      "rank": 1,
+      "compromised_domains": ["providerA"],
+      "description": "Every receipt controlled by provider A is unavailable or adversarial."
+    },
+    {
+      "id": "compromiseProviderB",
+      "rank": 1,
+      "compromised_domains": ["providerB"],
+      "description": "Every receipt controlled by provider B is unavailable or adversarial."
+    }
+  ]
+}
