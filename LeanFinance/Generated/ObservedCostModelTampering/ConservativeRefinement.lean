@@ -104,25 +104,28 @@ def conservativeRefinement :
       originalObservation
       refinedObservation :=
   {
-    embedState := embedState
-    embedAction := embedAction
-    actionInjective := embedAction_injective
-    initialPreserved := rfl
-    actionIncluded := by
-      intro action _member
-      cases action <;>
-        simp [
-          LeanFinance.Generated.WorkflowIntegrity.Search.workflow,
-          LeanFinance.Generated.ObservedCostModelTampering.Search.workflow,
-          embedAction]
-    enabledPreserved := enabled_preserved
-    transitionPreserved := by
-      intro state action
-      cases state
-      cases action <;> rfl
-    terminalPreserved := by
-      intro state
-      rfl
+    workflowRefinement :=
+      {
+        embedState := embedState
+        embedAction := embedAction
+        actionInjective := embedAction_injective
+        initialPreserved := rfl
+        actionIncluded := by
+          intro action _member
+          cases action <;>
+            simp [
+              LeanFinance.Generated.WorkflowIntegrity.Search.workflow,
+              LeanFinance.Generated.ObservedCostModelTampering.Search.workflow,
+              embedAction]
+        enabledPreserved := enabled_preserved
+        transitionPreserved := by
+          intro state action
+          cases state
+          cases action <;> rfl
+        terminalPreserved := by
+          intro state
+          rfl
+      }
     claimPreserved := by
       intro state
       simp [
@@ -144,7 +147,7 @@ theorem old_trace_replay_preserved
           LeanFinance.Generated.WorkflowIntegrity.Search.workflow
           trace) :=
   WorkflowRefinement.replay_eq_map
-    conservativeRefinement.toWorkflowRefinement trace
+    conservativeRefinement.workflowRefinement trace
 
 theorem old_trace_claim_preserved
     (trace : List OriginalAction) :
