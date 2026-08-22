@@ -1,0 +1,21 @@
+{
+  "schema_version": "lfv-selective-execution-policy-v1",
+  "policy_id": "official-backtest-run-v1",
+  "runner_id": "independent-runner-a",
+  "trust_domain": "execution-provider-a",
+  "action_universe": [
+    "register",
+    "executeBaseline",
+    "executeHiddenSweep",
+    "readFutureData",
+    "tamperCostModel",
+    "publish",
+    "anchor",
+    "abort"
+  ],
+  "forbidden_actions": [
+    "executeHiddenSweep",
+    "readFutureData",
+    "tamperCostModel"
+  ]
+}

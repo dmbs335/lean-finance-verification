@@ -24,3 +24,5 @@ import LeanFinance.Epistemic.SymbolicCoverage
 import LeanFinance.Epistemic.SymbolicCoverageExample
 import LeanFinance.Epistemic.ProviderQuorum
 import LeanFinance.Epistemic.ProviderQuorumExample
+import LeanFinance.Epistemic.SelectiveReceipt
+import LeanFinance.Epistemic.SelectiveReceiptExample
