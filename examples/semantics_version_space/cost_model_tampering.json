@@ -1,0 +1,51 @@
+{
+  "schema_version": "lfv-action-semantics-version-space-v1",
+  "name": "cost-model-tampering-action-version-space",
+  "variables": [
+    {
+      "id": "baselineExecuted",
+      "initial": false,
+      "probe_cost": 1,
+      "description": "Whether the baseline execution has occurred."
+    },
+    {
+      "id": "resultPublished",
+      "initial": false,
+      "probe_cost": 1,
+      "description": "Whether the selected result has already been published."
+    },
+    {
+      "id": "costModelTampered",
+      "initial": false,
+      "probe_cost": 1,
+      "description": "Whether the registered cost model is already altered."
+    }
+  ],
+  "effect_fields": [
+    "costModelTampered"
+  ],
+  "positive_observations": [
+    {
+      "before": {
+        "baselineExecuted": true,
+        "resultPublished": false,
+        "costModelTampered": false
+      },
+      "after": {
+        "costModelTampered": true
+      }
+    }
+  ],
+  "negative_states": [
+    {
+      "baselineExecuted": false,
+      "resultPublished": false,
+      "costModelTampered": false
+    },
+    {
+      "baselineExecuted": true,
+      "resultPublished": true,
+      "costModelTampered": false
+    }
+  ]
+}
