@@ -33,7 +33,7 @@ structure TraceModelRefinementCertificate
   originalResolve : Event → Option OriginalAction
   refinedResolve : Event → Option RefinedAction
   originalGap :
-    ∃ event,
+    ∃ event : Event,
       event ∈ observedTrace ∧
         originalResolve event = none
   refinedTrace : List RefinedAction
@@ -53,8 +53,13 @@ theorem originalAlphabetIncomplete
     {workflow : FiniteWorkflow RefinedState RefinedAction}
     {claim : RefinedState → Bool}
     (certificate :
-      TraceModelRefinementCertificate workflow claim) :
-    ∃ event,
+      TraceModelRefinementCertificate
+        (Event := Event)
+        (OriginalAction := OriginalAction)
+        (RefinedAction := RefinedAction)
+        (RefinedState := RefinedState)
+        workflow claim) :
+    ∃ event : Event,
       event ∈ certificate.observedTrace ∧
         certificate.originalResolve event = none :=
   certificate.originalGap
@@ -67,7 +72,12 @@ theorem refinedTraceResolves
     {workflow : FiniteWorkflow RefinedState RefinedAction}
     {claim : RefinedState → Bool}
     (certificate :
-      TraceModelRefinementCertificate workflow claim) :
+      TraceModelRefinementCertificate
+        (Event := Event)
+        (OriginalAction := OriginalAction)
+        (RefinedAction := RefinedAction)
+        (RefinedState := RefinedState)
+        workflow claim) :
     resolveTrace certificate.refinedResolve certificate.observedTrace =
       some certificate.refinedTrace :=
   certificate.refinedResolution
@@ -80,7 +90,12 @@ theorem refinedTraceReplays
     {workflow : FiniteWorkflow RefinedState RefinedAction}
     {claim : RefinedState → Bool}
     (certificate :
-      TraceModelRefinementCertificate workflow claim) :
+      TraceModelRefinementCertificate
+        (Event := Event)
+        (OriginalAction := OriginalAction)
+        (RefinedAction := RefinedAction)
+        (RefinedState := RefinedState)
+        workflow claim) :
     replay workflow certificate.refinedTrace =
       some certificate.finalState :=
   certificate.replayed
@@ -93,7 +108,12 @@ theorem refinedTraceViolatesClaim
     {workflow : FiniteWorkflow RefinedState RefinedAction}
     {claim : RefinedState → Bool}
     (certificate :
-      TraceModelRefinementCertificate workflow claim) :
+      TraceModelRefinementCertificate
+        (Event := Event)
+        (OriginalAction := OriginalAction)
+        (RefinedAction := RefinedAction)
+        (RefinedState := RefinedState)
+        workflow claim) :
     claim certificate.finalState = false :=
   certificate.violates
 
