@@ -35,6 +35,8 @@ jobs:
         run: python -m unittest discover -s tools/evidence_synth/tests -v
       - name: Test workflow counterexample-guided synthesis
         run: python -m unittest discover -s tools/workflow_cegis/tests -v
+      - name: Test observed attack-trace refinement
+        run: python -m unittest discover -s tools/trace_refinement/tests -v
       - name: Check generated backtest certificate reproducibility
         run: >-
           python -m tools.lfv_adapter check-generated
