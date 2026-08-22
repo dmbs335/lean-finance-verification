@@ -9,6 +9,7 @@ import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+from typing import Any
 
 from tools.lfv_adapter.canonical import hash_bytes, make_artifact_ref
 from tools.lfv_adapter.errors import ValidationError
@@ -131,12 +132,12 @@ class Rfc3161Tests(unittest.TestCase):
         extension_file = cls.root / "tsa-ext.cnf"
         extension_file.write_text(
             """[tsa_cert]
-"
-            "basicConstraints=critical,CA:FALSE\n"
-            "keyUsage=critical,digitalSignature\n"
-            "extendedKeyUsage=critical,timeStamping\n"
-            "subjectKeyIdentifier=hash\n"
-            "authorityKeyIdentifier=keyid,issuer\n""",
+basicConstraints=critical,CA:FALSE
+keyUsage=critical,digitalSignature
+extendedKeyUsage=critical,timeStamping
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer
+""",
             encoding="utf-8",
         )
         cls._run(
@@ -210,7 +211,7 @@ ess_cert_id_alg = sha256
             return response.read_bytes()
 
     @classmethod
-    def _offline_anchor(cls) -> dict[str, object]:
+    def _offline_anchor(cls) -> dict[str, Any]:
         terminal = cls.ledger["entries"][-1]["commitment"]
         target = anchor_target_digest(terminal, len(cls.ledger["entries"]))
         request_der = create_timestamp_query(
