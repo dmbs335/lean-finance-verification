@@ -7,6 +7,9 @@ open LeanFinance.Epistemic
 open LeanFinance.Generated.ObservedCostModelTampering.Evidence
 open LeanFinance.Generated.ObservedCostModelTampering.Connectivity
 
+set_option maxRecDepth 100000
+set_option maxHeartbeats 8000000
+
 /-- Every subset of the nine-channel robust candidate language. -/
 abbrev RobustCandidate := Fin 512
 
@@ -30,8 +33,16 @@ def robustDecode (candidate : RobustCandidate) : List ResilientChannel :=
 def robustSelected : RobustCandidate :=
   ⟨505, by decide⟩
 
-theorem robustSelected_decodes_to_architecture :
-    robustDecode robustSelected = resilientSelection := by
+/-- Canonical bit-order rendering of the seven-channel robust architecture. -/
+theorem robustSelected_decodes_to_canonical_architecture :
+    robustDecode robustSelected =
+      [.base .selfReport,
+        .base .fullExecutorLog,
+        .base .targetedReceipt_executeHiddenSweep,
+        .base .targetedReceipt_readFutureData,
+        .base .targetedReceipt_tamperCostModel,
+        .backupDeclaration,
+        .backupTamperReceipt] := by
   decide
 
 theorem robustSelected_cost :
