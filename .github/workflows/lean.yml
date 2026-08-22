@@ -35,6 +35,23 @@ jobs:
         run: python -m unittest discover -s tools/evidence_synth/tests -v
       - name: Test workflow counterexample-guided synthesis
         run: python -m unittest discover -s tools/workflow_cegis/tests -v
+      - name: Test observed attack-trace refinement
+        run: python -m unittest discover -s tools/trace_refinement/tests -v
+      - name: Check observed trace refinement reproducibility
+        run: >-
+          python -m tools.trace_refinement check-generated
+          --model examples/workflow_cegis/search_integrity.json
+          --trace examples/trace_refinement/cost_model_tampering.trace.json
+          --refined-model examples/trace_refinement/generated/refined-model.canonical.json
+          --refinement-report examples/trace_refinement/generated/refinement-report.canonical.json
+          --workflow-report examples/trace_refinement/generated/workflow-report.canonical.json
+          --evidence-model examples/trace_refinement/generated/evidence-model.canonical.json
+          --synthesis examples/trace_refinement/generated/global-synthesis.canonical.json
+          --repair-synthesis examples/trace_refinement/generated/repair-synthesis.canonical.json
+          --workflow-lean LeanFinance/Generated/ObservedCostModelTampering/Search.lean
+          --evidence-lean LeanFinance/Generated/ObservedCostModelTampering/Evidence.lean
+          --bridge-lean LeanFinance/Generated/ObservedCostModelTampering/CEGIS.lean
+          --trace-lean LeanFinance/Generated/ObservedCostModelTampering/TraceRefinement.lean
       - name: Check generated backtest certificate reproducibility
         run: >-
           python -m tools.lfv_adapter check-generated

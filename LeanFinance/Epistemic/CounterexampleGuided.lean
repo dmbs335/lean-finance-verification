@@ -56,6 +56,45 @@ def CEGISChain
       round.before = current ∧
         CEGISChain round.after rest finalSelection
 
+/-- Executable structural decision procedure for CEGIS-chain connectivity.
+    It inspects only public `before`/`after` lists; proof fields carried by a
+    refinement round never enter the computation. -/
+def decidableCEGISChain
+    {History : Type u}
+    {Channel : Type v}
+    {Observation : Type w}
+    [DecidableEq Channel]
+    {model : BoundedEvidenceModel History Channel Observation} :
+    (current : List Channel) →
+      (rounds : List (CEGISRefinementRound model)) →
+        (finalSelection : List Channel) →
+          Decidable (CEGISChain current rounds finalSelection)
+  | current, [], finalSelection =>
+      if same : current = finalSelection then
+        isTrue same
+      else
+        isFalse same
+  | current, round :: rest, finalSelection =>
+      if startsHere : round.before = current then
+        match decidableCEGISChain round.after rest finalSelection with
+        | isTrue connected => isTrue ⟨startsHere, connected⟩
+        | isFalse disconnected =>
+            isFalse (fun chain => disconnected chain.2)
+      else
+        isFalse (fun chain => startsHere chain.1)
+
+instance instDecidableCEGISChain
+    {History : Type u}
+    {Channel : Type v}
+    {Observation : Type w}
+    [DecidableEq Channel]
+    {model : BoundedEvidenceModel History Channel Observation}
+    (current : List Channel)
+    (rounds : List (CEGISRefinementRound model))
+    (finalSelection : List Channel) :
+    Decidable (CEGISChain current rounds finalSelection) :=
+  decidableCEGISChain current rounds finalSelection
+
 /-- A proof-carrying CEGIS transcript combines connected refinement rounds with
     an independently checked final verifier and optimality theorem. This
     interface accepts either explicit lower-cost counterexamples or exhaustive

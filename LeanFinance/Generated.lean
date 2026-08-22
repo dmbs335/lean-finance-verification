@@ -3,3 +3,7 @@ import LeanFinance.Generated.EvidenceSynthesis
 import LeanFinance.Generated.WorkflowSearch
 import LeanFinance.Generated.WorkflowEvidence
 import LeanFinance.Generated.WorkflowCEGIS
+import LeanFinance.Generated.ObservedCostModelTampering.Search
+import LeanFinance.Generated.ObservedCostModelTampering.Evidence
+import LeanFinance.Generated.ObservedCostModelTampering.CEGIS
+import LeanFinance.Generated.ObservedCostModelTampering.TraceRefinement

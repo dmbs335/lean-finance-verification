@@ -1,0 +1,63 @@
+{
+  "schema_version": "lfv-observed-attack-trace-v1",
+  "id": "costModelTampering",
+  "description": "The declared baseline is executed, its cost model is altered outside the visible ledger, and the same result is then published and timestamped.",
+  "refined_name": "observed-cost-model-tampering-refinement",
+  "refined_namespace_prefix": "LeanFinance.Generated.ObservedCostModelTampering",
+  "variable_extensions": [
+    {
+      "id": "costModelTampered",
+      "initial": false,
+      "claim_violation": true,
+      "sensor_cost": {
+        "operational": 1,
+        "privacy": 1,
+        "trust": 1
+      },
+      "description": "Whether the registered transaction-cost model was altered after the baseline execution contract was fixed."
+    }
+  ],
+  "steps": [
+    {
+      "event": "declareBaseline"
+    },
+    {
+      "event": "executeBaseline"
+    },
+    {
+      "event": "tamperCostModel",
+      "observed_before": {
+        "baselineExecuted": true,
+        "resultPublished": false,
+        "costModelTampered": false
+      },
+      "observed_after": {
+        "costModelTampered": true
+      },
+      "guard_fields": [
+        "baselineExecuted",
+        "resultPublished"
+      ],
+      "tags": [
+        "adversarial_execution",
+        "configuration_mutation"
+      ],
+      "sensor_templates": [],
+      "propagate_to_channels": [],
+      "sensor_cost": {
+        "operational": 0,
+        "privacy": 0,
+        "trust": 0
+      },
+      "description": "Alter the cost model after execution while leaving the researcher-visible declaration unchanged."
+    },
+    {
+      "event": "publishResult"
+    },
+    {
+      "event": "anchorLedger"
+    }
+  ],
+  "expected_terminal": true,
+  "expected_claim": false
+}
