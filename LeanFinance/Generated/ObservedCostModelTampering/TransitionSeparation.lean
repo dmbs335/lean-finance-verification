@@ -78,10 +78,8 @@ theorem declaration_receipt_persistent :
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
   subst safeHistory
-  cases badHistory <;>
-    simp_all [firstViolationKind, classifyViolationAction,
-      firstViolationAction, Separates,
-      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe]
+  revert badClass
+  cases badHistory <;> decide
 
 theorem hidden_sweep_receipt_persistent :
     PersistentTransitionSeparator
@@ -93,10 +91,8 @@ theorem hidden_sweep_receipt_persistent :
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
   subst safeHistory
-  cases badHistory <;>
-    simp_all [firstViolationKind, classifyViolationAction,
-      firstViolationAction, Separates,
-      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe]
+  revert badClass
+  cases badHistory <;> decide
 
 theorem future_data_receipt_persistent :
     PersistentTransitionSeparator
@@ -108,10 +104,8 @@ theorem future_data_receipt_persistent :
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
   subst safeHistory
-  cases badHistory <;>
-    simp_all [firstViolationKind, classifyViolationAction,
-      firstViolationAction, Separates,
-      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe]
+  revert badClass
+  cases badHistory <;> decide
 
 theorem cost_model_receipt_persistent :
     PersistentTransitionSeparator
@@ -123,10 +117,8 @@ theorem cost_model_receipt_persistent :
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
   subst safeHistory
-  cases badHistory <;>
-    simp_all [firstViolationKind, classifyViolationAction,
-      firstViolationAction, Separates,
-      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe]
+  revert badClass
+  cases badHistory <;> decide
 
 theorem transition_basis_persistently_covers_first_violations :
     PersistentTransitionCover
