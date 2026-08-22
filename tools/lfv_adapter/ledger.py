@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .canonical import (
     CANONICAL_FORMAT,
@@ -13,6 +13,9 @@ from .canonical import (
     write_pretty_json,
 )
 from .errors import ValidationError
+
+if TYPE_CHECKING:
+    from .rfc3161 import Rfc3161Trust
 
 LEDGER_SCHEMA = "lfv-search-ledger-v1"
 LEDGER_ENTRY_SCHEMA = "lfv-search-ledger-entry-v1"
@@ -223,8 +226,17 @@ def make_local_anchor(
     }
 
 
-def load_anchor(path: Path, *, allow_local: bool = False) -> dict[str, Any]:
-    return verify_anchor(load_json(path), allow_local=allow_local)
+def load_anchor(
+    path: Path,
+    *,
+    allow_local: bool = False,
+    rfc3161_trust: Rfc3161Trust | None = None,
+) -> dict[str, Any]:
+    return verify_anchor(
+        load_json(path),
+        allow_local=allow_local,
+        rfc3161_trust=rfc3161_trust,
+    )
 
 
 def verify_anchor(
@@ -233,10 +245,11 @@ def verify_anchor(
     *,
     cutoff_time: int | None = None,
     allow_local: bool = False,
+    rfc3161_trust: Rfc3161Trust | None = None,
 ) -> dict[str, Any]:
     if not isinstance(anchor, dict):
         raise ValidationError("anchor: expected an object")
-    expected = {
+    required = {
         "schema_version",
         "canonical_format",
         "commitment",
@@ -245,8 +258,9 @@ def verify_anchor(
         "provider",
         "evidence_id",
     }
-    unknown = set(anchor) - expected
-    missing = expected - set(anchor)
+    allowed = required | {"evidence"}
+    unknown = set(anchor) - allowed
+    missing = required - set(anchor)
     if unknown:
         raise ValidationError(f"anchor: unknown fields: {sorted(unknown)}")
     if missing:
@@ -260,12 +274,8 @@ def verify_anchor(
     anchored_at = _nat(anchor["anchored_at"], "anchor.anchored_at")
     provider = _string(anchor["provider"], "anchor.provider")
     evidence_id = _string(anchor["evidence_id"], "anchor.evidence_id")
-    if provider == "local-development" and not allow_local:
-        raise ValidationError(
-            "local-development anchor rejected; pass --allow-local-anchor only for fixtures"
-        )
 
-    normalized = {
+    normalized: dict[str, Any] = {
         "schema_version": ANCHOR_SCHEMA,
         "canonical_format": CANONICAL_FORMAT,
         "commitment": commitment,
@@ -274,6 +284,23 @@ def verify_anchor(
         "provider": provider,
         "evidence_id": evidence_id,
     }
+
+    if provider == "local-development":
+        if "evidence" in anchor:
+            raise ValidationError("local-development anchors must not claim external evidence")
+        if not allow_local:
+            raise ValidationError(
+                "local-development anchor rejected; pass --allow-local-anchor only for fixtures"
+            )
+    elif provider == "rfc3161":
+        from .rfc3161 import verify_rfc3161_anchor_evidence
+
+        normalized["evidence"] = verify_rfc3161_anchor_evidence(
+            {**normalized, "evidence": anchor.get("evidence")},
+            trust=rfc3161_trust,
+        )
+    else:
+        raise ValidationError(f"unsupported anchor provider: {provider!r}")
 
     if ledger is not None:
         verified_ledger = verify_ledger(ledger)
