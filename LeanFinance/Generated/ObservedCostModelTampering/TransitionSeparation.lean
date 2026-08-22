@@ -78,7 +78,9 @@ theorem declaration_receipt_persistent :
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
   subst safeHistory
-  cases badHistory <;> decide
+  cases badHistory <;>
+    simp_all [firstViolationKind, classifyViolationAction,
+      firstViolationAction, firstViolationActionFrom]
 
 theorem hidden_sweep_receipt_persistent :
     PersistentTransitionSeparator
@@ -90,7 +92,9 @@ theorem hidden_sweep_receipt_persistent :
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
   subst safeHistory
-  cases badHistory <;> decide
+  cases badHistory <;>
+    simp_all [firstViolationKind, classifyViolationAction,
+      firstViolationAction, firstViolationActionFrom]
 
 theorem future_data_receipt_persistent :
     PersistentTransitionSeparator
@@ -102,7 +106,9 @@ theorem future_data_receipt_persistent :
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
   subst safeHistory
-  cases badHistory <;> decide
+  cases badHistory <;>
+    simp_all [firstViolationKind, classifyViolationAction,
+      firstViolationAction, firstViolationActionFrom]
 
 theorem cost_model_receipt_persistent :
     PersistentTransitionSeparator
@@ -114,7 +120,9 @@ theorem cost_model_receipt_persistent :
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
   subst safeHistory
-  cases badHistory <;> decide
+  cases badHistory <;>
+    simp_all [firstViolationKind, classifyViolationAction,
+      firstViolationAction, firstViolationActionFrom]
 
 theorem transition_basis_persistently_covers_first_violations :
     PersistentTransitionCover
