@@ -16,7 +16,10 @@ Current certificate properties include:
 - every derived feature has recursively closed lineage, with each input available by
   the feature's own generation time;
 - the selected code/parameter trial appears in a commitment-chained search ledger;
-- the complete ledger prefix is bound to a pre-decision external anchor contract;
+- the complete ledger prefix is bound to a pre-decision anchor;
+- RFC 3161 anchors are re-verified against verifier-selected TSA trust, including the
+  original nonce, message imprint, signed response, certificate chain, and generation
+  time;
 - code, data, parameters, environment, features, and result are domain-separated by
   artifact kind, canonical schema, hash algorithm, and digest;
 - an adapter handoff exposes a proof-carrying certificate rather than an opaque
@@ -50,8 +53,9 @@ Lean is pinned in `lean-toolchain`.
 lake build
 ```
 
-GitHub Actions runs Python adapter tests, checks that generated artifacts are
-byte-reproducible, and then runs the Lean build.
+GitHub Actions runs Python adapter tests, including a locally generated RFC 3161 test
+PKI and signed timestamp, checks that generated artifacts are byte-reproducible, and
+then runs the Lean build.
 
 ## Python reference adapter
 
@@ -60,6 +64,9 @@ empirical command, canonicalizes its JSON result, hashes all research artifacts,
 checks the committed search ledger and anchor, and emits both a canonical bundle and a
 Lean `CertifiedAdapterOutput` witness.
 
+The checked-in deterministic fixture uses a deliberately non-authoritative local
+anchor:
+
 ```bash
 python -m tools.lfv_adapter build \
   --spec examples/reference_adapter/experiment.json \
@@ -67,9 +74,20 @@ python -m tools.lfv_adapter build \
   --allow-local-anchor
 ```
 
-The local anchor flag is only for the checked-in fixture; it is not a substitute for an
-independently published timestamp. See [`docs/REFERENCE_ADAPTER.md`](docs/REFERENCE_ADAPTER.md)
-for the serialization contract, preregistration flow, trust boundary, and schemas.
+A production ledger can instead be anchored by an RFC 3161 TSA:
+
+```bash
+python -m tools.lfv_adapter make-rfc3161-anchor \
+  --ledger research/search-ledger.json \
+  --tsa-url https://tsa.example.org/ \
+  --rfc3161-ca-file trust/tsa-roots.pem \
+  --out research/ledger-anchor.json
+```
+
+The TSA signing trust bundle is selected externally by the verifier and is hashed into
+the evidence binding. See [`docs/REFERENCE_ADAPTER.md`](docs/REFERENCE_ADAPTER.md) for
+the complete adapter flow and [`docs/RFC3161_ANCHORS.md`](docs/RFC3161_ANCHORS.md) for
+signed timestamp issuance, verification, and trust assumptions.
 
 ## Research roadmap
 
@@ -78,12 +96,15 @@ for the serialization contract, preregistration flow, trust boundary, and schema
 2. Formalize a finite Bayesian market game and executable equilibrium checker.
 3. Connect forced-flow composition, constraint activation, and regime-transition
    safety theorems end to end.
-4. Add authenticated adapters for external transparency logs or timestamp services.
+4. Add a second independent transparency-log anchor and require multi-provider quorum
+   for high-assurance preregistration.
 5. Run the reference adapter against a real point-in-time dataset and preserve the
    resulting certificate bundle as a reproducible research artifact.
 
 ## Scope
 
 This repository is research software. A Lean proof is only as strong as its formalized
-assumptions and the cryptographic, data-lineage, execution, and external-anchor evidence
-supplied to the checker.
+assumptions and the cryptographic, data-lineage, execution, external-anchor, and trust-
+material evidence supplied to the checker. RFC 3161 support verifies signed evidence
+but does not by itself prove TSA independence, revocation status, or long-term archival
+validity.
