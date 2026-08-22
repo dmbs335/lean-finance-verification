@@ -7,3 +7,4 @@ import LeanFinance.Epistemic.FiniteSynthesisCompleteness
 import LeanFinance.Epistemic.WorkflowTransition
 import LeanFinance.Epistemic.CounterexampleGuided
 import LeanFinance.Epistemic.TraceRefinement
+import LeanFinance.Epistemic.ModelRefinement
