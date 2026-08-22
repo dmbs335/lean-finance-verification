@@ -1,0 +1,9 @@
+{
+  "target_digest": "replace-with-64-hex-ledger-target",
+  "cutoff": 0,
+  "required_domains": 2,
+  "receipts": [
+    {"receipt": "trust/log-a.receipt.json", "public_key": "trust/log-a.pub"},
+    {"receipt": "trust/log-b.receipt.json", "public_key": "trust/log-b.pub"}
+  ]
+}
