@@ -1,0 +1,43 @@
+{
+  "schema_version": "lfv-multiclaim-evidence-v1",
+  "name": "shared-integrity-attestation",
+  "claims": ["noHidden", "noFuture"],
+  "worlds": [
+    {"id": "honest", "claims": {"noHidden": true, "noFuture": true}},
+    {"id": "hiddenSweep", "claims": {"noHidden": false, "noFuture": true}},
+    {"id": "futureLeak", "claims": {"noHidden": true, "noFuture": false}},
+    {"id": "dualAttack", "claims": {"noHidden": false, "noFuture": false}}
+  ],
+  "channels": [
+    {
+      "id": "hiddenReceipt",
+      "cost": 2,
+      "observations": {
+        "honest": "absent",
+        "hiddenSweep": "present",
+        "futureLeak": "absent",
+        "dualAttack": "present"
+      }
+    },
+    {
+      "id": "futureReceipt",
+      "cost": 2,
+      "observations": {
+        "honest": "absent",
+        "hiddenSweep": "absent",
+        "futureLeak": "present",
+        "dualAttack": "present"
+      }
+    },
+    {
+      "id": "unifiedAttestation",
+      "cost": 3,
+      "observations": {
+        "honest": "honest",
+        "hiddenSweep": "hidden",
+        "futureLeak": "future",
+        "dualAttack": "dual"
+      }
+    }
+  ]
+}
