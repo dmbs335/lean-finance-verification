@@ -1,0 +1,236 @@
+{
+  "schema_version": "lfv-workflow-cegis-model-v1",
+  "name": "counterexample-guided-search-integrity",
+  "namespace_prefix": "LeanFinance.Generated.WorkflowIntegrity",
+  "max_depth": 6,
+  "max_histories": 256,
+  "max_refinements": 4,
+  "cost_weights": {
+    "operational": 1,
+    "privacy": 1,
+    "trust": 1
+  },
+  "variables": [
+    {
+      "id": "baselineDeclared",
+      "initial": false,
+      "sensor_cost": {"operational": 1, "privacy": 0, "trust": 1},
+      "description": "Whether the baseline strategy was declared before execution."
+    },
+    {
+      "id": "baselineExecuted",
+      "initial": false,
+      "sensor_cost": {"operational": 1, "privacy": 1, "trust": 1},
+      "description": "Whether the baseline strategy was executed."
+    },
+    {
+      "id": "hiddenSweepExecuted",
+      "initial": false,
+      "sensor_cost": {"operational": 1, "privacy": 1, "trust": 1},
+      "description": "Whether an unreported parameter sweep was executed."
+    },
+    {
+      "id": "futureDataRead",
+      "initial": false,
+      "sensor_cost": {"operational": 1, "privacy": 1, "trust": 1},
+      "description": "Whether data unavailable at the decision time was read."
+    },
+    {
+      "id": "resultPublished",
+      "initial": false,
+      "sensor_cost": {"operational": 1, "privacy": 0, "trust": 1},
+      "description": "Whether the selected result was published."
+    },
+    {
+      "id": "ledgerAnchored",
+      "initial": false,
+      "sensor_cost": {"operational": 1, "privacy": 0, "trust": 1},
+      "description": "Whether the researcher-visible ledger received an external anchor."
+    }
+  ],
+  "actions": [
+    {
+      "id": "declareBaseline",
+      "guard": {
+        "all": [
+          {"not": {"var": "baselineDeclared"}},
+          {"not": {"var": "baselineExecuted"}},
+          {"not": {"var": "resultPublished"}}
+        ]
+      },
+      "effects": [
+        {"set": {"var": "baselineDeclared", "value": true}}
+      ],
+      "max_occurrences": 1,
+      "tags": ["declaration"],
+      "sensor_cost": {"operational": 0, "privacy": 0, "trust": 0},
+      "description": "Declare the baseline strategy before any execution."
+    },
+    {
+      "id": "executeBaseline",
+      "guard": {
+        "all": [
+          {"not": {"var": "baselineExecuted"}},
+          {"not": {"var": "resultPublished"}}
+        ]
+      },
+      "effects": [
+        {"set": {"var": "baselineExecuted", "value": true}}
+      ],
+      "max_occurrences": 1,
+      "tags": ["execution"],
+      "sensor_cost": {"operational": 0, "privacy": 0, "trust": 0},
+      "description": "Execute the selected baseline strategy."
+    },
+    {
+      "id": "executeHiddenSweep",
+      "guard": {
+        "all": [
+          {"var": "baselineExecuted"},
+          {"not": {"var": "hiddenSweepExecuted"}},
+          {"not": {"var": "resultPublished"}}
+        ]
+      },
+      "effects": [
+        {"set": {"var": "hiddenSweepExecuted", "value": true}}
+      ],
+      "max_occurrences": 1,
+      "tags": ["execution", "adversarial_execution"],
+      "sensor_cost": {"operational": 0, "privacy": 0, "trust": 0},
+      "description": "Execute an unreported parameter sweep before publishing the baseline."
+    },
+    {
+      "id": "readFutureData",
+      "guard": {
+        "all": [
+          {"var": "baselineExecuted"},
+          {"not": {"var": "futureDataRead"}},
+          {"not": {"var": "resultPublished"}}
+        ]
+      },
+      "effects": [
+        {"set": {"var": "futureDataRead", "value": true}}
+      ],
+      "max_occurrences": 1,
+      "tags": ["data_access", "adversarial_execution"],
+      "sensor_cost": {"operational": 0, "privacy": 0, "trust": 0},
+      "description": "Read a future data revision unavailable at the decision time."
+    },
+    {
+      "id": "publishResult",
+      "guard": {
+        "all": [
+          {"var": "baselineExecuted"},
+          {"not": {"var": "resultPublished"}}
+        ]
+      },
+      "effects": [
+        {"set": {"var": "resultPublished", "value": true}}
+      ],
+      "max_occurrences": 1,
+      "tags": ["publication"],
+      "sensor_cost": {"operational": 0, "privacy": 0, "trust": 0},
+      "description": "Publish the selected result bundle."
+    },
+    {
+      "id": "anchorLedger",
+      "guard": {
+        "all": [
+          {"var": "resultPublished"},
+          {"not": {"var": "ledgerAnchored"}}
+        ]
+      },
+      "effects": [
+        {"set": {"var": "ledgerAnchored", "value": true}}
+      ],
+      "max_occurrences": 1,
+      "tags": ["anchoring"],
+      "sensor_cost": {"operational": 0, "privacy": 0, "trust": 0},
+      "description": "Externally timestamp the researcher-visible ledger prefix."
+    }
+  ],
+  "terminal": {"var": "ledgerAnchored"},
+  "claim": {
+    "all": [
+      {
+        "any": [
+          {"not": {"var": "baselineExecuted"}},
+          {"var": "baselineDeclared"}
+        ]
+      },
+      {"not": {"var": "hiddenSweepExecuted"}},
+      {"not": {"var": "futureDataRead"}}
+    ]
+  },
+  "channels": [
+    {
+      "id": "selfReport",
+      "deployed": true,
+      "visible_actions": ["declareBaseline", "publishResult", "anchorLedger"],
+      "visible_state": ["baselineDeclared", "resultPublished", "ledgerAnchored"],
+      "cost": {"operational": 2, "privacy": 0, "trust": 0},
+      "description": "The researcher-visible declaration, publication, and anchoring history."
+    },
+    {
+      "id": "resultBundle",
+      "deployed": true,
+      "visible_actions": ["publishResult"],
+      "visible_state": ["resultPublished"],
+      "cost": {"operational": 1, "privacy": 0, "trust": 0},
+      "description": "Canonical artifacts for the selected result."
+    },
+    {
+      "id": "rfc3161Anchor",
+      "deployed": true,
+      "visible_actions": ["anchorLedger"],
+      "visible_state": ["ledgerAnchored"],
+      "cost": {"operational": 1, "privacy": 0, "trust": 2},
+      "description": "A valid RFC 3161 timestamp over the researcher-visible ledger."
+    },
+    {
+      "id": "fullExecutorLog",
+      "deployed": false,
+      "visible_actions": ["executeBaseline", "executeHiddenSweep", "readFutureData"],
+      "visible_state": [],
+      "cost": {"operational": 4, "privacy": 2, "trust": 0},
+      "description": "An independent log revealing every execution and sensitive data-access event."
+    }
+  ],
+  "sensor_templates": [
+    {
+      "id": "targetedReceipt",
+      "kind": "action",
+      "action_tags": ["adversarial_execution"],
+      "variables": [],
+      "cost": {"operational": 2, "privacy": 0, "trust": 0},
+      "description": "A narrow independent receipt for one specifically instrumented adversarial action."
+    }
+  ],
+  "trace_aliases": [
+    {
+      "id": "undeclaredBaseline",
+      "trace": ["executeBaseline", "publishResult", "anchorLedger"],
+      "description": "The baseline is executed without a prior declaration."
+    },
+    {
+      "id": "honest",
+      "trace": ["declareBaseline", "executeBaseline", "publishResult", "anchorLedger"],
+      "description": "The declared baseline is the only execution and uses only admissible data."
+    },
+    {
+      "id": "hiddenSweep",
+      "trace": ["declareBaseline", "executeBaseline", "executeHiddenSweep", "publishResult", "anchorLedger"],
+      "description": "An unreported parameter sweep is executed before publishing the same visible result."
+    },
+    {
+      "id": "futureLeak",
+      "trace": ["declareBaseline", "executeBaseline", "readFutureData", "publishResult", "anchorLedger"],
+      "description": "The baseline reads a future data revision before publishing the same visible result."
+    },
+    {
+      "id": "dualAttack",
+      "trace": ["declareBaseline", "executeBaseline", "executeHiddenSweep", "readFutureData", "publishResult", "anchorLedger"],
+      "description": "A hidden sweep and a future-data access both occur before publication."
+    }
+  ]
+}

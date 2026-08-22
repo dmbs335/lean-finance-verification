@@ -27,6 +27,8 @@ jobs:
         run: python -m unittest discover -s tools/lfv_adapter/tests -v
       - name: Test exact evidence synthesizer
         run: python -m unittest discover -s tools/evidence_synth/tests -v
+      - name: Test workflow counterexample-guided synthesis
+        run: python -m unittest discover -s tools/workflow_cegis/tests -v
       - name: Check generated backtest certificate reproducibility
         run: >-
           python -m tools.lfv_adapter check-generated
@@ -40,6 +42,43 @@ jobs:
           --model examples/evidence_synthesis/search_completeness.json
           --certificate examples/evidence_synthesis/generated/synthesis.canonical.json
           --lean LeanFinance/Generated/EvidenceSynthesis.lean
+      - name: Reproduce workflow CEGIS artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          first="$(mktemp -d)"
+          second="$(mktemp -d)"
+          generate() {
+            local out="$1"
+            python -m tools.workflow_cegis synth \
+              --model examples/workflow_cegis/search_integrity.json \
+              --report "$out/report.canonical.json" \
+              --evidence-model "$out/evidence-model.canonical.json" \
+              --synthesis "$out/global-synthesis.canonical.json" \
+              --repair-synthesis "$out/repair-synthesis.canonical.json" \
+              --workflow-lean "$out/WorkflowSearch.lean" \
+              --evidence-lean "$out/WorkflowEvidence.lean" \
+              --bridge-lean "$out/WorkflowCEGIS.lean"
+          }
+          generate "$first"
+          generate "$second"
+          for artifact in \
+            report.canonical.json \
+            evidence-model.canonical.json \
+            global-synthesis.canonical.json \
+            repair-synthesis.canonical.json \
+            WorkflowSearch.lean \
+            WorkflowEvidence.lean \
+            WorkflowCEGIS.lean
+          do
+            cmp "$first/$artifact" "$second/$artifact"
+          done
+          cmp "$first/WorkflowSearch.lean" LeanFinance/Generated/WorkflowSearch.lean
+          cmp "$first/WorkflowEvidence.lean" LeanFinance/Generated/WorkflowEvidence.lean
+          cmp "$first/WorkflowCEGIS.lean" LeanFinance/Generated/WorkflowCEGIS.lean
+          python -m tools.workflow_cegis verify \
+            --model examples/workflow_cegis/search_integrity.json \
+            --report "$first/report.canonical.json"
       - uses: leanprover/lean-action@v1
         with:
           build: true
