@@ -39,6 +39,21 @@ def Separates
     (left right : History) : Prop :=
   channel evidenceChannel left ≠ channel evidenceChannel right
 
+/-- Closed finite separator goals are executable whenever observations have
+    decidable equality. This keeps generated examples computational without
+    requiring each one to unfold `Separates` manually. -/
+instance instDecidableSeparates
+    {Channel : Type u}
+    {History : Type v}
+    {Observation : Type w}
+    [DecidableEq Observation]
+    (channel : Channel → History → Observation)
+    (evidenceChannel : Channel)
+    (left right : History) :
+    Decidable (Separates channel evidenceChannel left right) := by
+  unfold Separates
+  infer_instance
+
 /-- A selection hits every claim disagreement when every pair of histories with
     different claim truth values is separated by at least one selected
     channel. -/
