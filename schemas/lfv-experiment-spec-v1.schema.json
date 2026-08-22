@@ -1,0 +1,250 @@
+{
+  "$defs": {
+    "jsonArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "schema_id"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://rewrite-lab.example/schemas/lfv-experiment-spec-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "anchor_path": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "code": {
+      "additionalProperties": false,
+      "properties": {
+        "paths": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "schema_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_id",
+        "paths"
+      ],
+      "type": "object"
+    },
+    "datasets": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "available_at": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "observed_at": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "schema_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "schema_id",
+          "observed_at",
+          "available_at"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "decision": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "decision_time": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "feature_names": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "metric_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "metric_pointer": {
+          "pattern": "^/",
+          "type": "string"
+        },
+        "strategy_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "strategy_id",
+        "decision_time",
+        "metric_name",
+        "metric_pointer",
+        "dataset_ids",
+        "feature_names"
+      ],
+      "type": "object"
+    },
+    "environment": {
+      "$ref": "#/$defs/jsonArtifact"
+    },
+    "execution": {
+      "additionalProperties": false,
+      "properties": {
+        "argv": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "result_schema_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "timeout_seconds": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "argv",
+        "timeout_seconds",
+        "result_schema_id"
+      ],
+      "type": "object"
+    },
+    "features": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "generated_at": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "inputs": {
+            "items": {
+              "pattern": "^(dataset|feature):.+$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "pointer": {
+            "pattern": "^/",
+            "type": "string"
+          },
+          "schema_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "pointer",
+          "schema_id",
+          "generated_at",
+          "inputs"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "hash_algorithm": {
+      "enum": [
+        "sha256",
+        "sha512",
+        "blake3"
+      ]
+    },
+    "ledger_path": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "namespace": {
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$",
+      "type": "string"
+    },
+    "parameters": {
+      "$ref": "#/$defs/jsonArtifact"
+    },
+    "schema_version": {
+      "const": "lfv-experiment-spec-v1"
+    }
+  },
+  "required": [
+    "schema_version",
+    "name",
+    "namespace",
+    "hash_algorithm",
+    "code",
+    "datasets",
+    "parameters",
+    "environment",
+    "execution",
+    "features",
+    "decision",
+    "ledger_path",
+    "anchor_path"
+  ],
+  "title": "Lean Finance Verification experiment specification v1",
+  "type": "object"
+}

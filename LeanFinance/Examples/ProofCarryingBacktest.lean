@@ -104,6 +104,14 @@ theorem demoDatasetAvailable :
   · simp [DatasetAvailableAt, demoDataset, demoDecision]
   · simp [DatasetHashBound, demoDataset, demoDatasetArtifact, NonEmptyString]
 
+theorem demoDatasetAvailableAtFeatureGeneration :
+    ArtifactAvailableAt demoCatalog demoFeatureLineage.generatedAt
+      demoDataset.contentHash := by
+  apply ArtifactAvailableAt.dataset demoDataset
+  · simp [demoCatalog]
+  · simp [DatasetAvailableAt, demoDataset, demoFeatureLineage]
+  · simp [DatasetHashBound, demoDataset, demoDatasetArtifact, NonEmptyString]
+
 theorem demoFeatureAvailable :
     ArtifactAvailableAt demoCatalog demoDecision.decisionTime
       demoDerivedFeature.outputHash := by
@@ -117,7 +125,7 @@ theorem demoFeatureAvailable :
   · intro inputHash member
     simp [demoDerivedFeature, demoFeatureLineage] at member
     subst inputHash
-    exact demoDatasetAvailable
+    exact demoDatasetAvailableAtFeatureGeneration
 
 theorem demoNoFutureInformation : NoFutureInformation demoDecision := by
   constructor

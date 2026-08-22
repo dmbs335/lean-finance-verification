@@ -1,0 +1,51 @@
+{
+  "schema_version": "lfv-experiment-spec-v1",
+  "name": "reference-momentum-backtest",
+  "namespace": "LeanFinance.Generated.ReferenceAdapter",
+  "hash_algorithm": "sha256",
+  "code": {
+    "schema_id": "lfv-code-tree-v1",
+    "paths": ["strategy.py"]
+  },
+  "datasets": [
+    {
+      "id": "prices",
+      "path": "prices.csv",
+      "schema_id": "lfv-dataset-file-v1",
+      "observed_at": 4,
+      "available_at": 5
+    }
+  ],
+  "parameters": {
+    "path": "parameters.json",
+    "schema_id": "lfv-parameters-json-v1"
+  },
+  "environment": {
+    "path": "environment.json",
+    "schema_id": "lfv-environment-json-v1"
+  },
+  "execution": {
+    "argv": ["{python}", "strategy.py", "prices.csv", "parameters.json"],
+    "timeout_seconds": 10,
+    "result_schema_id": "lfv-result-json-v1"
+  },
+  "features": [
+    {
+      "name": "momentum",
+      "pointer": "/features/momentum",
+      "schema_id": "lfv-feature-json-v1",
+      "generated_at": 6,
+      "inputs": ["dataset:prices"]
+    }
+  ],
+  "decision": {
+    "strategy_id": "momentum-v1",
+    "decision_time": 10,
+    "metric_name": "net-alpha-bps",
+    "metric_pointer": "/metric_value",
+    "dataset_ids": ["prices"],
+    "feature_names": ["momentum"]
+  },
+  "ledger_path": "ledger.json",
+  "anchor_path": "anchor.json"
+}
