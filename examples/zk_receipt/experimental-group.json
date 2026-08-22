@@ -1,0 +1,8 @@
+{
+  "schema_version": "lfv-experimental-pedersen-group-v1",
+  "parameter_id": "lfv-experimental-safe-prime-256-v1",
+  "p": "ca4c619a63458f98f866def4687bd6f4f658ffb6f98425e8b0b472737b6f21cf",
+  "q": "652630cd31a2c7cc7c336f7a343deb7a7b2c7fdb7cc212f4585a3939bdb790e7",
+  "g": "a7b5d996b8a5362b342b6714bbac7d2dba57ec8e6eda30498fc8adc0fb7106d0",
+  "h": "a4fa562543b4527e3b33a698cb4c13bf3bb7189a61afae85b917be2bc22a6366"
+}

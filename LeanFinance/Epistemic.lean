@@ -26,3 +26,5 @@ import LeanFinance.Epistemic.ProviderQuorum
 import LeanFinance.Epistemic.ProviderQuorumExample
 import LeanFinance.Epistemic.SelectiveReceipt
 import LeanFinance.Epistemic.SelectiveReceiptExample
+import LeanFinance.Epistemic.ZeroKnowledgeReceipt
+import LeanFinance.Epistemic.ZeroKnowledgeReceiptExample

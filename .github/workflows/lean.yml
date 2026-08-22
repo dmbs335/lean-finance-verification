@@ -53,6 +53,8 @@ jobs:
         run: python -m unittest discover -s tools/external_quorum/tests -v
       - name: Test selective-disclosure execution receipts
         run: python -m unittest discover -s tools/selective_receipt/tests -v
+      - name: Test experimental zero-count ZK receipts
+        run: python -m unittest discover -s tools/zk_receipt/tests -v
       - name: Check evidence taxonomy reproducibility
         run: >-
           python -m tools.evidence_taxonomy check-generated
