@@ -11,7 +11,6 @@ research-integrity contracts.
 structure AdapterExecutionRecord where
   claim : BacktestClaim
   certificate : ProofCarryingBacktestCertificate claim
-  deriving Repr
 
 /-- A valid adapter handoff must expose a certificate whose bound manifest
 contains the emitted result artifact.
