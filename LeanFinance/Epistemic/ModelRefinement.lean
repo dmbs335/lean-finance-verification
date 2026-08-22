@@ -30,9 +30,9 @@ theorem list_count_map_of_injective
 /-- A conservative embedding of one deterministic workflow into another.
 
 Every original action remains available, old enablement decisions are
-preserved on embedded prefixes, transitions commute with the state embedding,
-and terminal classification is unchanged. The refined workflow may add new
-states or actions, but it cannot reinterpret an old trace. -/
+preserved on embedded executed prefixes, transitions commute with the state
+embedding, and terminal classification is unchanged. The refined workflow may
+add new states or actions, but it cannot reinterpret an old trace. -/
 structure WorkflowRefinement
     {OriginalState : Type u}
     {OriginalAction : Type v}
@@ -49,12 +49,12 @@ structure WorkflowRefinement
       action ∈ original.actions →
         embedAction action ∈ refined.actions
   enabledPreserved :
-    ∀ state prefix action,
+    ∀ state executedPrefix action,
       refined.enabled
           (embedState state)
-          (prefix.map embedAction)
+          (executedPrefix.map embedAction)
           (embedAction action) =
-        original.enabled state prefix action
+        original.enabled state executedPrefix action
   transitionPreserved :
     ∀ state action,
       refined.transition
@@ -69,7 +69,7 @@ structure WorkflowRefinement
 namespace WorkflowRefinement
 
 /-- Replay commutes with a conservative workflow embedding, including arbitrary
-    already-executed prefixes used by action occurrence bounds. -/
+    already-executed action lists used by occurrence bounds. -/
 theorem replayFrom_eq_map
     {OriginalState : Type u}
     {OriginalAction : Type v}
@@ -79,14 +79,14 @@ theorem replayFrom_eq_map
     {refined : FiniteWorkflow RefinedState RefinedAction}
     (refinement : WorkflowRefinement original refined)
     (state : OriginalState)
-    (prefix trace : List OriginalAction) :
+    (executedPrefix trace : List OriginalAction) :
     replayFrom refined
         (refinement.embedState state)
-        (prefix.map refinement.embedAction)
+        (executedPrefix.map refinement.embedAction)
         (trace.map refinement.embedAction) =
       Option.map refinement.embedState
-        (replayFrom original state prefix trace) := by
-  induction trace generalizing state prefix with
+        (replayFrom original state executedPrefix trace) := by
+  induction trace generalizing state executedPrefix with
   | nil => rfl
   | cons action rest ih =>
       simp [replayFrom,
@@ -112,7 +112,7 @@ theorem replay_eq_map
   unfold replay
   rw [← refinement.initialPreserved]
   simpa using
-    refinement.replayFrom_eq_map original.initial [] trace
+    replayFrom_eq_map refinement original.initial [] trace
 
 /-- Successful old executions remain successful with the embedded final state. -/
 theorem replay_some_preserved
@@ -128,7 +128,7 @@ theorem replay_some_preserved
     (replayed : replay original trace = some finalState) :
     replay refined (trace.map refinement.embedAction) =
       some (refinement.embedState finalState) := by
-  rw [refinement.replay_eq_map, replayed]
+  rw [replay_eq_map refinement, replayed]
   rfl
 
 /-- Failed old executions cannot become valid merely because the action
@@ -144,7 +144,7 @@ theorem replay_none_preserved
     (trace : List OriginalAction)
     (replayed : replay original trace = none) :
     replay refined (trace.map refinement.embedAction) = none := by
-  rw [refinement.replay_eq_map, replayed]
+  rw [replay_eq_map refinement, replayed]
   rfl
 
 /-- Terminal classification of every old trace is preserved. -/
@@ -160,7 +160,7 @@ theorem terminal_trace_preserved
     isTerminalTrace refined (trace.map refinement.embedAction) =
       isTerminalTrace original trace := by
   unfold isTerminalTrace
-  rw [refinement.replay_eq_map]
+  rw [replay_eq_map refinement]
   cases replayed : replay original trace with
   | none => rfl
   | some state =>
@@ -182,14 +182,16 @@ structure SemanticWorkflowRefinement
     (originalClaim : OriginalState → Bool)
     (refinedClaim : RefinedState → Bool)
     (originalObserve : OriginalState → Observation)
-    (refinedObserve : RefinedState → Observation)
-    extends WorkflowRefinement original refined where
+    (refinedObserve : RefinedState → Observation) where
+  workflowRefinement : WorkflowRefinement original refined
   claimPreserved :
     ∀ state,
-      refinedClaim (embedState state) = originalClaim state
+      refinedClaim (workflowRefinement.embedState state) =
+        originalClaim state
   observationPreserved :
     ∀ state,
-      refinedObserve (embedState state) = originalObserve state
+      refinedObserve (workflowRefinement.embedState state) =
+        originalObserve state
 
 namespace SemanticWorkflowRefinement
 
@@ -213,14 +215,15 @@ theorem traceClaimPreserved
         originalClaim refinedClaim
         originalObserve refinedObserve)
     (trace : List OriginalAction) :
-    (match replay refined (trace.map refinement.embedAction) with
+    (match replay refined
+        (trace.map refinement.workflowRefinement.embedAction) with
       | some state => refinedClaim state
       | none => false) =
     (match replay original trace with
       | some state => originalClaim state
       | none => false) := by
   rw [WorkflowRefinement.replay_eq_map
-    refinement.toWorkflowRefinement]
+    refinement.workflowRefinement]
   cases replayed : replay original trace with
   | none => rfl
   | some state =>
@@ -247,10 +250,11 @@ theorem traceObservationPreserved
         originalObserve refinedObserve)
     (trace : List OriginalAction) :
     Option.map refinedObserve
-        (replay refined (trace.map refinement.embedAction)) =
+        (replay refined
+          (trace.map refinement.workflowRefinement.embedAction)) =
       Option.map originalObserve (replay original trace) := by
   rw [WorkflowRefinement.replay_eq_map
-    refinement.toWorkflowRefinement]
+    refinement.workflowRefinement]
   cases replayed : replay original trace with
   | none => rfl
   | some state =>
