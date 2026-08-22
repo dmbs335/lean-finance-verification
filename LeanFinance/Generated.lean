@@ -11,3 +11,4 @@ import LeanFinance.Generated.ObservedCostModelTampering.ConservativeRefinement
 import LeanFinance.Generated.ObservedCostModelTampering.EvidenceDebt
 import LeanFinance.Generated.ObservedCostModelTampering.Connectivity
 import LeanFinance.Generated.ObservedCostModelTampering.RobustSynthesis
+import LeanFinance.Generated.ObservedCostModelTampering.Taxonomy
