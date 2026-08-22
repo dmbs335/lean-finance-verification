@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rewrite-lab.example/schemas/lfv-ledger-anchor-v1.schema.json",
+  "title": "Lean Finance Verification ledger anchor v1",
+  "oneOf": [
+    {"$ref": "#/$defs/localAnchor"},
+    {"$ref": "#/$defs/rfc3161Anchor"}
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "artifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "schema_id", "digest"],
+      "properties": {
+        "algorithm": {"enum": ["sha256", "sha512", "blake3"]},
+        "schema_id": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]+$"}
+      }
+    },
+    "baseAnchor": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "canonical_format",
+        "commitment",
+        "entry_count",
+        "anchored_at",
+        "provider",
+        "evidence_id"
+      ],
+      "properties": {
+        "schema_version": {"const": "lfv-ledger-anchor-v1"},
+        "canonical_format": {"const": "lfv-canonical-json-v1"},
+        "commitment": {"$ref": "#/$defs/artifactRef"},
+        "entry_count": {"type": "integer", "minimum": 1},
+        "anchored_at": {"type": "integer", "minimum": 0},
+        "provider": {"type": "string"},
+        "evidence_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "localAnchor": {
+      "allOf": [
+        {"$ref": "#/$defs/baseAnchor"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {"const": "lfv-ledger-anchor-v1"},
+            "canonical_format": {"const": "lfv-canonical-json-v1"},
+            "commitment": {"$ref": "#/$defs/artifactRef"},
+            "entry_count": {"type": "integer", "minimum": 1},
+            "anchored_at": {"type": "integer", "minimum": 0},
+            "provider": {"const": "local-development"},
+            "evidence_id": {
+              "type": "string",
+              "pattern": "^local-development:[0-9a-f]+$"
+            }
+          }
+        }
+      ]
+    },
+    "rfc3161Evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "tsa_url",
+        "target",
+        "request_der_base64",
+        "response_der_base64",
+        "request_sha256",
+        "response_sha256",
+        "hash_algorithm",
+        "message_imprint",
+        "policy_oid",
+        "serial_number",
+        "nonce",
+        "tsa_name",
+        "gen_time_utc",
+        "gen_time_unix_floor",
+        "anchor_time_unix_ceiling",
+        "ca_bundle_sha256",
+        "untrusted_bundle_sha256",
+        "openssl_version"
+      ],
+      "properties": {
+        "schema_version": {"const": "lfv-rfc3161-evidence-v1"},
+        "tsa_url": {
+          "type": "string",
+          "pattern": "^https?://"
+        },
+        "target": {
+          "allOf": [
+            {"$ref": "#/$defs/artifactRef"},
+            {
+              "properties": {
+                "algorithm": {"const": "sha256"},
+                "schema_id": {"const": "lfv-rfc3161-anchor-target-v1"},
+                "digest": {"$ref": "#/$defs/sha256"}
+              }
+            }
+          ]
+        },
+        "request_der_base64": {
+          "type": "string",
+          "contentEncoding": "base64"
+        },
+        "response_der_base64": {
+          "type": "string",
+          "contentEncoding": "base64"
+        },
+        "request_sha256": {"$ref": "#/$defs/sha256"},
+        "response_sha256": {"$ref": "#/$defs/sha256"},
+        "hash_algorithm": {"const": "sha256"},
+        "message_imprint": {"$ref": "#/$defs/sha256"},
+        "policy_oid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "serial_number": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nonce": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tsa_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gen_time_utc": {
+          "type": "string",
+          "pattern": "Z$"
+        },
+        "gen_time_unix_floor": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "anchor_time_unix_ceiling": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ca_bundle_sha256": {"$ref": "#/$defs/sha256"},
+        "untrusted_bundle_sha256": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/sha256"}
+          ]
+        },
+        "openssl_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "rfc3161Anchor": {
+      "allOf": [
+        {"$ref": "#/$defs/baseAnchor"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["evidence"],
+          "properties": {
+            "schema_version": {"const": "lfv-ledger-anchor-v1"},
+            "canonical_format": {"const": "lfv-canonical-json-v1"},
+            "commitment": {"$ref": "#/$defs/artifactRef"},
+            "entry_count": {"type": "integer", "minimum": 1},
+            "anchored_at": {"type": "integer", "minimum": 0},
+            "provider": {"const": "rfc3161"},
+            "evidence_id": {
+              "type": "string",
+              "pattern": "^rfc3161:sha256:[0-9a-f]{64}$"
+            },
+            "evidence": {"$ref": "#/$defs/rfc3161Evidence"}
+          }
+        }
+      ]
+    }
+  }
+}

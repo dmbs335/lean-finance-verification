@@ -7,7 +7,7 @@ import sys
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .canonical import (
     CANONICAL_FORMAT,
@@ -16,15 +16,17 @@ from .canonical import (
     load_json,
     make_artifact_ref,
     make_document_digest,
-    validate_artifact_ref,
 )
 from .errors import ExecutionError, ValidationError
-from .ledger import find_selected_trial, load_anchor, load_ledger, verify_anchor, verify_ledger
+from .ledger import find_selected_trial, load_anchor, load_ledger, verify_anchor
 from .paths import logical_path
 from .spec import DatasetSpec, ExperimentSpec, FeatureSpec
 
 from .bundle_schema import BUNDLE_DIGEST_SCHEMA, BUNDLE_SCHEMA
 from .bundle_verify import verify_bundle
+
+if TYPE_CHECKING:
+    from .rfc3161 import Rfc3161Trust
 
 
 @dataclass(frozen=True)
@@ -76,7 +78,10 @@ def _artifact_descriptor(
 
 
 def compute_code_artifact(spec: ExperimentSpec) -> dict[str, Any]:
-    files = [_raw_file_descriptor(spec, relative) for relative in sorted(spec.code.paths)]
+    files = [
+        _raw_file_descriptor(spec, relative)
+        for relative in sorted(spec.code.paths)
+    ]
     return _artifact_descriptor(
         kind="sourceCode",
         schema_id=spec.code.schema_id,
@@ -86,7 +91,9 @@ def compute_code_artifact(spec: ExperimentSpec) -> dict[str, Any]:
     )
 
 
-def compute_dataset_artifact(spec: ExperimentSpec, dataset: DatasetSpec) -> dict[str, Any]:
+def compute_dataset_artifact(
+    spec: ExperimentSpec, dataset: DatasetSpec
+) -> dict[str, Any]:
     file_descriptor = _raw_file_descriptor(spec, dataset.path)
     payload = {
         "dataset_id": dataset.id,
@@ -144,22 +151,33 @@ def resolve_pointer(document: Any, pointer: str) -> Any:
         token = raw_token.replace("~1", "/").replace("~0", "~")
         if isinstance(current, dict):
             if token not in current:
-                raise ValidationError(f"JSON pointer {pointer!r}: missing object key {token!r}")
+                raise ValidationError(
+                    f"JSON pointer {pointer!r}: missing object key {token!r}"
+                )
             current = current[token]
         elif isinstance(current, list):
             if token == "-" or not token.isdigit():
-                raise ValidationError(f"JSON pointer {pointer!r}: invalid array index {token!r}")
+                raise ValidationError(
+                    f"JSON pointer {pointer!r}: invalid array index {token!r}"
+                )
             index = int(token)
             if index >= len(current):
-                raise ValidationError(f"JSON pointer {pointer!r}: array index out of range")
+                raise ValidationError(
+                    f"JSON pointer {pointer!r}: array index out of range"
+                )
             current = current[index]
         else:
-            raise ValidationError(f"JSON pointer {pointer!r}: traverses a scalar value")
+            raise ValidationError(
+                f"JSON pointer {pointer!r}: traverses a scalar value"
+            )
     return current
 
 
 def run_empirical_command(spec: ExperimentSpec) -> tuple[Any, dict[str, Any]]:
-    argv = [sys.executable if argument == "{python}" else argument for argument in spec.execution.argv]
+    argv = [
+        sys.executable if argument == "{python}" else argument
+        for argument in spec.execution.argv
+    ]
     environment = os.environ.copy()
     environment["PYTHONHASHSEED"] = "0"
     try:
@@ -185,7 +203,8 @@ def run_empirical_command(spec: ExperimentSpec) -> tuple[Any, dict[str, Any]]:
     if completed.returncode != 0:
         stderr = completed.stderr.strip()
         raise ExecutionError(
-            f"empirical command exited with {completed.returncode}: {stderr or '<empty stderr>'}"
+            f"empirical command exited with {completed.returncode}: "
+            f"{stderr or '<empty stderr>'}"
         )
     stdout = completed.stdout.strip()
     if not stdout:
@@ -193,8 +212,11 @@ def run_empirical_command(spec: ExperimentSpec) -> tuple[Any, dict[str, Any]]:
     try:
         payload = json.loads(stdout)
     except json.JSONDecodeError as exc:
-        raise ExecutionError(f"empirical command stdout is not JSON: {exc}") from exc
-    # canonical_bytes performs the restricted-value validation, including float rejection.
+        raise ExecutionError(
+            f"empirical command stdout is not JSON: {exc}"
+        ) from exc
+    # canonical_bytes performs the restricted-value validation, including
+    # floating-point rejection.
     canonical_bytes(payload)
     metadata = {
         "argv": list(spec.execution.argv),
@@ -215,12 +237,14 @@ def _validate_temporal_lineage(
         if kind == "dataset":
             if datasets[target].available_at > feature.generated_at:
                 raise ValidationError(
-                    f"feature {feature.name!r} was generated before dataset {target!r} was available"
+                    f"feature {feature.name!r} was generated before "
+                    f"dataset {target!r} was available"
                 )
         elif kind == "feature":
             if features[target].generated_at > feature.generated_at:
                 raise ValidationError(
-                    f"feature {feature.name!r} depends on later feature {target!r}"
+                    f"feature {feature.name!r} depends on later "
+                    f"feature {target!r}"
                 )
 
 
@@ -238,9 +262,13 @@ def _build_feature_descriptors(
         for reference in feature.inputs:
             kind, _, target = reference.partition(":")
             if kind == "dataset":
-                input_hashes.append(dataset_descriptors[target]["artifact"]["ref"]["digest"])
+                input_hashes.append(
+                    dataset_descriptors[target]["artifact"]["ref"]["digest"]
+                )
             else:
-                input_hashes.append(features[target]["artifact"]["ref"]["digest"])
+                input_hashes.append(
+                    features[target]["artifact"]["ref"]["digest"]
+                )
         code_hash = code_descriptor["ref"]["digest"]
         artifact_payload = {
             "name": feature.name,
@@ -273,6 +301,7 @@ def build_bundle(
     spec: ExperimentSpec,
     *,
     allow_local_anchor: bool = False,
+    rfc3161_trust: Rfc3161Trust | None = None,
 ) -> tuple[dict[str, Any], Any]:
     code = compute_code_artifact(spec)
     datasets: dict[str, dict[str, Any]] = {}
@@ -302,13 +331,16 @@ def build_bundle(
                 f"dataset {dataset_id!r} was not available by the decision time"
             )
     for feature_name in spec.decision.feature_names:
-        if spec.feature_by_name[feature_name].generated_at > spec.decision.decision_time:
+        if (
+            spec.feature_by_name[feature_name].generated_at
+            > spec.decision.decision_time
+        ):
             raise ValidationError(
                 f"feature {feature_name!r} was not generated by the decision time"
             )
 
     ledger = load_ledger(spec.resolve(spec.ledger_path))
-    selected_index, selected_trial = find_selected_trial(
+    selected_index, _selected_trial = find_selected_trial(
         ledger,
         strategy_id=spec.decision.strategy_id,
         parameters=parameters["ref"],
@@ -316,10 +348,15 @@ def build_bundle(
         cutoff_time=spec.decision.decision_time,
     )
     anchor = verify_anchor(
-        load_anchor(spec.resolve(spec.anchor_path), allow_local=allow_local_anchor),
+        load_anchor(
+            spec.resolve(spec.anchor_path),
+            allow_local=allow_local_anchor,
+            rfc3161_trust=rfc3161_trust,
+        ),
         ledger,
         cutoff_time=spec.decision.decision_time,
         allow_local=allow_local_anchor,
+        rfc3161_trust=rfc3161_trust,
     )
 
     result_payload, execution = run_empirical_command(spec)
@@ -329,13 +366,23 @@ def build_bundle(
         payload=result_payload,
         algorithm=spec.hash_algorithm,
     )
-    metric_value = resolve_pointer(result_payload, spec.decision.metric_pointer)
+    metric_value = resolve_pointer(
+        result_payload, spec.decision.metric_pointer
+    )
     if isinstance(metric_value, bool) or not isinstance(metric_value, int):
-        raise ValidationError("selected metric must be an integer for Lean Scalar")
+        raise ValidationError(
+            "selected metric must be an integer for Lean Scalar"
+        )
 
-    features = _build_feature_descriptors(spec, result_payload, datasets, code)
-    used_datasets = [datasets[dataset_id] for dataset_id in spec.decision.dataset_ids]
-    used_features = [features[name] for name in spec.decision.feature_names]
+    features = _build_feature_descriptors(
+        spec, result_payload, datasets, code
+    )
+    used_datasets = [
+        datasets[dataset_id] for dataset_id in spec.decision.dataset_ids
+    ]
+    used_features = [
+        features[name] for name in spec.decision.feature_names
+    ]
 
     core: dict[str, Any] = {
         "schema_version": BUNDLE_SCHEMA,
@@ -347,11 +394,16 @@ def build_bundle(
         },
         "artifacts": {
             "code": code,
-            "datasets": [datasets[dataset.id] for dataset in spec.datasets],
+            "datasets": [
+                datasets[dataset.id] for dataset in spec.datasets
+            ],
             "parameters": parameters,
             "environment": environment,
             "result": result_artifact,
-            "features": [features[feature.name] for feature in spec.topological_features()],
+            "features": [
+                features[feature.name]
+                for feature in spec.topological_features()
+            ],
         },
         "decision": {
             "strategy_id": spec.decision.strategy_id,
@@ -397,6 +449,9 @@ def build_bundle(
     )
     bundle = deepcopy(core)
     bundle["bundle_digest"] = bundle_digest
-    verify_bundle(bundle, allow_local_anchor=allow_local_anchor)
+    verify_bundle(
+        bundle,
+        allow_local_anchor=allow_local_anchor,
+        rfc3161_trust=rfc3161_trust,
+    )
     return bundle, result_payload
-
