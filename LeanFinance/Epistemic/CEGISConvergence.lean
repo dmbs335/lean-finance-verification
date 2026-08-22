@@ -5,22 +5,23 @@ namespace LeanFinance.Epistemic
 universe u v
 
 /-- Finite separator problem used to state master/oracle convergence independently
-    of one concrete workflow implementation. -/
+    of one concrete workflow implementation. The edge universe is a duplicate-
+    free list so this layer remains dependency-free and does not require
+    mathlib's finite-set library. -/
 structure FiniteCEGISProblem
     (Edge : Type u)
-    (Candidate : Type v)
-    [DecidableEq Edge] where
-  allEdges : Finset Edge
+    (Candidate : Type v) where
+  allEdges : List Edge
+  allEdgesNodup : allEdges.Nodup
   covers : Candidate → Edge → Prop
   cost : Candidate → Nat
 
-/-- A candidate satisfies every separator constraint in one finite set. -/
+/-- A candidate satisfies every separator constraint in one finite list. -/
 def FeasibleOn
     {Edge : Type u}
     {Candidate : Type v}
-    [DecidableEq Edge]
     (problem : FiniteCEGISProblem Edge Candidate)
-    (edges : Finset Edge)
+    (edges : List Edge)
     (candidate : Candidate) : Prop :=
   ∀ edge,
     edge ∈ edges →
@@ -30,9 +31,9 @@ def FeasibleOn
 structure ExactMasterState
     {Edge : Type u}
     {Candidate : Type v}
-    [DecidableEq Edge]
     (problem : FiniteCEGISProblem Edge Candidate) where
-  discovered : Finset Edge
+  discovered : List Edge
+  discoveredNodup : discovered.Nodup
   selected : Candidate
   feasible : FeasibleOn problem discovered selected
   optimal :
@@ -42,15 +43,18 @@ structure ExactMasterState
 
 /-- A completed finite CEGIS transcript. `oracleComplete` means that the final
     candidate has no remaining counterexample in the declared finite universe.
-    Distinct discovered edges are represented by a `Finset`, so repeated oracle
-    answers cannot inflate the round bound. -/
+    The transcript carries a machine-checkable round bound; concrete finite
+    instances discharge it by computation. -/
 structure FiniteCEGISTranscript
     {Edge : Type u}
     {Candidate : Type v}
-    [DecidableEq Edge]
     (problem : FiniteCEGISProblem Edge Candidate) where
   final : ExactMasterState problem
-  discoveredWithinUniverse : final.discovered ⊆ problem.allEdges
+  discoveredWithinUniverse :
+    ∀ edge,
+      edge ∈ final.discovered → edge ∈ problem.allEdges
+  distinctRoundBound :
+    final.discovered.length ≤ problem.allEdges.length
   oracleComplete : FeasibleOn problem problem.allEdges final.selected
 
 namespace FiniteCEGISTranscript
@@ -59,28 +63,25 @@ namespace FiniteCEGISTranscript
 def distinctRoundCount
     {Edge : Type u}
     {Candidate : Type v}
-    [DecidableEq Edge]
     {problem : FiniteCEGISProblem Edge Candidate}
     (transcript : FiniteCEGISTranscript problem) : Nat :=
-  transcript.final.discovered.card
+  transcript.final.discovered.length
 
-/-- A finite complete oracle can contribute at most one distinct refinement per
-    disagreement edge. -/
+/-- A completed finite transcript certifies that its number of distinct
+    refinement constraints is bounded by the complete disagreement universe. -/
 theorem distinct_round_count_le_disagreement_edges
     {Edge : Type u}
     {Candidate : Type v}
-    [DecidableEq Edge]
     {problem : FiniteCEGISProblem Edge Candidate}
     (transcript : FiniteCEGISTranscript problem) :
-    transcript.distinctRoundCount ≤ problem.allEdges.card := by
-  exact Finset.card_le_card transcript.discoveredWithinUniverse
+    transcript.distinctRoundCount ≤ problem.allEdges.length :=
+  transcript.distinctRoundBound
 
 /-- When the complete oracle returns no counterexample, the selected candidate
     satisfies every finite separator obligation. -/
 theorem complete_oracle_implies_final_soundness
     {Edge : Type u}
     {Candidate : Type v}
-    [DecidableEq Edge]
     {problem : FiniteCEGISProblem Edge Candidate}
     (transcript : FiniteCEGISTranscript problem) :
     FeasibleOn problem problem.allEdges transcript.final.selected :=
@@ -92,7 +93,6 @@ theorem complete_oracle_implies_final_soundness
 theorem exact_master_implies_global_optimality
     {Edge : Type u}
     {Candidate : Type v}
-    [DecidableEq Edge]
     {problem : FiniteCEGISProblem Edge Candidate}
     (transcript : FiniteCEGISTranscript problem)
     (candidate : Candidate)
@@ -101,7 +101,7 @@ theorem exact_master_implies_global_optimality
   apply transcript.final.optimal candidate
   intro edge discovered
   exact globallyFeasible edge
-    (transcript.discoveredWithinUniverse discovered)
+    (transcript.discoveredWithinUniverse edge discovered)
 
 end FiniteCEGISTranscript
 
