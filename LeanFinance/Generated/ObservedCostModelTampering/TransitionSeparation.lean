@@ -4,12 +4,13 @@ import LeanFinance.Generated.ObservedCostModelTampering.CEGIS
 namespace LeanFinance.Generated.ObservedCostModelTampering.TransitionSeparation
 
 open LeanFinance.Epistemic
-namespace Search :=
-  LeanFinance.Generated.ObservedCostModelTampering.Search
-namespace Evidence :=
-  LeanFinance.Generated.ObservedCostModelTampering.Evidence
-namespace CEGIS :=
-  LeanFinance.Generated.ObservedCostModelTampering.CEGIS
+
+abbrev WorkflowAction :=
+  LeanFinance.Generated.ObservedCostModelTampering.Search.Action
+abbrev EvidenceHistory :=
+  LeanFinance.Generated.ObservedCostModelTampering.Evidence.History
+abbrev EvidenceChannel :=
+  LeanFinance.Generated.ObservedCostModelTampering.Evidence.Channel
 
 inductive ViolationKind where
   | undeclaredExecution
@@ -19,7 +20,7 @@ inductive ViolationKind where
   deriving Repr, DecidableEq
 
 def classifyViolationAction :
-    Search.Action → Option ViolationKind
+    WorkflowAction → Option ViolationKind
   | .executeBaseline => some .undeclaredExecution
   | .executeHiddenSweep => some .hiddenSweep
   | .readFutureData => some .futureDataAccess
@@ -29,42 +30,47 @@ def classifyViolationAction :
   | .anchorLedger => none
 
 def firstViolationKind
-    (history : Evidence.History) : Option ViolationKind :=
+    (history : EvidenceHistory) : Option ViolationKind :=
   match firstViolationAction
-      Search.workflow Search.claimState
-      (CEGIS.historyTrace history) with
+      LeanFinance.Generated.ObservedCostModelTampering.Search.workflow
+      LeanFinance.Generated.ObservedCostModelTampering.Search.claimState
+      (LeanFinance.Generated.ObservedCostModelTampering.CEGIS.historyTrace history) with
   | none => none
   | some action => classifyViolationAction action
 
 /-- The generated model has one safe terminal history; every other terminal
     history has one of four first-violation transition kinds. -/
 theorem no_first_violation_iff_honest
-    (history : Evidence.History) :
+    (history : EvidenceHistory) :
     firstViolationKind history = none ↔
       history = .honest := by
   cases history <;> decide
 
 theorem model_claim_iff_no_first_violation
-    (history : Evidence.History) :
-    Evidence.model.ClaimHolds history ↔
+    (history : EvidenceHistory) :
+    LeanFinance.Generated.ObservedCostModelTampering.Evidence.model.ClaimHolds history ↔
       FirstViolationClaim firstViolationKind history := by
   cases history <;> decide
 
 /-- One receipt per primitive first-violation boundary. -/
-def transitionBasis : List Evidence.Channel :=
+def transitionBasis : List EvidenceChannel :=
   [.selfReport,
     .targetedReceipt_executeHiddenSweep,
     .targetedReceipt_readFutureData,
     .targetedReceipt_tamperCostModel]
 
 theorem transition_basis_is_exact_history_optimum :
-    transitionBasis = Evidence.decode Evidence.selected := by
+    transitionBasis =
+      LeanFinance.Generated.ObservedCostModelTampering.Evidence.decode
+        LeanFinance.Generated.ObservedCostModelTampering.Evidence.selected := by
   decide
 
 theorem declaration_receipt_persistent :
     PersistentTransitionSeparator
-      Evidence.observe firstViolationKind
-      .selfReport .undeclaredExecution := by
+      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe
+      firstViolationKind
+      (.selfReport : EvidenceChannel)
+      .undeclaredExecution := by
   intro safeHistory badHistory safeClass badClass
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
@@ -73,8 +79,10 @@ theorem declaration_receipt_persistent :
 
 theorem hidden_sweep_receipt_persistent :
     PersistentTransitionSeparator
-      Evidence.observe firstViolationKind
-      .targetedReceipt_executeHiddenSweep .hiddenSweep := by
+      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe
+      firstViolationKind
+      (.targetedReceipt_executeHiddenSweep : EvidenceChannel)
+      .hiddenSweep := by
   intro safeHistory badHistory safeClass badClass
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
@@ -83,8 +91,10 @@ theorem hidden_sweep_receipt_persistent :
 
 theorem future_data_receipt_persistent :
     PersistentTransitionSeparator
-      Evidence.observe firstViolationKind
-      .targetedReceipt_readFutureData .futureDataAccess := by
+      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe
+      firstViolationKind
+      (.targetedReceipt_readFutureData : EvidenceChannel)
+      .futureDataAccess := by
   intro safeHistory badHistory safeClass badClass
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
@@ -93,8 +103,10 @@ theorem future_data_receipt_persistent :
 
 theorem cost_model_receipt_persistent :
     PersistentTransitionSeparator
-      Evidence.observe firstViolationKind
-      .targetedReceipt_tamperCostModel .costModelMutation := by
+      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe
+      firstViolationKind
+      (.targetedReceipt_tamperCostModel : EvidenceChannel)
+      .costModelMutation := by
   intro safeHistory badHistory safeClass badClass
   have safeEq : safeHistory = .honest :=
     (no_first_violation_iff_honest safeHistory).mp safeClass
@@ -103,7 +115,7 @@ theorem cost_model_receipt_persistent :
 
 theorem transition_basis_persistently_covers_first_violations :
     PersistentTransitionCover
-      Evidence.observe
+      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe
       (fun evidenceChannel => evidenceChannel ∈ transitionBasis)
       firstViolationKind := by
   intro violation _occurs
@@ -130,7 +142,7 @@ theorem transition_basis_persistently_covers_first_violations :
 
 theorem transition_basis_verifies_first_violation_absence :
     ChannelSelectionVerifies
-      Evidence.observe
+      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe
       (fun evidenceChannel => evidenceChannel ∈ transitionBasis)
       (FirstViolationClaim firstViolationKind) :=
   persistent_transition_cover_implies_verification
@@ -140,9 +152,9 @@ theorem transition_basis_verifies_first_violation_absence :
     claim over all bounded histories. -/
 theorem transition_basis_verifies_integrity :
     ChannelSelectionVerifies
-      Evidence.observe
+      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe
       (fun evidenceChannel => evidenceChannel ∈ transitionBasis)
-      Evidence.model.ClaimHolds := by
+      LeanFinance.Generated.ObservedCostModelTampering.Evidence.model.ClaimHolds := by
   intro left right sameEvidence
   have transitionSame :=
     transition_basis_verifies_first_violation_absence
@@ -163,14 +175,15 @@ theorem transition_basis_verifies_integrity :
 
 /-- Publication-side declaration/result/timestamp evidence is silent on the
     cost-model first-violation transition. -/
-def publicationChannel (evidenceChannel : Evidence.Channel) : Prop :=
+def publicationChannel (evidenceChannel : EvidenceChannel) : Prop :=
   evidenceChannel = .selfReport ∨
     evidenceChannel = .resultBundle ∨
     evidenceChannel = .rfc3161Anchor
 
 def publicationSilentWitness :
     SilentFirstViolationWitness
-      Evidence.observe publicationChannel firstViolationKind :=
+      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe
+      publicationChannel firstViolationKind :=
   {
     safeHistory := .honest
     badHistory := .costModelTampering
@@ -184,12 +197,15 @@ def publicationSilentWitness :
 
 theorem publication_channels_cannot_verify_first_violation_absence :
     ¬ ChannelSelectionVerifies
-      Evidence.observe publicationChannel
+      LeanFinance.Generated.ObservedCostModelTampering.Evidence.observe
+      publicationChannel
       (FirstViolationClaim firstViolationKind) :=
   publicationSilentWitness.silent_first_violation_implies_unverifiable
 
-def violatingHistories : List Evidence.History :=
-  Evidence.histories.filter (fun history => !(Evidence.claim history))
+def violatingHistories : List EvidenceHistory :=
+  LeanFinance.Generated.ObservedCostModelTampering.Evidence.histories.filter
+    (fun history =>
+      !(LeanFinance.Generated.ObservedCostModelTampering.Evidence.claim history))
 
 def primitiveViolationKinds : List ViolationKind :=
   [.undeclaredExecution,
