@@ -116,7 +116,7 @@ theorem featureAvailableAtGeneration_momentum :
     subst inputHash
     apply ArtifactAvailableAt.dataset dataset_prices
     · simp [lineageCatalog]
-    · simp [DatasetAvailableAt, dataset_prices, featureLineage_momentum]
+    · simp [DatasetAvailableAt, dataset_prices, derivedFeature_momentum, featureLineage_momentum]
     · simp [DatasetHashBound, dataset_prices, datasetArtifact_prices,
         NonEmptyString]
 
