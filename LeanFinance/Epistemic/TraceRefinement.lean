@@ -1,4 +1,6 @@
 import LeanFinance.Epistemic.WorkflowTransition
+import LeanFinance.Epistemic.ModelRefinement
+import LeanFinance.Epistemic.ModelRefinementExample
 
 namespace LeanFinance.Epistemic
 
