@@ -32,10 +32,11 @@ The epistemic layer additionally proves and computes limits on verification itse
   claim-disagreement separator set;
 - exploration completeness cannot be certified solely from a researcher's public
   declaration;
-- in the formal search-history model, the declaration and independent executor log
-  form a mechanically proved minimal evidence cut set;
-- an exact bounded synthesizer enumerates adversarial histories and channel subsets,
-  finds minimum-cost evidence, and emits a counterexample for every cheaper candidate.
+- an exact bounded synthesizer finds minimum-cost evidence and emits a counterexample
+  for every cheaper candidate;
+- a workflow CEGIS front end generates reachable attacks from transition semantics,
+  discovers evidence-indistinguishable claim failures, instantiates new sensor
+  channels, and rechecks the refined design in Lean.
 
 These properties do **not** prove that a strategy is profitable, that raw data is true,
 or that an empirical model is statistically correct. They prove the narrower
@@ -50,7 +51,7 @@ LeanFinance/
 ├── Constraints/      margin, VaR, redemption, and short-cover triggers
 ├── Dynamics/         market-state and equilibrium-regime transitions
 ├── Inference/        latent state, identification, and inverse-game boundaries
-├── Epistemic/        verifiability, cut sets, impossibility, finite synthesis soundness
+├── Epistemic/        verifiability, cut sets, finite synthesis, workflow semantics
 ├── StrategyEcology/  context-dependent causal strategy interactions
 ├── SupplyChain/      dynamic capacity, substitution, qualification, and rent claims
 ├── Backtest/         artifacts, PIT lineage, anchored search history, adapter contract
@@ -66,9 +67,9 @@ Lean is pinned in `lean-toolchain`.
 lake build
 ```
 
-GitHub Actions runs the Python adapter and exact-synthesis tests, exercises a locally
-generated RFC 3161 test PKI, checks generated artifacts byte-for-byte, and then runs the
-Lean build.
+GitHub Actions runs the empirical adapter, RFC 3161, exact evidence-synthesis, and
+workflow CEGIS tests; checks generated artifacts byte-for-byte; and then runs the Lean
+build.
 
 ## Evidence separation theory
 
@@ -97,15 +98,49 @@ python -m tools.evidence_synth synth \
   --pretty
 ```
 
-The checked-in search-completeness model discovers `{selfReport, executorLog}` as the
-unique inclusion-minimal set. A canonical result bundle and valid RFC 3161 timestamp do
-not separate an honest run from an unreported parameter sweep, because both are
-post-processings of the same visible declaration.
-
 `LeanFinance/Epistemic/FiniteSynthesis.lean` proves the executable checker sound and
 turns generated lower-cost counterexamples into a Lean weighted-optimality theorem.
 See [`docs/EVIDENCE_SYNTHESIS.md`](docs/EVIDENCE_SYNTHESIS.md) for the model, certificate,
 Pareto frontier, and bounded-model interpretation.
+
+## Counterexample-guided workflow synthesis
+
+The workflow front end replaces hand-written adversarial worlds with a finite Boolean
+transition system. It computes all terminal traces to a declared depth and runs an
+exact master/oracle loop:
+
+```text
+minimum-cost repair satisfying known counterexamples
+→ new indistinguishable claim-disagreement pair
+→ separator constraint
+→ repeat
+```
+
+```bash
+python -m tools.workflow_cegis synth \
+  --model examples/workflow_cegis/search_integrity.json \
+  --report /tmp/lfv-workflow-cegis/report.canonical.json \
+  --evidence-model /tmp/lfv-workflow-cegis/evidence-model.canonical.json \
+  --synthesis /tmp/lfv-workflow-cegis/global-synthesis.canonical.json \
+  --repair-synthesis /tmp/lfv-workflow-cegis/repair-synthesis.canonical.json \
+  --workflow-lean LeanFinance/Generated/WorkflowSearch.lean \
+  --evidence-lean LeanFinance/Generated/WorkflowEvidence.lean \
+  --bridge-lean LeanFinance/Generated/WorkflowCEGIS.lean \
+  --pretty
+```
+
+The checked-in workflow generates ten terminal histories automatically. The deployed
+`selfReport + resultBundle + rfc3161Anchor` channels first fail on a future-data leak
+and then on a hidden parameter sweep. CEGIS adds two narrow independent action receipts.
+Exact repair synthesis proves those receipts cost less than a full executor log, while
+global synthesis identifies the result bundle and timestamp as redundant for this
+particular exploration-integrity claim.
+
+The generated Lean modules prove trace-catalog completeness, bind claims and
+observations back to workflow replay, materialize every refinement counterexample,
+connect the rounds into one CEGIS chain, and exhaustively prove both greenfield and
+mandatory-baseline repair optimality in the kernel. See
+[`docs/COUNTEREXAMPLE_GUIDED_EVIDENCE_SYNTHESIS.md`](docs/COUNTEREXAMPLE_GUIDED_EVIDENCE_SYNTHESIS.md).
 
 ## Python reference adapter
 
@@ -134,30 +169,29 @@ python -m tools.lfv_adapter make-rfc3161-anchor \
   --out research/ledger-anchor.json
 ```
 
-The TSA signing trust bundle is selected externally by the verifier and is hashed into
-the evidence binding. See [`docs/REFERENCE_ADAPTER.md`](docs/REFERENCE_ADAPTER.md) for
-the complete adapter flow and [`docs/RFC3161_ANCHORS.md`](docs/RFC3161_ANCHORS.md) for
-signed timestamp issuance, verification, and trust assumptions.
+See [`docs/REFERENCE_ADAPTER.md`](docs/REFERENCE_ADAPTER.md) for the complete adapter
+flow and [`docs/RFC3161_ANCHORS.md`](docs/RFC3161_ANCHORS.md) for timestamp trust and
+archival assumptions.
 
 ## Research roadmap
 
-1. Generate bounded adversarial histories from executable workflow transition systems
-   instead of writing histories by hand.
-2. Learn counterexample-guided model refinements when a new attack is absent from the
-   current history space.
-3. Synthesize privacy-constrained and trust-diversified evidence portfolios, including
-   multi-provider anchor quorum.
-4. Connect forced-flow composition, constraint activation, and regime-transition
-   safety theorems end to end.
-5. Run the reference adapter against a real point-in-time dataset and preserve the
-   resulting certificate bundle as a reproducible research artifact.
+1. Import real attack traces and perform transition-model refinement when a trace is
+   absent from the current action semantics.
+2. Learn reusable adversarial action schemas across backtests, dataset pipelines, and
+   market-model workflows.
+3. Add robust evidence portfolios against sensor compromise, correlated providers, and
+   adaptive adversaries rather than assuming every selected channel is reliable.
+4. Synthesize privacy-constrained and trust-diversified channels, including
+   multi-provider anchor quorum and zero-knowledge execution receipts.
+5. Run the complete workflow against a real point-in-time dataset and preserve the
+   resulting attack catalog, evidence repair, and backtest certificate.
 
 ## Scope
 
 This repository is research software. A Lean proof is only as strong as its formalized
-history space, observation maps, assumptions, and the cryptographic, data-lineage,
-execution, external-anchor, and trust-material evidence supplied to the checker. RFC
-3161 support verifies signed evidence but does not by itself prove TSA independence,
-revocation status, or long-term archival validity. Exact synthesis is complete over the
-declared bounded model and candidate channel language; it does not prove that the model
-contains every real-world adversarial history.
+history space, transition semantics, observation maps, assumptions, and the
+cryptographic, data-lineage, execution, external-anchor, and trust-material evidence
+supplied to the checker. Workflow exploration is complete only up to the declared depth
+and action language. Exact synthesis is complete only over the generated bounded
+histories and candidate channels. Neither establishes that every materially relevant
+real-world attack has been modeled.

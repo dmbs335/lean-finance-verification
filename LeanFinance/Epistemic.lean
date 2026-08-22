@@ -3,3 +3,6 @@ import LeanFinance.Epistemic.CutSet
 import LeanFinance.Epistemic.SelfCertification
 import LeanFinance.Epistemic.BacktestCompleteness
 import LeanFinance.Epistemic.FiniteSynthesis
+import LeanFinance.Epistemic.FiniteSynthesisCompleteness
+import LeanFinance.Epistemic.WorkflowTransition
+import LeanFinance.Epistemic.CounterexampleGuided

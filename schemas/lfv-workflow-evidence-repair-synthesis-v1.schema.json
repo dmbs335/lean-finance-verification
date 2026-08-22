@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rewrite-lab.example/schemas/lfv-workflow-evidence-repair-synthesis-v1.schema.json",
+  "title": "Lean Finance Verification exact workflow evidence repair v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "canonical_format",
+    "mandatory_channels",
+    "optional_channels",
+    "history_count",
+    "channel_count",
+    "candidate_count",
+    "disagreement_edges",
+    "verifying_candidate_count",
+    "status",
+    "repair_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "lfv-workflow-evidence-repair-synthesis-v1"},
+    "canonical_format": {"const": "lfv-canonical-json-v1"},
+    "mandatory_channels": {"type": "array", "items": {"type": "string"}},
+    "optional_channels": {"type": "array", "items": {"type": "string"}},
+    "history_count": {"type": "integer", "minimum": 2},
+    "channel_count": {"type": "integer", "minimum": 1, "maximum": 12},
+    "candidate_count": {"type": "integer", "minimum": 1},
+    "disagreement_edges": {"type": "array", "minItems": 1},
+    "verifying_candidate_count": {"type": "integer", "minimum": 0},
+    "status": {"enum": ["synthesized", "impossible"]},
+    "selected": {"$ref": "#/$defs/candidate"},
+    "optimal_incremental_weighted_cost": {"type": "integer", "minimum": 0},
+    "optimal_repairs": {"type": "array", "items": {"$ref": "#/$defs/candidate"}},
+    "minimal_repairs": {"type": "array", "items": {"$ref": "#/$defs/candidate"}},
+    "pareto_frontier": {"type": "array", "items": {"$ref": "#/$defs/candidate"}},
+    "lower_cost_failures": {"type": "array", "items": {"$ref": "#/$defs/candidate"}},
+    "impossibility_witness": {"type": "object"},
+    "all_optional_mask": {"type": "integer", "minimum": 0},
+    "repair_digest": {"$ref": "#/$defs/digest"}
+  },
+  "$defs": {
+    "cost": {
+      "type": "object",
+      "required": ["operational", "privacy", "trust"],
+      "properties": {
+        "operational": {"type": "integer", "minimum": 0},
+        "privacy": {"type": "integer", "minimum": 0},
+        "trust": {"type": "integer", "minimum": 0}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "required": [
+        "mask",
+        "optional_channels",
+        "selected_channels",
+        "incremental_cost",
+        "incremental_weighted_cost",
+        "total_cost",
+        "total_weighted_cost",
+        "verifies"
+      ],
+      "properties": {
+        "mask": {"type": "integer", "minimum": 0},
+        "optional_channels": {"type": "array", "items": {"type": "string"}},
+        "selected_channels": {"type": "array", "items": {"type": "string"}},
+        "incremental_cost": {"$ref": "#/$defs/cost"},
+        "incremental_weighted_cost": {"type": "integer", "minimum": 0},
+        "total_cost": {"$ref": "#/$defs/cost"},
+        "total_weighted_cost": {"type": "integer", "minimum": 0},
+        "verifies": {"type": "boolean"},
+        "uncovered_edge": {"type": "string"}
+      }
+    },
+    "digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "schema_id", "digest"],
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "schema_id": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

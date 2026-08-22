@@ -1,2 +1,5 @@
 import LeanFinance.Generated.ReferenceAdapter
 import LeanFinance.Generated.EvidenceSynthesis
+import LeanFinance.Generated.WorkflowSearch
+import LeanFinance.Generated.WorkflowEvidence
+import LeanFinance.Generated.WorkflowCEGIS

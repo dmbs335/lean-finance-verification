@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rewrite-lab.example/schemas/lfv-workflow-cegis-report-v1.schema.json",
+  "title": "Lean Finance Verification workflow CEGIS report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "canonical_format",
+    "name",
+    "namespace_prefix",
+    "model_digest",
+    "exploration",
+    "channels",
+    "initial_selection",
+    "refinement_status",
+    "iterations",
+    "refined_selection",
+    "newly_required_channels",
+    "exact_synthesis",
+    "exact_repair_synthesis",
+    "evidence_model",
+    "cegis_digest",
+    "report_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "lfv-workflow-cegis-report-v1"},
+    "canonical_format": {"const": "lfv-canonical-json-v1"},
+    "name": {"type": "string", "minLength": 1},
+    "namespace_prefix": {"type": "string", "minLength": 1},
+    "model_digest": {"$ref": "#/$defs/digest"},
+    "exploration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_depth", "history_count", "histories"],
+      "properties": {
+        "max_depth": {"type": "integer", "minimum": 1},
+        "history_count": {"type": "integer", "minimum": 1},
+        "histories": {"type": "array", "minItems": 1}
+      }
+    },
+    "channels": {"type": "array", "minItems": 1, "maxItems": 12},
+    "initial_selection": {"type": "array", "items": {"type": "string"}},
+    "refinement_status": {"enum": ["synthesized", "unresolved"]},
+    "iterations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["iteration", "status", "candidate", "discovered_edges"],
+        "properties": {
+          "iteration": {"type": "integer", "minimum": 0},
+          "status": {"enum": ["counterexample", "verified", "unresolved"]},
+          "candidate": {"type": "object"},
+          "counterexample": {"type": "object"},
+          "after_candidate": {"type": "object"},
+          "newly_added_channels": {"type": "array", "items": {"type": "string"}},
+          "available_channel_proposals": {"type": "array"},
+          "discovered_edges": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "refined_selection": {"type": "array", "items": {"type": "string"}},
+    "newly_required_channels": {"type": "array", "items": {"type": "string"}},
+    "exact_synthesis": {"type": "object"},
+    "exact_repair_synthesis": {"type": "object"},
+    "evidence_model": {"type": "object"},
+    "deployment_analysis": {"type": "object"},
+    "failure": {"type": "object"},
+    "cegis_digest": {"$ref": "#/$defs/digest"},
+    "report_digest": {"$ref": "#/$defs/digest"}
+  },
+  "$defs": {
+    "digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "schema_id", "digest"],
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "schema_id": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

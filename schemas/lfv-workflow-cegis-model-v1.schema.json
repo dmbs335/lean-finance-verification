@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rewrite-lab.example/schemas/lfv-workflow-cegis-model-v1.schema.json",
+  "title": "Lean Finance Verification workflow CEGIS model v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "name",
+    "namespace_prefix",
+    "max_depth",
+    "cost_weights",
+    "variables",
+    "actions",
+    "terminal",
+    "claim",
+    "channels",
+    "sensor_templates",
+    "trace_aliases"
+  ],
+  "properties": {
+    "schema_version": {"const": "lfv-workflow-cegis-model-v1"},
+    "name": {"type": "string", "minLength": 1},
+    "namespace_prefix": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+    },
+    "max_depth": {"type": "integer", "minimum": 1, "maximum": 12},
+    "max_histories": {"type": "integer", "minimum": 1},
+    "max_refinements": {"type": "integer", "minimum": 1},
+    "cost_weights": {"$ref": "#/$defs/cost"},
+    "variables": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "initial", "sensor_cost", "description"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "initial": {"type": "boolean"},
+          "sensor_cost": {"$ref": "#/$defs/cost"},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "guard",
+          "effects",
+          "max_occurrences",
+          "tags",
+          "sensor_cost",
+          "description"
+        ],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "guard": {"$ref": "#/$defs/expression"},
+          "effects": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["set"],
+              "properties": {
+                "set": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["var", "value"],
+                  "properties": {
+                    "var": {"type": "string", "minLength": 1},
+                    "value": {"$ref": "#/$defs/expression"}
+                  }
+                }
+              }
+            }
+          },
+          "max_occurrences": {"type": "integer", "minimum": 1},
+          "tags": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "sensor_cost": {"$ref": "#/$defs/cost"},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "terminal": {"$ref": "#/$defs/expression"},
+    "claim": {"$ref": "#/$defs/expression"},
+    "channels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "deployed",
+          "visible_actions",
+          "visible_state",
+          "cost",
+          "description"
+        ],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "deployed": {"type": "boolean"},
+          "visible_actions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "visible_state": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "cost": {"$ref": "#/$defs/cost"},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "sensor_templates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "action_tags", "variables", "cost", "description"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["action", "state"]},
+          "action_tags": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "variables": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "cost": {"$ref": "#/$defs/cost"},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "trace_aliases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "trace", "description"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "trace": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operational", "privacy", "trust"],
+      "properties": {
+        "operational": {"type": "integer", "minimum": 0},
+        "privacy": {"type": "integer", "minimum": 0},
+        "trust": {"type": "integer", "minimum": 0}
+      }
+    },
+    "expression": {
+      "oneOf": [
+        {"type": "boolean"},
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "properties": {
+            "var": {"type": "string", "minLength": 1},
+            "not": {"$ref": "#/$defs/expression"},
+            "all": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/expression"}},
+            "any": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/expression"}},
+            "eq": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/expression"}},
+            "ne": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/expression"}},
+            "if": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["condition", "then", "else"],
+              "properties": {
+                "condition": {"$ref": "#/$defs/expression"},
+                "then": {"$ref": "#/$defs/expression"},
+                "else": {"$ref": "#/$defs/expression"}
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}
