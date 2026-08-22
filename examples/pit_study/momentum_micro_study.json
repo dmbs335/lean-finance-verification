@@ -1,0 +1,50 @@
+{
+  "schema_version": "lfv-pit-micro-study-v1",
+  "name": "point-in-time-momentum-micro-study",
+  "vintages": [
+    {"id": "prices-v1", "revision": 1, "first_published_at": 1, "supersedes": null},
+    {"id": "prices-v2", "revision": 2, "first_published_at": 45, "supersedes": "prices-v1"}
+  ],
+  "assets": [
+    {"id": "ALPHA", "listed_at": 0, "delisted_at": null},
+    {"id": "BETA", "listed_at": 0, "delisted_at": 40},
+    {"id": "GAMMA", "listed_at": 20, "delisted_at": null}
+  ],
+  "prices": [
+    {"asset": "ALPHA", "time": 10, "available_at": 11, "value": 100, "vintage": "prices-v1"},
+    {"asset": "ALPHA", "time": 20, "available_at": 21, "value": 105, "vintage": "prices-v1"},
+    {"asset": "ALPHA", "time": 30, "available_at": 31, "value": 110, "vintage": "prices-v1"},
+    {"asset": "ALPHA", "time": 40, "available_at": 41, "value": 115, "vintage": "prices-v1"},
+    {"asset": "BETA", "time": 10, "available_at": 11, "value": 100, "vintage": "prices-v1"},
+    {"asset": "BETA", "time": 20, "available_at": 21, "value": 110, "vintage": "prices-v1"},
+    {"asset": "BETA", "time": 30, "available_at": 31, "value": 90, "vintage": "prices-v1"},
+    {"asset": "GAMMA", "time": 20, "available_at": 21, "value": 100, "vintage": "prices-v1"},
+    {"asset": "GAMMA", "time": 30, "available_at": 31, "value": 108, "vintage": "prices-v1"},
+    {"asset": "GAMMA", "time": 40, "available_at": 41, "value": 120, "vintage": "prices-v1"},
+    {"asset": "ALPHA", "time": 40, "available_at": 45, "value": 116, "vintage": "prices-v2"},
+    {"asset": "GAMMA", "time": 40, "available_at": 45, "value": 121, "vintage": "prices-v2"}
+  ],
+  "universe_snapshots": [
+    {"as_of": 20, "members": ["ALPHA", "BETA", "GAMMA"]},
+    {"as_of": 30, "members": ["ALPHA", "BETA", "GAMMA"]},
+    {"as_of": 40, "members": ["ALPHA", "GAMMA"]}
+  ],
+  "decisions": [
+    {"decision_at": 21, "as_of": 20, "lookback_time": 10, "observation_time": 20, "vintage": "prices-v1"},
+    {"decision_at": 31, "as_of": 30, "lookback_time": 20, "observation_time": 30, "vintage": "prices-v1"},
+    {"decision_at": 41, "as_of": 40, "lookback_time": 30, "observation_time": 40, "vintage": "prices-v1"}
+  ],
+  "corporate_actions": [
+    {"id": "BETA-delisting", "asset": "BETA", "announced_at": 35, "effective_at": 40}
+  ],
+  "adjustments": [
+    {"id": "delisting-adjusted-series", "generated_at": 41, "actions": ["BETA-delisting"]}
+  ],
+  "evaluation_contract": {
+    "registered_at": 1,
+    "benchmark": "equal-weight-eligible-universe",
+    "metric": "one-period-price-momentum",
+    "lookback_periods": 1,
+    "cost_bps": 10
+  }
+}
