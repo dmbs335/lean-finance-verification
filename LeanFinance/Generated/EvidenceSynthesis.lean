@@ -252,7 +252,7 @@ def counterexample_mask13 :
         simp [decode, model, observe] at member ⊢
   }
 
-theorem cheaperCandidateCounterexample
+def cheaperCandidateCounterexample
     (candidate : Candidate)
     (cheaper :
       selectionCost model (decode candidate) <
