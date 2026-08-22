@@ -47,20 +47,28 @@ def Valid (manifest : VendorPackageManifest) : Prop :=
 end VendorPackageManifest
 
 /-- Proof boundary after verifier-selected public-key signature validation and
-    exact file checks. -/
+    exact file checks.
+
+    Each external verification statement is supplied as a proposition and the
+    structure carries a proof of that proposition. Declaring a field merely as
+    `Prop` would store a proposition value rather than evidence that it holds,
+    and is invalid in a `Prop`-valued Lean structure. -/
 structure VerifiedVendorPackage
-    (manifest : VendorPackageManifest) : Prop where
+    (manifest : VendorPackageManifest)
+    (SignatureVerified FileDigestsMatch RowCountsMatch SchemasMatch : Prop) : Prop where
   manifestValid : manifest.Valid
-  signatureVerified : Prop
-  fileDigestsMatch : Prop
-  rowCountsMatch : Prop
-  schemasMatch : Prop
+  signatureVerified : SignatureVerified
+  fileDigestsMatch : FileDigestsMatch
+  rowCountsMatch : RowCountsMatch
+  schemasMatch : SchemasMatch
 
 namespace VerifiedVendorPackage
 
 theorem has_valid_manifest
     {manifest : VendorPackageManifest}
-    (verified : VerifiedVendorPackage manifest) :
+    {SignatureVerified FileDigestsMatch RowCountsMatch SchemasMatch : Prop}
+    (verified : VerifiedVendorPackage manifest SignatureVerified
+      FileDigestsMatch RowCountsMatch SchemasMatch) :
     manifest.Valid :=
   verified.manifestValid
 

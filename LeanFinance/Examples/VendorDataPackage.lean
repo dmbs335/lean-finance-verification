@@ -29,4 +29,19 @@ theorem manifest_valid : manifest.Valid := by
   simp [VendorPackageManifest.Valid, manifest, prices, artifact,
     ArtifactRef.Valid, NonEmptyString]
 
+/-- A concrete proof object exercises the external-verification proposition
+    parameters and prevents a regression to proposition-valued fields. -/
+def verifiedPackage :
+    VerifiedVendorPackage manifest True True True True :=
+  {
+    manifestValid := manifest_valid
+    signatureVerified := True.intro
+    fileDigestsMatch := True.intro
+    rowCountsMatch := True.intro
+    schemasMatch := True.intro
+  }
+
+theorem verified_package_has_valid_manifest : manifest.Valid :=
+  verifiedPackage.has_valid_manifest
+
 end LeanFinance.Examples.VendorDataPackage
