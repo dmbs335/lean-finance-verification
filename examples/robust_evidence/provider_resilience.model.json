@@ -1,0 +1,64 @@
+{
+  "schema_version": "lfv-evidence-synthesis-model-v1",
+  "name": "provider-resilient-execution-receipts",
+  "namespace": "LeanFinance.Generated.ProviderResilientEvidence",
+  "claim_name": "NoHiddenExecution",
+  "cost_weights": {
+    "operational": 1,
+    "privacy": 1,
+    "trust": 1
+  },
+  "histories": [
+    {
+      "id": "honest",
+      "claim": true,
+      "description": "The declared execution is the only execution."
+    },
+    {
+      "id": "attack",
+      "claim": false,
+      "description": "An undeclared execution occurs outside the visible research record."
+    }
+  ],
+  "channels": [
+    {
+      "id": "providerAReceipt1",
+      "description": "First receipt issued by provider A.",
+      "cost": {
+        "operational": 1,
+        "privacy": 0,
+        "trust": 0
+      },
+      "observations": {
+        "honest": "clean",
+        "attack": "violation"
+      }
+    },
+    {
+      "id": "providerAReceipt2",
+      "description": "Second receipt issued by the same provider A.",
+      "cost": {
+        "operational": 1,
+        "privacy": 0,
+        "trust": 0
+      },
+      "observations": {
+        "honest": "clean",
+        "attack": "violation"
+      }
+    },
+    {
+      "id": "providerBReceipt",
+      "description": "Independent receipt issued by provider B.",
+      "cost": {
+        "operational": 2,
+        "privacy": 0,
+        "trust": 0
+      },
+      "observations": {
+        "honest": "clean",
+        "attack": "violation"
+      }
+    }
+  ]
+}
