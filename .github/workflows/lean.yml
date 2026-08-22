@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -23,9 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -39,40 +37,21 @@ jobs:
         run: python -m unittest discover -s tools/workflow_cegis/tests -v
       - name: Test observed attack-trace refinement
         run: python -m unittest discover -s tools/trace_refinement/tests -v
-      - name: Generate and pin observed trace refinement artifacts
-        shell: bash
-        run: |
-          set -euo pipefail
-          json_out="examples/trace_refinement/generated"
-          lean_out="LeanFinance/Generated/ObservedCostModelTampering"
-          mkdir -p "$json_out" "$lean_out"
-          python -m tools.trace_refinement refine \
-            --model examples/workflow_cegis/search_integrity.json \
-            --trace examples/trace_refinement/cost_model_tampering.trace.json \
-            --refined-model "$json_out/refined-model.canonical.json" \
-            --refinement-report "$json_out/refinement-report.canonical.json" \
-            --workflow-report "$json_out/workflow-report.canonical.json" \
-            --evidence-model "$json_out/evidence-model.canonical.json" \
-            --synthesis "$json_out/global-synthesis.canonical.json" \
-            --repair-synthesis "$json_out/repair-synthesis.canonical.json" \
-            --workflow-lean "$lean_out/Search.lean" \
-            --evidence-lean "$lean_out/Evidence.lean" \
-            --bridge-lean "$lean_out/CEGIS.lean" \
-            --trace-lean "$lean_out/TraceRefinement.lean"
-      - name: Commit generated trace refinement artifacts once
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        shell: bash
-        run: |
-          set -euo pipefail
-          git add examples/trace_refinement/generated LeanFinance/Generated/ObservedCostModelTampering
-          if git diff --cached --quiet; then
-            echo "generated artifacts already pinned"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Pin observed attack trace refinement artifacts"
-          git push origin "HEAD:${GITHUB_HEAD_REF}"
+      - name: Check observed trace refinement reproducibility
+        run: >-
+          python -m tools.trace_refinement check-generated
+          --model examples/workflow_cegis/search_integrity.json
+          --trace examples/trace_refinement/cost_model_tampering.trace.json
+          --refined-model examples/trace_refinement/generated/refined-model.canonical.json
+          --refinement-report examples/trace_refinement/generated/refinement-report.canonical.json
+          --workflow-report examples/trace_refinement/generated/workflow-report.canonical.json
+          --evidence-model examples/trace_refinement/generated/evidence-model.canonical.json
+          --synthesis examples/trace_refinement/generated/global-synthesis.canonical.json
+          --repair-synthesis examples/trace_refinement/generated/repair-synthesis.canonical.json
+          --workflow-lean LeanFinance/Generated/ObservedCostModelTampering/Search.lean
+          --evidence-lean LeanFinance/Generated/ObservedCostModelTampering/Evidence.lean
+          --bridge-lean LeanFinance/Generated/ObservedCostModelTampering/CEGIS.lean
+          --trace-lean LeanFinance/Generated/ObservedCostModelTampering/TraceRefinement.lean
       - name: Check generated backtest certificate reproducibility
         run: >-
           python -m tools.lfv_adapter check-generated
