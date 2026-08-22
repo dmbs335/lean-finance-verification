@@ -20,3 +20,5 @@ import LeanFinance.Epistemic.CEGISConvergence
 import LeanFinance.Epistemic.CEGISConvergenceExample
 import LeanFinance.Epistemic.MultiClaim
 import LeanFinance.Epistemic.MultiClaimExample
+import LeanFinance.Epistemic.SymbolicCoverage
+import LeanFinance.Epistemic.SymbolicCoverageExample

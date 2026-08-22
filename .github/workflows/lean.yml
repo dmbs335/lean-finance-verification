@@ -45,6 +45,8 @@ jobs:
         run: python -m unittest discover -s tools/model_family_synth/tests -v
       - name: Test multi-claim evidence synthesis
         run: python -m unittest discover -s tools/multiclaim_synth/tests -v
+      - name: Test symbolic evidence synthesis and attack corpus
+        run: python -m unittest discover -s tools/symbolic_evidence/tests -v
       - name: Check evidence taxonomy reproducibility
         run: >-
           python -m tools.evidence_taxonomy check-generated
