@@ -27,11 +27,11 @@ theorem selectedSeparatesBool_complete
       · by_cases headDifferent :
           model.observe head left ≠ model.observe head right
         · simp [selectedSeparatesBool, headDifferent]
-        · have tailSeparates :
-              SelectedSeparates model tail left right :=
-            ⟨evidenceChannel, memberTail, different⟩
+        · have tailAccepted :
+              selectedSeparatesBool model tail left right = true :=
+            ih memberTail
           simpa [selectedSeparatesBool, headDifferent] using
-            ih tailSeparates
+            tailAccepted
 
 /-- Pair checking is complete whenever equal claims or a separator witness is
     supplied. -/
