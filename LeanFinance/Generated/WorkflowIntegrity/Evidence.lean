@@ -17,4 +17,8 @@ namespace LeanFinance.Generated.WorkflowIntegrity.Evidence
     ((((6 : Fin 8) : Nat) / (2 ^ 2)) % 2) = 1 := by
   decide
 
+@[simp] theorem selectedRepair_bit2_reduced :
+    ((((6 : Fin 8) : Nat) / 4) % 2) = 1 := by
+  decide
+
 end LeanFinance.Generated.WorkflowIntegrity.Evidence
