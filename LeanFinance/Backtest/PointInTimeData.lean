@@ -124,8 +124,8 @@ structure PointInTimeResearchCertificate where
   vintage : DatasetVersion
   vintageAvailable : vintage.AvailableAt decisionAt
   listings : List ListingRecord
-  universe : UniverseSnapshot
-  universeExact : universe.ExactFor listings
+  universeSnapshot : UniverseSnapshot
+  universeExact : universeSnapshot.ExactFor listings
   adjustedSeries : AdjustedSeriesCertificate
   adjustmentValid : adjustedSeries.Valid
   evaluation : EvaluationContract
