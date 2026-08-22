@@ -167,7 +167,7 @@ theorem checkAgainst_sound
           acceptedParts.1 claimDifferent
       · exact ih acceptedParts.2 right memberTail claimDifferent
 
-/-- Check every listed history against the complete finite history universe. -/
+/-- Check every listed history against the complete finite history list. -/
 def checkRows
     {History : Type u}
     {Channel : Type v}
@@ -175,11 +175,11 @@ def checkRows
     [DecidableEq Observation]
     (model : BoundedEvidenceModel History Channel Observation)
     (selected : List Channel)
-    (universe : List History) : List History → Bool
+    (allHistories : List History) : List History → Bool
   | [] => true
   | left :: rest =>
-      checkAgainst model selected left universe &&
-        checkRows model selected universe rest
+      checkAgainst model selected left allHistories &&
+        checkRows model selected allHistories rest
 
 theorem checkRows_sound
     {History : Type u}
@@ -188,12 +188,12 @@ theorem checkRows_sound
     [DecidableEq Observation]
     (model : BoundedEvidenceModel History Channel Observation)
     (selected : List Channel)
-    (universe remaining : List History)
-    (accepted : checkRows model selected universe remaining = true) :
+    (allHistories remaining : List History)
+    (accepted : checkRows model selected allHistories remaining = true) :
     ∀ left,
       left ∈ remaining →
         ∀ right,
-          right ∈ universe →
+          right ∈ allHistories →
             model.claim left ≠ model.claim right →
               SelectedSeparates model selected left right := by
   induction remaining with
@@ -202,14 +202,14 @@ theorem checkRows_sound
       simp at member
   | cons head tail ih =>
       have acceptedParts :
-          checkAgainst model selected head universe = true ∧
-            checkRows model selected universe tail = true := by
+          checkAgainst model selected head allHistories = true ∧
+            checkRows model selected allHistories tail = true := by
         simpa [checkRows] using accepted
       intro left member
       rcases List.mem_cons.mp member with equalHead | memberTail
       · subst left
         exact checkAgainst_sound
-          model selected head universe acceptedParts.1
+          model selected head allHistories acceptedParts.1
       · exact ih acceptedParts.2 left memberTail
 
 /-- Fully executable finite verification checker. -/
