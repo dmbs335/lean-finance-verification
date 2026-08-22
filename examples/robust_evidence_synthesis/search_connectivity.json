@@ -1,0 +1,136 @@
+{
+  "schema_version": "lfv-robust-evidence-model-v1",
+  "name": "search-integrity-connectivity-two",
+  "namespace": "LeanFinance.Generated.RobustEvidenceSynthesis",
+  "claim_name": "NoHiddenTrials",
+  "required_connectivity": 2,
+  "cost_weights": {
+    "operational": 1,
+    "privacy": 1,
+    "trust": 1
+  },
+  "histories": [
+    {
+      "id": "honest",
+      "claim": true,
+      "description": "The baseline was declared and was the only execution."
+    },
+    {
+      "id": "hiddenSweep",
+      "claim": false,
+      "description": "The same declaration is published after an unreported sweep."
+    },
+    {
+      "id": "undeclaredBaseline",
+      "claim": false,
+      "description": "The baseline was executed without a declaration."
+    }
+  ],
+  "channels": [
+    {
+      "id": "selfReport",
+      "domain": "researcher",
+      "cost": {
+        "operational": 2,
+        "privacy": 0,
+        "trust": 0
+      },
+      "observations": {
+        "honest": ["baseline"],
+        "hiddenSweep": ["baseline"],
+        "undeclaredBaseline": []
+      },
+      "description": "The researcher's committed declaration."
+    },
+    {
+      "id": "declarationRegistry",
+      "domain": "registry",
+      "cost": {
+        "operational": 2,
+        "privacy": 0,
+        "trust": 1
+      },
+      "observations": {
+        "honest": ["baseline"],
+        "hiddenSweep": ["baseline"],
+        "undeclaredBaseline": []
+      },
+      "description": "An independently operated declaration registry."
+    },
+    {
+      "id": "executorA",
+      "domain": "executorA",
+      "cost": {
+        "operational": 3,
+        "privacy": 1,
+        "trust": 0
+      },
+      "observations": {
+        "honest": ["baseline"],
+        "hiddenSweep": ["baseline", "hidden-sweep"],
+        "undeclaredBaseline": ["baseline"]
+      },
+      "description": "The primary independent execution log."
+    },
+    {
+      "id": "executorMirror",
+      "domain": "executorA",
+      "cost": {
+        "operational": 1,
+        "privacy": 0,
+        "trust": 0
+      },
+      "observations": {
+        "honest": ["baseline"],
+        "hiddenSweep": ["baseline", "hidden-sweep"],
+        "undeclaredBaseline": ["baseline"]
+      },
+      "description": "A cheaper mirror controlled by the same executor domain."
+    },
+    {
+      "id": "executorB",
+      "domain": "executorB",
+      "cost": {
+        "operational": 3,
+        "privacy": 1,
+        "trust": 0
+      },
+      "observations": {
+        "honest": ["baseline"],
+        "hiddenSweep": ["baseline", "hidden-sweep"],
+        "undeclaredBaseline": ["baseline"]
+      },
+      "description": "A second independently operated execution receipt."
+    },
+    {
+      "id": "resultBundle",
+      "domain": "researcher",
+      "cost": {
+        "operational": 1,
+        "privacy": 0,
+        "trust": 0
+      },
+      "observations": {
+        "honest": "same-selected-result",
+        "hiddenSweep": "same-selected-result",
+        "undeclaredBaseline": "same-selected-result"
+      },
+      "description": "Canonical selected-result artifacts."
+    },
+    {
+      "id": "rfc3161Anchor",
+      "domain": "tsa",
+      "cost": {
+        "operational": 1,
+        "privacy": 0,
+        "trust": 2
+      },
+      "observations": {
+        "honest": "same-visible-ledger",
+        "hiddenSweep": "same-visible-ledger",
+        "undeclaredBaseline": "same-visible-ledger"
+      },
+      "description": "A timestamp over the same researcher-visible ledger."
+    }
+  ]
+}
