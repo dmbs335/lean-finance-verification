@@ -1,0 +1,41 @@
+{
+  "schema_version": "lfv-attack-evidence-corpus-v1",
+  "name": "research-integrity-attack-corpus",
+  "channels": [
+    {"id": "declarationReceipt", "cost": 2, "description": "Independent record of declarations."},
+    {"id": "executionReceipt", "cost": 3, "description": "Independent receipt for strategy execution."},
+    {"id": "dataAccessReceipt", "cost": 3, "description": "Receipt for time-scoped data access."},
+    {"id": "revisionVintage", "cost": 2, "description": "Provider-signed dataset vintage identity."},
+    {"id": "universeSnapshot", "cost": 3, "description": "Point-in-time eligible-universe snapshot."},
+    {"id": "corporateActionLineage", "cost": 3, "description": "Lineage for corporate-action transformations."},
+    {"id": "evaluationContractRegistry", "cost": 4, "description": "Registered benchmark, metric, window, and cost contract."},
+    {"id": "environmentAttestation", "cost": 3, "description": "Execution-environment attestation."},
+    {"id": "adapterProvenance", "cost": 3, "description": "Signed adapter and build provenance."},
+    {"id": "runnerReceipt", "cost": 4, "description": "Mandatory official-runner receipt."},
+    {"id": "transparencyLog", "cost": 2, "description": "Append-only public log inclusion evidence."},
+    {"id": "tsaAnchor", "cost": 2, "description": "Independent signed timestamp."},
+    {"id": "unifiedIntegrityAttestation", "cost": 8, "description": "Shared attestation over declaration, execution, data, universe, evaluation, and control-plane boundaries."}
+  ],
+  "attacks": [
+    {"id": "hiddenParameterSweep", "category": "search", "boundary": "execution", "separators": ["executionReceipt", "runnerReceipt", "unifiedIntegrityAttestation"], "description": "Execute an unreported parameter sweep."},
+    {"id": "failedRunDeletion", "category": "search", "boundary": "execution", "separators": ["executionReceipt", "runnerReceipt", "unifiedIntegrityAttestation"], "description": "Delete failed or aborted official trials."},
+    {"id": "undeclaredExecution", "category": "search", "boundary": "declaration", "separators": ["declarationReceipt", "runnerReceipt", "unifiedIntegrityAttestation"], "description": "Execute a trial absent from the declaration."},
+    {"id": "officialRunnerBypass", "category": "search", "boundary": "execution", "separators": ["runnerReceipt", "adapterProvenance", "unifiedIntegrityAttestation"], "description": "Run outside the mandatory execution path."},
+    {"id": "futureRevisionAccess", "category": "data", "boundary": "data-vintage", "separators": ["dataAccessReceipt", "revisionVintage", "unifiedIntegrityAttestation"], "description": "Read a revision unavailable at decision time."},
+    {"id": "vendorBackfill", "category": "data", "boundary": "data-vintage", "separators": ["dataAccessReceipt", "revisionVintage", "unifiedIntegrityAttestation"], "description": "Substitute a later vendor backfill."},
+    {"id": "restatementSubstitution", "category": "data", "boundary": "data-vintage", "separators": ["dataAccessReceipt", "revisionVintage", "unifiedIntegrityAttestation"], "description": "Use a restated fundamental value historically."},
+    {"id": "corporateActionCorrection", "category": "data", "boundary": "data-vintage", "separators": ["corporateActionLineage", "revisionVintage", "unifiedIntegrityAttestation"], "description": "Apply a later corporate-action correction."},
+    {"id": "survivorshipFiltering", "category": "universe", "boundary": "universe", "separators": ["universeSnapshot", "unifiedIntegrityAttestation"], "description": "Filter the universe by future survival."},
+    {"id": "futureIndexConstituents", "category": "universe", "boundary": "universe", "separators": ["universeSnapshot", "revisionVintage", "unifiedIntegrityAttestation"], "description": "Use future index constituents."},
+    {"id": "delistedAssetOmission", "category": "universe", "boundary": "universe", "separators": ["universeSnapshot", "corporateActionLineage", "unifiedIntegrityAttestation"], "description": "Omit delisted assets from historical results."},
+    {"id": "benchmarkSwitching", "category": "evaluation", "boundary": "evaluation", "separators": ["evaluationContractRegistry", "unifiedIntegrityAttestation"], "description": "Change benchmark after observing outcomes."},
+    {"id": "metricSwitching", "category": "evaluation", "boundary": "evaluation", "separators": ["evaluationContractRegistry", "unifiedIntegrityAttestation"], "description": "Select a favorable metric after evaluation."},
+    {"id": "evaluationWindowShift", "category": "evaluation", "boundary": "evaluation", "separators": ["evaluationContractRegistry", "unifiedIntegrityAttestation"], "description": "Move the evaluation window post hoc."},
+    {"id": "costModelMutation", "category": "evaluation", "boundary": "evaluation", "separators": ["evaluationContractRegistry", "unifiedIntegrityAttestation"], "description": "Alter transaction costs after execution."},
+    {"id": "environmentSubstitution", "category": "control-plane", "boundary": "control-plane", "separators": ["environmentAttestation", "runnerReceipt", "unifiedIntegrityAttestation"], "description": "Replace the declared runtime environment."},
+    {"id": "unsignedAdapterReplacement", "category": "control-plane", "boundary": "control-plane", "separators": ["adapterProvenance", "runnerReceipt", "unifiedIntegrityAttestation"], "description": "Run an unregistered adapter build."},
+    {"id": "configurationMutation", "category": "control-plane", "boundary": "control-plane", "separators": ["environmentAttestation", "evaluationContractRegistry", "unifiedIntegrityAttestation"], "description": "Mutate control-plane configuration outside the ledger."},
+    {"id": "anchorProviderSubstitution", "category": "external-time", "boundary": "external-time", "separators": ["tsaAnchor", "transparencyLog"], "description": "Replace the declared external anchor provider."},
+    {"id": "timestampBackdating", "category": "external-time", "boundary": "external-time", "separators": ["tsaAnchor", "transparencyLog"], "description": "Present a backdated existence claim."}
+  ]
+}
