@@ -67,17 +67,19 @@ theorem evidence_cut_set_duality
     (claim : History → Prop) :
     ChannelSelectionVerifies channel selected claim ↔
       HitsEveryClaimDisagreement channel selected claim := by
-  classical
   constructor
   · intro verifies left right disagreement
-    by_contra noSeparator
+    apply Classical.byContradiction
+    intro noSeparator
     have sameEvidence : ChannelsAgree channel selected left right := by
       intro evidenceChannel chosen
-      by_contra different
+      apply Classical.byContradiction
+      intro different
       exact noSeparator ⟨evidenceChannel, chosen, different⟩
     exact disagreement (verifies left right sameEvidence)
   · intro hits left right sameEvidence
-    by_contra disagreement
+    apply Classical.byContradiction
+    intro disagreement
     rcases hits left right disagreement with
       ⟨evidenceChannel, chosen, separates⟩
     exact separates (sameEvidence evidenceChannel chosen)
