@@ -284,9 +284,7 @@ theorem selected_repair_cost_minimal :
 
 theorem cegis_chain_connected :
     CEGISChain initialSelection cegisRounds refinedSelection := by
-  simp [CEGISChain, cegisRounds, initialSelection, refinedSelection,
-    round0Before, round0After, refinementRound0, round1Before, round1After, refinementRound1, round2Before, round2After, refinementRound2,
-    selectedRepair, decodeRepair, decodeRepairMask, LeanFinance.Generated.ObservedCostModelTampering.Evidence.bitSelected]
+  decide
 
 def proofCarryingCEGIS :
     ProofCarryingCEGIS LeanFinance.Generated.ObservedCostModelTampering.Evidence.model
