@@ -1,4 +1,4 @@
-import LeanFinance.Epistemic.CutSet
+import LeanFinance.Epistemic.FiniteSynthesis
 import LeanFinance.Epistemic.WorkflowTransition
 
 namespace LeanFinance.Epistemic
@@ -45,6 +45,31 @@ def FirstViolationClaim
     (firstViolation : History → Option Violation)
     (history : History) : Prop :=
   firstViolation history = none
+
+/-- Boolean bounded-model claims are executable propositions. This instance is
+    intentionally colocated with transition classification because generated
+    transition witnesses compare `ClaimHolds` directly with first-violation
+    absence. -/
+instance instDecidableBoundedClaimHolds
+    {History : Type u}
+    {Channel : Type v}
+    {Observation : Type w}
+    (model : BoundedEvidenceModel History Channel Observation)
+    (history : History) :
+    Decidable (model.ClaimHolds history) := by
+  unfold BoundedEvidenceModel.ClaimHolds
+  infer_instance
+
+/-- First-violation absence is decidable for finite violation alphabets. -/
+instance instDecidableFirstViolationClaim
+    {History : Type u}
+    {Violation : Type v}
+    [DecidableEq Violation]
+    (firstViolation : History → Option Violation)
+    (history : History) :
+    Decidable (FirstViolationClaim firstViolation history) := by
+  unfold FirstViolationClaim
+  infer_instance
 
 /-- One violation kind occurs in the modeled history space. -/
 def FirstViolationOccurs
