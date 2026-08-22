@@ -13,3 +13,4 @@ import LeanFinance.Epistemic.Connectivity
 import LeanFinance.Epistemic.RobustSynthesis
 import LeanFinance.Epistemic.EvidenceTaxonomy
 import LeanFinance.Epistemic.ObservationBoundary
+import LeanFinance.Epistemic.TransitionSeparation
