@@ -26,15 +26,16 @@ being justified by an input that appeared later but still before the final
 decision. Because this is inductive, a dependency cycle cannot justify itself
 without a base artifact. -/
 inductive ArtifactAvailableAt
-    (catalog : LineageCatalog)
-    (availableBy : Timestamp) : ContentHash → Prop where
+    (catalog : LineageCatalog) : Timestamp → ContentHash → Prop where
   | dataset
+      {availableBy : Timestamp}
       (dataset : Dataset)
       (member : dataset ∈ catalog.datasets)
       (available : DatasetAvailableAt dataset availableBy)
       (hashBound : DatasetHashBound dataset) :
       ArtifactAvailableAt catalog availableBy dataset.contentHash
   | feature
+      {availableBy : Timestamp}
       (feature : DerivedFeature)
       (member : feature ∈ catalog.features)
       (outputBound : NonEmptyString feature.outputHash)
