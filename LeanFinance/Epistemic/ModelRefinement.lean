@@ -89,12 +89,22 @@ theorem replayFrom_eq_map
   induction trace generalizing state executedPrefix with
   | nil => rfl
   | cons action rest ih =>
-      simp [replayFrom,
-        refinement.terminalPreserved,
-        refinement.enabledPreserved,
-        refinement.transitionPreserved,
-        List.map_append,
-        ih]
+      simp only [List.map_cons, replayFrom]
+      rw [refinement.terminalPreserved]
+      by_cases terminalNow : original.terminal state = true
+      · simp [terminalNow]
+      · by_cases enabledNow :
+          original.enabled state executedPrefix action = true
+        · have recursive :=
+            ih
+              (state := original.transition state action)
+              (executedPrefix := executedPrefix ++ [action])
+          simpa [terminalNow, enabledNow,
+            refinement.enabledPreserved,
+            refinement.transitionPreserved,
+            List.map_append] using recursive
+        · simp [terminalNow, enabledNow,
+            refinement.enabledPreserved]
 
 /-- A complete old trace has exactly the embedded replay result in the refined
     workflow. -/
@@ -164,7 +174,7 @@ theorem terminal_trace_preserved
   cases replayed : replay original trace with
   | none => rfl
   | some state =>
-      simp [replayed, refinement.terminalPreserved]
+      simp [refinement.terminalPreserved]
 
 end WorkflowRefinement
 
@@ -227,7 +237,7 @@ theorem traceClaimPreserved
   cases replayed : replay original trace with
   | none => rfl
   | some state =>
-      simp [replayed, refinement.claimPreserved]
+      simp [refinement.claimPreserved]
 
 /-- Every successful old trace retains its state-derived observation after
     refinement. -/
@@ -258,7 +268,7 @@ theorem traceObservationPreserved
   cases replayed : replay original trace with
   | none => rfl
   | some state =>
-      simp [replayed, refinement.observationPreserved]
+      simp [refinement.observationPreserved]
 
 end SemanticWorkflowRefinement
 
