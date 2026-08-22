@@ -1,0 +1,24 @@
+{
+  "schema_version": "lfv-pit-research-plan-v1",
+  "name": "signed-vendor-pit-momentum-micro-study",
+  "universe_snapshots": [
+    {"as_of": 20, "members": ["ALPHA", "BETA", "GAMMA"]},
+    {"as_of": 30, "members": ["ALPHA", "BETA", "GAMMA"]},
+    {"as_of": 40, "members": ["ALPHA", "GAMMA"]}
+  ],
+  "decisions": [
+    {"decision_at": 21, "as_of": 20, "lookback_time": 10, "observation_time": 20, "vintage": "prices-v1"},
+    {"decision_at": 31, "as_of": 30, "lookback_time": 20, "observation_time": 30, "vintage": "prices-v1"},
+    {"decision_at": 41, "as_of": 40, "lookback_time": 30, "observation_time": 40, "vintage": "prices-v1"}
+  ],
+  "adjustments": [
+    {"id": "delisting-adjusted-series", "generated_at": 41, "actions": ["BETA-delisting"]}
+  ],
+  "evaluation_contract": {
+    "registered_at": 1,
+    "benchmark": "equal-weight-eligible-universe",
+    "metric": "one-period-price-momentum",
+    "lookback_periods": 1,
+    "cost_bps": 10
+  }
+}

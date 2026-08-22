@@ -49,6 +49,8 @@ jobs:
         run: python -m unittest discover -s tools/symbolic_evidence/tests -v
       - name: Test point-in-time data study
         run: python -m unittest discover -s tools/pit_study/tests -v
+      - name: Test signed PIT vendor import
+        run: python -m unittest discover -s tools/pit_vendor_import/tests -v
       - name: Test signed external evidence quorum
         run: python -m unittest discover -s tools/external_quorum/tests -v
       - name: Test selective-disclosure execution receipts

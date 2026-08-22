@@ -1,0 +1,68 @@
+name: One-shot vendor branch integration
+
+on:
+  push:
+    branches:
+      - feature/signed-pit-vendor-import
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/signed-pit-vendor-import
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Merge current main and normalize integration points
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if ! git merge --no-commit --no-ff origin/main; then
+            git checkout --theirs -- .github/workflows/lean.yml LeanFinance/Backtest.lean
+            git add .github/workflows/lean.yml LeanFinance/Backtest.lean
+          fi
+
+          python - <<'PY'
+          from pathlib import Path
+
+          backtest = Path('LeanFinance/Backtest.lean')
+          text = backtest.read_text()
+          line = 'import LeanFinance.Backtest.VendorDataPackage\n'
+          if line not in text:
+              marker = 'import LeanFinance.Examples.ProofCarryingBacktest\n'
+              if marker in text:
+                  text = text.replace(marker, line + marker)
+              else:
+                  text += ('\n' if not text.endswith('\n') else '') + line
+              backtest.write_text(text)
+
+          workflow = Path('.github/workflows/lean.yml')
+          text = workflow.read_text()
+          step = '''      - name: Test signed PIT vendor package import
+        run: python -m unittest discover -s tools/pit_vendor_import/tests -v
+'''
+          if 'tools/pit_vendor_import/tests' not in text:
+              marker = '      - uses: leanprover/lean-action@v1\n'
+              if marker not in text:
+                  raise SystemExit('lean-action marker not found')
+              text = text.replace(marker, step + marker)
+              workflow.write_text(text)
+
+          example = Path('LeanFinance/Examples/VendorDataPackage.lean')
+          text = example.read_text()
+          text = text.replace('kind := .prices', 'kind := VendorFileKind.prices')
+          example.write_text(text)
+          PY
+
+          rm .github/workflows/one-shot-vendor-rebase.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Integrate signed PIT vendor import with current main'
+          git push origin HEAD:feature/signed-pit-vendor-import
