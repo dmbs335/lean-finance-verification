@@ -25,13 +25,21 @@ jobs:
         run: openssl version -a
       - name: Test Python reference adapter
         run: python -m unittest discover -s tools/lfv_adapter/tests -v
-      - name: Check generated certificate reproducibility
+      - name: Test exact evidence synthesizer
+        run: python -m unittest discover -s tools/evidence_synth/tests -v
+      - name: Check generated backtest certificate reproducibility
         run: >-
           python -m tools.lfv_adapter check-generated
           --spec examples/reference_adapter/experiment.json
           --bundle examples/reference_adapter/generated/bundle.canonical.json
           --lean LeanFinance/Generated/ReferenceAdapter.lean
           --allow-local-anchor
+      - name: Check generated evidence synthesis reproducibility
+        run: >-
+          python -m tools.evidence_synth check-generated
+          --model examples/evidence_synthesis/search_completeness.json
+          --certificate examples/evidence_synthesis/generated/synthesis.canonical.json
+          --lean LeanFinance/Generated/EvidenceSynthesis.lean
       - uses: leanprover/lean-action@v1
         with:
           build: true

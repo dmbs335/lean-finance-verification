@@ -1,0 +1,86 @@
+{
+  "schema_version": "lfv-evidence-synthesis-model-v1",
+  "name": "search-completeness-minimal-evidence",
+  "namespace": "LeanFinance.Generated.EvidenceSynthesis",
+  "claim_name": "NoHiddenTrials",
+  "cost_weights": {
+    "operational": 1,
+    "privacy": 1,
+    "trust": 1
+  },
+  "histories": [
+    {
+      "id": "honest",
+      "claim": true,
+      "description": "The baseline trial was declared and was the only executed trial."
+    },
+    {
+      "id": "hiddenSweep",
+      "claim": false,
+      "description": "The same declaration is published after an unreported parameter sweep."
+    },
+    {
+      "id": "undeclaredBaseline",
+      "claim": false,
+      "description": "The baseline was executed but was never present in the declared search history."
+    }
+  ],
+  "channels": [
+    {
+      "id": "selfReport",
+      "description": "Researcher-published declaration and committed search history.",
+      "cost": {
+        "operational": 2,
+        "privacy": 0,
+        "trust": 0
+      },
+      "observations": {
+        "honest": ["baseline"],
+        "hiddenSweep": ["baseline"],
+        "undeclaredBaseline": []
+      }
+    },
+    {
+      "id": "executorLog",
+      "description": "Execution events observed independently of the researcher's final report.",
+      "cost": {
+        "operational": 4,
+        "privacy": 1,
+        "trust": 0
+      },
+      "observations": {
+        "honest": ["baseline"],
+        "hiddenSweep": ["baseline", "hidden-sweep"],
+        "undeclaredBaseline": ["baseline"]
+      }
+    },
+    {
+      "id": "resultBundle",
+      "description": "Canonical code, result, and parameter artifacts from the selected trial.",
+      "cost": {
+        "operational": 1,
+        "privacy": 0,
+        "trust": 0
+      },
+      "observations": {
+        "honest": "same-selected-result",
+        "hiddenSweep": "same-selected-result",
+        "undeclaredBaseline": "same-selected-result"
+      }
+    },
+    {
+      "id": "rfc3161Anchor",
+      "description": "A valid external timestamp over the researcher-published ledger prefix.",
+      "cost": {
+        "operational": 1,
+        "privacy": 0,
+        "trust": 2
+      },
+      "observations": {
+        "honest": "same-ledger-timestamp",
+        "hiddenSweep": "same-ledger-timestamp",
+        "undeclaredBaseline": "same-ledger-timestamp"
+      }
+    }
+  ]
+}

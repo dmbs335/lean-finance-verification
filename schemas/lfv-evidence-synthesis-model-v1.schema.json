@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rewrite-lab.example/schemas/lfv-evidence-synthesis-model-v1.schema.json",
+  "title": "Lean Finance Verification bounded evidence synthesis model v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "name", "namespace", "claim_name", "cost_weights", "histories", "channels"],
+  "properties": {
+    "schema_version": {"const": "lfv-evidence-synthesis-model-v1"},
+    "name": {"type": "string", "minLength": 1},
+    "namespace": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"},
+    "claim_name": {"type": "string", "minLength": 1},
+    "cost_weights": {"$ref": "#/$defs/cost"},
+    "histories": {
+      "type": "array", "minItems": 2,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "claim", "description"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "claim": {"type": "boolean"},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "channels": {
+      "type": "array", "minItems": 1, "maxItems": 12,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "description", "cost", "observations"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "minLength": 1},
+          "cost": {"$ref": "#/$defs/cost"},
+          "observations": {"type": "object"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "cost": {
+      "type": "object", "additionalProperties": false,
+      "required": ["operational", "privacy", "trust"],
+      "properties": {
+        "operational": {"type": "integer", "minimum": 0},
+        "privacy": {"type": "integer", "minimum": 0},
+        "trust": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

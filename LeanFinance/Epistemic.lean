@@ -2,3 +2,4 @@ import LeanFinance.Epistemic.Verification
 import LeanFinance.Epistemic.CutSet
 import LeanFinance.Epistemic.SelfCertification
 import LeanFinance.Epistemic.BacktestCompleteness
+import LeanFinance.Epistemic.FiniteSynthesis
