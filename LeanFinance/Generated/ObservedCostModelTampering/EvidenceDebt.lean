@@ -4,27 +4,22 @@ import LeanFinance.Generated.ObservedCostModelTampering.Evidence
 namespace LeanFinance.Generated.ObservedCostModelTampering.DebtEvolution
 
 open LeanFinance.Epistemic
-namespace Evidence :=
-  LeanFinance.Generated.ObservedCostModelTampering.Evidence
-
-abbrev History := Evidence.History
-abbrev Channel := Evidence.Channel
-abbrev Observation := Evidence.Observation
+open LeanFinance.Generated.ObservedCostModelTampering.Evidence
 
 /-- Histories that do not contain the newly learned cost-model mutation. The
     targeted receipt is used here only to identify the conservative old-history
     image inside the refined common history type. -/
 def legacyHistories : List History :=
-  Evidence.histories.filter (fun history =>
-    Evidence.observe .targetedReceipt_tamperCostModel history == .obs9)
+  histories.filter (fun history =>
+    observe .targetedReceipt_tamperCostModel history == .obs9)
 
 def legacyModel :
     BoundedEvidenceModel History Channel Observation :=
-  { Evidence.model with histories := legacyHistories }
+  { model with histories := legacyHistories }
 
 abbrev attackedModel :
     BoundedEvidenceModel History Channel Observation :=
-  Evidence.model
+  model
 
 theorem legacy_history_count : legacyHistories.length = 10 := by
   decide
@@ -37,9 +32,11 @@ def observedAttackHistoryExtension :
   {
     historiesIncluded := by
       intro history member
-      change history ∈ Evidence.histories
-      simp [legacyModel, legacyHistories] at member
-      exact member.1
+      have filtered :
+          history ∈ histories ∧
+            observe .targetedReceipt_tamperCostModel history == .obs9 := by
+        simpa [legacyModel, legacyHistories] using member
+      exact filtered.1
     channelCatalogPreserved := rfl
     observePreserved := by
       intro channel history
@@ -57,13 +54,13 @@ def observedAttackHistoryExtension :
 abbrev LegacyCandidate := Fin 64
 
 def legacyDecodeMask (mask : Nat) : List Channel :=
-  (if Evidence.bitSelected mask 0 then [.selfReport] else [])
-    ++ (if Evidence.bitSelected mask 1 then [.resultBundle] else [])
-    ++ (if Evidence.bitSelected mask 2 then [.rfc3161Anchor] else [])
-    ++ (if Evidence.bitSelected mask 3 then [.fullExecutorLog] else [])
-    ++ (if Evidence.bitSelected mask 4 then
+  (if bitSelected mask 0 then [.selfReport] else [])
+    ++ (if bitSelected mask 1 then [.resultBundle] else [])
+    ++ (if bitSelected mask 2 then [.rfc3161Anchor] else [])
+    ++ (if bitSelected mask 3 then [.fullExecutorLog] else [])
+    ++ (if bitSelected mask 4 then
           [.targetedReceipt_executeHiddenSweep] else [])
-    ++ (if Evidence.bitSelected mask 5 then
+    ++ (if bitSelected mask 5 then
           [.targetedReceipt_readFutureData] else [])
 
 def legacyDecode (candidate : LegacyCandidate) : List Channel :=
@@ -125,11 +122,14 @@ theorem attackedLegacyNoCandidateVerifies :
       ¬ BoundedSelectionVerifies attackedModel
           (legacyDecode candidate) := by
   intro candidate candidateVerifies
-  have accepted :=
+  have accepted :
+      boundedVerifiesBool attackedModel
+        (legacyDecode candidate) = true :=
     boundedVerifiesBool_complete
       attackedModel (legacyDecode candidate)
       candidateVerifies
-  rw [attackedLegacyCheckerRejects candidate] at accepted
+  have rejected := attackedLegacyCheckerRejects candidate
+  rw [rejected] at accepted
   contradiction
 
 def attackedLegacyDebtCertificate :
@@ -144,46 +144,50 @@ def attackedLegacyDebtCertificate :
     receipt and again has a finite optimum. -/
 def expandedDebtCertificate :
     EvidenceDebtCertificate
-      attackedModel Evidence.Candidate Evidence.decode :=
+      attackedModel Candidate decode :=
   .finite
     {
-      selected := Evidence.selected
+      selected := selected
       selectedVerifies := by
-        simpa using Evidence.selectedBoundedlyVerifies
+        simpa [attackedModel] using selectedBoundedlyVerifies
       minimal := by
         intro candidate candidateVerifies
-        exact Evidence.synthesized_selection_is_cost_minimal
-          candidate candidateVerifies
+        simpa [attackedModel] using
+          synthesized_selection_is_cost_minimal
+            candidate candidateVerifies
     }
 
 def embedLegacyCandidate
-    (candidate : LegacyCandidate) : Evidence.Candidate :=
+    (candidate : LegacyCandidate) : Candidate :=
   ⟨candidate.val, Nat.lt_trans candidate.isLt (by decide)⟩
 
-theorem embeddedLegacyDecodePreserved :
-    ∀ candidate : LegacyCandidate,
-      Evidence.decode (embedLegacyCandidate candidate) =
-        legacyDecode candidate := by
-  decide
+theorem embeddedLegacyDecodePreserved
+    (candidate : LegacyCandidate) :
+    decode (embedLegacyCandidate candidate) =
+      legacyDecode candidate := by
+  change decodeMask candidate.val = legacyDecodeMask candidate.val
+  have highBitOff : bitSelected candidate.val 6 = false := by
+    simp [bitSelected, Nat.div_eq_of_lt candidate.isLt]
+  simp [decodeMask, legacyDecodeMask, highBitOff]
 
 def observedSensorLanguageExtension :
     CandidateLanguageExtension
-      LegacyCandidate Evidence.Candidate
-      legacyDecode Evidence.decode :=
+      LegacyCandidate Candidate
+      legacyDecode decode :=
   {
     embed := embedLegacyCandidate
     decodePreserved := embeddedLegacyDecodePreserved
   }
 
 theorem legacy_debt_value :
-    legacyDebtCertificate.debt = .finite 6 := by
+    legacyDebtCertificate.debt = EvidenceDebt.finite 6 := by
   decide
 
 theorem attacked_old_language_debt_value :
-    attackedLegacyDebtCertificate.debt = .impossible := rfl
+    attackedLegacyDebtCertificate.debt = EvidenceDebt.impossible := rfl
 
 theorem expanded_debt_value :
-    expandedDebtCertificate.debt = .finite 8 := by
+    expandedDebtCertificate.debt = EvidenceDebt.finite 8 := by
   decide
 
 /-- Adding the observed attack cannot lower debt; in this instance it pushes
@@ -211,8 +215,8 @@ theorem sensor_extension_reduces_debt :
     evidence debt in the declared cost model. -/
 theorem observed_attack_adds_two_units_of_finite_debt :
     ∃ baseline refined,
-      legacyDebtCertificate.debt = .finite baseline ∧
-      expandedDebtCertificate.debt = .finite refined ∧
+      legacyDebtCertificate.debt = EvidenceDebt.finite baseline ∧
+      expandedDebtCertificate.debt = EvidenceDebt.finite refined ∧
       refined = baseline + 2 := by
   refine ⟨6, 8, legacy_debt_value, expanded_debt_value, ?_⟩
   decide
