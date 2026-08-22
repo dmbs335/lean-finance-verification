@@ -41,9 +41,15 @@ def visibleBoundaryCounterexample :
   {
     left := .honest
     right := .costModelTampering
-    sameEvidence := by decide
-    leftClaim := by decide
-    rightNotClaim := by decide
+    sameEvidence := by
+      unfold EvidenceEquivalent
+      decide
+    leftClaim := by
+      unfold IntegrityClaim
+      decide
+    rightNotClaim := by
+      unfold IntegrityClaim
+      decide
   }
 
 theorem visible_boundary_cannot_verify_integrity :
@@ -54,7 +60,10 @@ theorem visible_boundary_cannot_verify_integrity :
 def resultBundleFactorsThroughVisibleBoundary :
     FactorsThroughBoundary
       visibleBoundary (observe .resultBundle) :=
-  ⟨fun boundary => boundary.result, fun _ => rfl⟩
+  {
+    postprocess := fun boundary => boundary.result
+    factor := fun _ => rfl
+  }
 
 /-- The RFC 3161 timestamp observation is also only a projection of the visible
     boundary. Its cryptographic strength authenticates the projection but does
@@ -62,12 +71,18 @@ def resultBundleFactorsThroughVisibleBoundary :
 def rfc3161FactorsThroughVisibleBoundary :
     FactorsThroughBoundary
       visibleBoundary (observe .rfc3161Anchor) :=
-  ⟨fun boundary => boundary.anchor, fun _ => rfl⟩
+  {
+    postprocess := fun boundary => boundary.anchor
+    factor := fun _ => rfl
+  }
 
 def selfReportFactorsThroughVisibleBoundary :
     FactorsThroughBoundary
       visibleBoundary (observe .selfReport) :=
-  ⟨fun boundary => boundary.declaration, fun _ => rfl⟩
+  {
+    postprocess := fun boundary => boundary.declaration
+    factor := fun _ => rfl
+  }
 
 theorem result_bundle_cannot_certify_upstream_integrity :
     ¬ Verifiable (observe .resultBundle) IntegrityClaim :=
@@ -105,9 +120,15 @@ theorem visible_publication_channels_factor_through_boundary :
       visibleBoundary observe visiblePublicationChannel := by
   intro evidenceChannel selected
   rcases selected with rfl | rfl | rfl
-  · exact selfReportFactorsThroughVisibleBoundary
-  · exact resultBundleFactorsThroughVisibleBoundary
-  · exact rfc3161FactorsThroughVisibleBoundary
+  · exact
+      ⟨selfReportFactorsThroughVisibleBoundary.postprocess,
+        selfReportFactorsThroughVisibleBoundary.factor⟩
+  · exact
+      ⟨resultBundleFactorsThroughVisibleBoundary.postprocess,
+        resultBundleFactorsThroughVisibleBoundary.factor⟩
+  · exact
+      ⟨rfc3161FactorsThroughVisibleBoundary.postprocess,
+        rfc3161FactorsThroughVisibleBoundary.factor⟩
 
 /-- Even the complete selected family of declaration, result, and timestamp
     channels cannot verify the upstream integrity claim. -/
