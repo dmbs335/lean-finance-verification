@@ -233,8 +233,8 @@ theorem silent_first_violation_implies_unverifiable
     verifies witness.safeHistory witness.badHistory
       witness.selectedAgree
   have safeClaim :
-      FirstViolationClaim firstViolation witness.safeHistory :=
-    witness.safeClass
+      FirstViolationClaim firstViolation witness.safeHistory := by
+    simpa [FirstViolationClaim] using witness.safeClass
   have badNotClaim :
       ¬ FirstViolationClaim firstViolation witness.badHistory := by
     simp [FirstViolationClaim, witness.badClass]
