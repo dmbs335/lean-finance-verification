@@ -19,14 +19,14 @@ def replayFrom
     {Action : Type v}
     (workflow : FiniteWorkflow State Action) :
     State → List Action → List Action → Option State
-  | state, _prefix, [] => some state
-  | state, prefix, action :: rest =>
+  | state, _executedPrefix, [] => some state
+  | state, executedPrefix, action :: rest =>
       if workflow.terminal state then
         none
-      else if workflow.enabled state prefix action then
+      else if workflow.enabled state executedPrefix action then
         replayFrom workflow
           (workflow.transition state action)
-          (prefix ++ [action]) rest
+          (executedPrefix ++ [action]) rest
       else
         none
 
