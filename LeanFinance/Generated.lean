@@ -9,3 +9,4 @@ import LeanFinance.Generated.ObservedCostModelTampering.CEGIS
 import LeanFinance.Generated.ObservedCostModelTampering.TraceRefinement
 import LeanFinance.Generated.ObservedCostModelTampering.ConservativeRefinement
 import LeanFinance.Generated.ObservedCostModelTampering.EvidenceDebt
+import LeanFinance.Generated.ObservedCostModelTampering.Connectivity
