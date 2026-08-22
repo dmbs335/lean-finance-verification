@@ -25,7 +25,7 @@ Current certificate properties include:
 - an adapter handoff exposes a proof-carrying certificate rather than an opaque
   performance number.
 
-The epistemic layer additionally proves limits on verification itself:
+The epistemic layer additionally proves and computes limits on verification itself:
 
 - deterministic post-processing cannot amplify the distinctions present in evidence;
 - a selected family of evidence channels verifies a claim exactly when it hits every
@@ -33,7 +33,9 @@ The epistemic layer additionally proves limits on verification itself:
 - exploration completeness cannot be certified solely from a researcher's public
   declaration;
 - in the formal search-history model, the declaration and independent executor log
-  form a mechanically proved minimal evidence cut set.
+  form a mechanically proved minimal evidence cut set;
+- an exact bounded synthesizer enumerates adversarial histories and channel subsets,
+  finds minimum-cost evidence, and emits a counterexample for every cheaper candidate.
 
 These properties do **not** prove that a strategy is profitable, that raw data is true,
 or that an empirical model is statistically correct. They prove the narrower
@@ -48,12 +50,12 @@ LeanFinance/
 ├── Constraints/      margin, VaR, redemption, and short-cover triggers
 ├── Dynamics/         market-state and equilibrium-regime transitions
 ├── Inference/        latent state, identification, and inverse-game boundaries
-├── Epistemic/        verifiability, non-amplification, evidence cut sets, impossibility
+├── Epistemic/        verifiability, cut sets, impossibility, finite synthesis soundness
 ├── StrategyEcology/  context-dependent causal strategy interactions
 ├── SupplyChain/      dynamic capacity, substitution, qualification, and rent claims
 ├── Backtest/         artifacts, PIT lineage, anchored search history, adapter contract
 ├── Certificate/      data, strategy, backtest, and verified-claim certificates
-└── Generated/        adapter-emitted concrete Lean witnesses
+└── Generated/        adapter- and synthesizer-emitted concrete Lean witnesses
 ```
 
 ## Build
@@ -64,9 +66,9 @@ Lean is pinned in `lean-toolchain`.
 lake build
 ```
 
-GitHub Actions runs Python adapter tests, including a locally generated RFC 3161 test
-PKI and signed timestamp, checks that generated artifacts are byte-reproducible, and
-then runs the Lean build.
+GitHub Actions runs the Python adapter and exact-synthesis tests, exercises a locally
+generated RFC 3161 test PKI, checks generated artifacts byte-for-byte, and then runs the
+Lean build.
 
 ## Evidence separation theory
 
@@ -78,8 +80,32 @@ observational equivalence class.
 The layer mechanizes verification non-amplification, epistemic cut-set duality,
 constructive unverifiability witnesses, and a general no-self-certified-completeness
 theorem. See [`docs/EVIDENCE_SEPARATION_THEORY.md`](docs/EVIDENCE_SEPARATION_THEORY.md)
-for the formal statements, the minimal search-integrity cut set, and the proposed
-evidence-synthesis research program.
+for the semantic results.
+
+## Exact evidence cut-set synthesis
+
+The bounded synthesizer accepts complete candidate histories, evidence-channel
+observations, and operational/privacy/trust costs. It constructs the separator
+hypergraph, enumerates every channel subset, returns the minimum weighted-cost design,
+and attaches an uncovered history pair to every lower-cost candidate.
+
+```bash
+python -m tools.evidence_synth synth \
+  --model examples/evidence_synthesis/search_completeness.json \
+  --out examples/evidence_synthesis/generated/synthesis.canonical.json \
+  --lean-out LeanFinance/Generated/EvidenceSynthesis.lean \
+  --pretty
+```
+
+The checked-in search-completeness model discovers `{selfReport, executorLog}` as the
+unique inclusion-minimal set. A canonical result bundle and valid RFC 3161 timestamp do
+not separate an honest run from an unreported parameter sweep, because both are
+post-processings of the same visible declaration.
+
+`LeanFinance/Epistemic/FiniteSynthesis.lean` proves the executable checker sound and
+turns generated lower-cost counterexamples into a Lean weighted-optimality theorem.
+See [`docs/EVIDENCE_SYNTHESIS.md`](docs/EVIDENCE_SYNTHESIS.md) for the model, certificate,
+Pareto frontier, and bounded-model interpretation.
 
 ## Python reference adapter
 
@@ -115,14 +141,14 @@ signed timestamp issuance, verification, and trust assumptions.
 
 ## Research roadmap
 
-1. Build bounded adversarial-history generators and synthesize minimum-cost evidence
-   cut sets from separator hypergraphs.
-2. Add costs for privacy leakage, operational burden, and external trust to evidence
-   selection.
-3. Connect forced-flow composition, constraint activation, and regime-transition
+1. Generate bounded adversarial histories from executable workflow transition systems
+   instead of writing histories by hand.
+2. Learn counterexample-guided model refinements when a new attack is absent from the
+   current history space.
+3. Synthesize privacy-constrained and trust-diversified evidence portfolios, including
+   multi-provider anchor quorum.
+4. Connect forced-flow composition, constraint activation, and regime-transition
    safety theorems end to end.
-4. Add a second independent transparency-log anchor and require multi-provider quorum
-   for high-assurance preregistration.
 5. Run the reference adapter against a real point-in-time dataset and preserve the
    resulting certificate bundle as a reproducible research artifact.
 
@@ -132,6 +158,6 @@ This repository is research software. A Lean proof is only as strong as its form
 history space, observation maps, assumptions, and the cryptographic, data-lineage,
 execution, external-anchor, and trust-material evidence supplied to the checker. RFC
 3161 support verifies signed evidence but does not by itself prove TSA independence,
-revocation status, or long-term archival validity. Evidence-separation theorems prove
-structural possibility and impossibility relative to modeled channels; they do not
-assert that an omitted real-world channel is trustworthy.
+revocation status, or long-term archival validity. Exact synthesis is complete over the
+declared bounded model and candidate channel language; it does not prove that the model
+contains every real-world adversarial history.
