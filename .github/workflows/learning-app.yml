@@ -1,0 +1,74 @@
+name: Learning App CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "learning-app/**"
+      - "tools/learning_app/**"
+      - "LeanFinance/**"
+      - "tools/**"
+      - "docs/**"
+      - ".github/workflows/learning-app.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "learning-app/**"
+      - "tools/learning_app/**"
+      - "LeanFinance/**"
+      - "tools/**"
+      - "docs/**"
+      - ".github/workflows/learning-app.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: learning-app-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate repository coverage
+        run: python -m tools.learning_app.check_curriculum
+      - name: Test learning curriculum
+        run: python -m unittest discover -s tools/learning_app/tests -v
+      - name: Check browser JavaScript syntax
+        run: |
+          for file in learning-app/data/*.js learning-app/app/*.js; do
+            node --check "$file"
+          done
+      - name: Smoke-test static delivery
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m http.server 8765 >/tmp/lfv-learning-app.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for _ in {1..20}; do
+            if curl --fail --silent \
+              http://127.0.0.1:8765/learning-app/ >/tmp/learning-app.html
+            then
+              break
+            fi
+            sleep 0.25
+          done
+          grep -q "Lean Finance Verification Academy" /tmp/learning-app.html
+          curl --fail --silent \
+            http://127.0.0.1:8765/learning-app/data/curriculum.js \
+            | grep -q "LFV_CURRICULUM"
