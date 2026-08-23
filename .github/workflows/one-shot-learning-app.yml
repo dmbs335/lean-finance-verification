@@ -1,0 +1,71 @@
+name: Bootstrap comprehensive learning app
+
+on:
+  push:
+    branches:
+      - feature/comprehensive-learning-app
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/comprehensive-learning-app
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Materialize learning application
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .learning-app-payload/part* | base64 --decode > "$RUNNER_TEMP/learning-app-payload.tgz"
+          tar -xzf "$RUNNER_TEMP/learning-app-payload.tgz" -C .
+          rm -rf .learning-app-payload tools/learning_app/__pycache__
+          rm .github/workflows/one-shot-learning-app.yml
+
+          python - <<'PY'
+          from pathlib import Path
+
+          readme = Path("README.md")
+          text = readme.read_text(encoding="utf-8")
+          heading = "## Interactive learning app"
+          section = """## Interactive learning app
+
+          A dependency-free repository-guided academy lives in
+          [`learning-app/`](learning-app/). It covers the financial-model layers,
+          proof-carrying backtest contracts, evidence-separation theory, synthesis
+          tools, point-in-time and vendor boundaries, external quorum, privacy
+          receipts, generated witnesses, and CI.
+
+          ```bash
+          python -m http.server 8000
+          # open http://localhost:8000/learning-app/
+          ```
+
+          The curriculum links each lesson to concrete Lean sources, Python tools,
+          examples, documentation, and runnable commands. Repository coverage is
+          checked with:
+
+          ```bash
+          python -m tools.learning_app.check_curriculum
+          ```
+
+          """
+          if heading not in text:
+              marker = "## Evidence separation theory"
+              if marker in text:
+                  text = text.replace(marker, section + marker, 1)
+              else:
+                  text = text.rstrip() + "\n\n" + section
+              readme.write_text(text, encoding="utf-8")
+          PY
+
+          git add -A
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Add comprehensive repository-guided learning app"
+          git push origin HEAD:feature/comprehensive-learning-app
