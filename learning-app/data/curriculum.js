@@ -1,0 +1,1 @@
+window.LFV_CURRICULUM = window.LFV_ACADEMY;
