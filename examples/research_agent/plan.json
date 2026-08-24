@@ -1,14 +1,15 @@
 {
-  "schema_version": "lfv-proof-carrying-research-plan-v3",
-  "research_id": "certifiable-alpha-hidden-risk-study-v3",
-  "hypothesis": "Research evidence changes alpha ranking, residual alpha uncertainty, portfolio selection, capacity use, common liquidation risk, and matched event-window outflows under the declared controlled models.",
+  "schema_version": "lfv-proof-carrying-research-plan-v4",
+  "research_id": "certifiable-alpha-hidden-risk-study-v4",
+  "hypothesis": "Research evidence changes alpha ranking, residual alpha uncertainty, portfolio selection, capacity use, common liquidation risk, matched event-window outflows, and whether local certificates compose into one bound research pipeline under the declared controlled models.",
   "analyses": {
     "fake_alpha_benchmark": "examples/fake_alpha/controlled.json",
     "certifiable_alpha_interval": "examples/certifiable_alpha/uncertainty.json",
     "evidence_portfolio": "examples/evidence_portfolio/hidden_common_risk.json",
     "certifiability_crowding": "examples/certifiability_crowding/capacity.json",
     "epistemic_liquidation": "examples/epistemic_liquidation/shared_vendor_shock.json",
-    "epistemic_event_study": "examples/epistemic_event_study/vendor_shock.json"
+    "epistemic_event_study": "examples/epistemic_event_study/vendor_shock.json",
+    "certificate_composition": "examples/certificate_composition/research_bundle.json"
   },
   "gates": {
     "require_exact_alpha_recovery": true,
@@ -19,6 +20,8 @@
     "minimum_crowding_paradox_count": 2,
     "minimum_hidden_common_risk_pairs": 1,
     "require_event_study_acceptance": true,
-    "minimum_event_study_average_did_bps": 800
+    "minimum_event_study_average_did_bps": 800,
+    "require_composition_verification": true,
+    "maximum_composition_evidence_cost": 4
   }
 }

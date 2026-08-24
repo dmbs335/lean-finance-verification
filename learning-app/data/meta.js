@@ -410,8 +410,8 @@ window.LFV_ACADEMY = {
     },
     {
       "id": "bounded-agent",
-      "label": "Bounded Research Agent",
-      "description": "여섯 분석을 등록하고 fail-closed certificate까지 따라갑니다.",
+      "label": "Bounded Research Agent v4",
+      "description": "일곱 분석과 cross-certificate composition을 등록하고 fail-closed certificate까지 따라갑니다.",
       "lessonIds": [
         "fake-alpha",
         "alpha-uncertainty",
@@ -419,6 +419,7 @@ window.LFV_ACADEMY = {
         "certifiability-crowding",
         "epistemic-liquidation",
         "epistemic-event-study",
+        "certificate-composition",
         "research-agent-gates"
       ]
     },

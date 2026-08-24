@@ -1,6 +1,6 @@
 # Proof-Carrying Research Agent Harness
 
-The v3 research-agent harness connects six controlled analyses under one registered plan:
+The v4 research-agent harness connects seven controlled analyses under one registered plan:
 
 ```text
 fake-alpha audit
@@ -9,14 +9,28 @@ fake-alpha audit
 → certifiability/capacity stress
 → shared-evidence liquidation stress
 → preregistered matched event study
+→ certificate composition
 → bounded certificate
 ```
 
-The plan fixes every input and numerical gate before execution. Each analysis is recomputed through its deterministic checker. The final report binds the plan and six analysis reports by canonical SHA-256 digests. A certificate is emitted only when every gate passes.
+The plan fixes every input and numerical gate before execution. Each analysis is recomputed through its deterministic checker. The final report binds the plan and seven analysis reports by canonical SHA-256 digests. A certificate is emitted only when every local gate passes **and** the selected bridge evidence verifies the declared global pipeline claim.
 
-The checked-in plan requires exact recovery of injected alpha distortions; an alpha interval no wider than 600 bps with a positive lower endpoint; at least 200 units of evidence-adjusted portfolio improvement; two crowding paradox cases; one hidden-common-risk liquidation pair; an accepted event study; and average event DID of at least 800 bps.
+The checked-in plan requires exact recovery of injected alpha distortions; an alpha interval no wider than 600 bps with a positive lower endpoint; at least 200 units of evidence-adjusted portfolio improvement; two crowding paradox cases; one hidden-common-risk liquidation pair; an accepted event study with average DID of at least 800 bps; and a composition architecture no more expensive than 4 units.
 
-The controlled event-study result is 850 bps across three matched pairs. Raising the agent-level threshold to 900 rejects the run even though the event-study's own preregistered 700 bps threshold passes. The nested gates make both the analysis contract and the certificate-issuance contract explicit.
+The controlled composition analysis selects:
+
+```text
+dataDecisionBindingReceipt
+decisionResultBindingReceipt
+```
+
+at cost 4. Local dataset, decision, and result certificates are valid in every controlled world, but their pass/fail summary does not verify the global claim. The bridge receipts bind the exact dataset to the decision and the exact decision to the result. Lowering the agent's composition-cost budget to 3 rejects the run even though all six local analyses remain green.
+
+## Prefix-accurate failure stages
+
+The agent computes every analysis for diagnostics, but `completed_stages` records only the ordered prefix that passed. A failed event-study gate does not report `eventStudied`; a failed composition gate includes `eventStudied` but omits `pipelineComposed` and `certified`.
+
+This prevents a diagnostic execution from being misreported as a completed proof stage.
 
 ## Candidate decision policy
 
@@ -54,6 +68,14 @@ The controlled candidate batch demonstrates all three paths:
 - `overcrowdedCandidate` is integrity-valid but rejected at a -3 bps deployable lower bound;
 - `unobservableCandidate` is rejected because its required hardware receipt is outside the declared channel language.
 
+Run the registered plan with:
+
+```bash
+python -m tools.research_agent --repository-root . run \
+  --plan examples/research_agent/plan.json \
+  --out /tmp/lfv-research-agent.json
+```
+
 Run the candidate gate with:
 
 ```bash
@@ -62,16 +84,8 @@ python -m tools.research_agent gate-candidates \
   --out /tmp/lfv-research-candidates.json
 ```
 
-Verify by exact recomputation:
-
-```bash
-python -m tools.research_agent verify-candidates \
-  --batch examples/research_agent/candidates.json \
-  --report /tmp/lfv-research-candidates.json
-```
-
 ## Trust and scientific boundary
 
-This is an orchestration and safety harness, not an autonomous scientist or investment adviser. It certifies that registered finite analyses executed and passed machine-checkable gates, and it prevents obvious evidence or deployability failures from reaching review.
+This is an orchestration and safety harness, not an autonomous scientist or investment adviser. It certifies that registered finite analyses executed, passed machine-checkable gates, and were composed through the declared binding language.
 
-It does not generate a novel strategy, validate real data, eliminate unobserved confounding, calibrate economic parameters, establish market causality, prove the attack language complete, or decide whether the hypothesis is scientifically important. Human approval remains mandatory and external evidence must still be authenticated by the repository's cryptographic and operational layers.
+It does not generate a novel strategy, validate real data, eliminate unobserved confounding, calibrate economic parameters, establish market causality, prove the attack or composition language complete, or establish that binding digests were measured at the correct causal boundary. Human approval remains mandatory and external evidence must still be authenticated by the repository's cryptographic and operational layers.

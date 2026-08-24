@@ -8,7 +8,7 @@ from tools.evidence_synth.canonical import canonical_bytes, load_json
 
 from .errors import ValidationError
 
-SCHEMA = "lfv-proof-carrying-research-plan-v3"
+SCHEMA = "lfv-proof-carrying-research-plan-v4"
 
 
 @dataclass(frozen=True)
@@ -19,6 +19,7 @@ class AnalysisPaths:
     certifiability_crowding: Path
     epistemic_liquidation: Path
     epistemic_event_study: Path
+    certificate_composition: Path
 
 
 @dataclass(frozen=True)
@@ -32,6 +33,8 @@ class Gates:
     minimum_hidden_common_risk_pairs: int
     require_event_study_acceptance: bool
     minimum_event_study_average_did_bps: int
+    require_composition_verification: bool
+    maximum_composition_evidence_cost: int
 
 
 @dataclass(frozen=True)
@@ -107,6 +110,7 @@ def load_plan(path: Path, repository_root: Path) -> Plan:
         "fake_alpha_benchmark", "certifiable_alpha_interval",
         "evidence_portfolio", "certifiability_crowding",
         "epistemic_liquidation", "epistemic_event_study",
+        "certificate_composition",
     }
     if set(analyses_raw) != analysis_fields:
         raise ValidationError("$.analyses: fields do not match analysis schema")
@@ -126,6 +130,8 @@ def load_plan(path: Path, repository_root: Path) -> Plan:
         "minimum_crowding_paradox_count", "minimum_hidden_common_risk_pairs",
         "require_event_study_acceptance",
         "minimum_event_study_average_did_bps",
+        "require_composition_verification",
+        "maximum_composition_evidence_cost",
     }
     if set(gates_raw) != gate_fields:
         raise ValidationError("$.gates: fields do not match gate schema")
@@ -165,6 +171,14 @@ def load_plan(path: Path, repository_root: Path) -> Plan:
         minimum_event_study_average_did_bps=_natural(
             gates_raw["minimum_event_study_average_did_bps"],
             "$.gates.minimum_event_study_average_did_bps",
+        ),
+        require_composition_verification=_boolean(
+            gates_raw["require_composition_verification"],
+            "$.gates.require_composition_verification",
+        ),
+        maximum_composition_evidence_cost=_natural(
+            gates_raw["maximum_composition_evidence_cost"],
+            "$.gates.maximum_composition_evidence_cost",
         ),
     )
     return Plan(
