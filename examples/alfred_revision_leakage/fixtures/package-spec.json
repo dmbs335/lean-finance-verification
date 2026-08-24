@@ -1,0 +1,56 @@
+{
+  "schema_version": "lfv-alfred-vintage-package-spec-v1",
+  "series_id": "TESTREV",
+  "latest_vintage_date": "2020-08-01",
+  "release_calendar": "release-calendar.json",
+  "responses": [
+    {
+      "kind": "realtime",
+      "as_of_date": "2020-03-15",
+      "vintage_date": "2020-03-15",
+      "relative_path": "responses/realtime-2020-03-15.json"
+    },
+    {
+      "kind": "latest",
+      "as_of_date": "2020-03-15",
+      "vintage_date": "2020-08-01",
+      "relative_path": "responses/latest.json"
+    },
+    {
+      "kind": "realtime",
+      "as_of_date": "2020-04-15",
+      "vintage_date": "2020-04-15",
+      "relative_path": "responses/realtime-2020-04-15.json"
+    },
+    {
+      "kind": "latest",
+      "as_of_date": "2020-04-15",
+      "vintage_date": "2020-08-01",
+      "relative_path": "responses/latest.json"
+    },
+    {
+      "kind": "realtime",
+      "as_of_date": "2020-05-15",
+      "vintage_date": "2020-05-15",
+      "relative_path": "responses/realtime-2020-05-15.json"
+    },
+    {
+      "kind": "latest",
+      "as_of_date": "2020-05-15",
+      "vintage_date": "2020-08-01",
+      "relative_path": "responses/latest.json"
+    },
+    {
+      "kind": "realtime",
+      "as_of_date": "2020-06-15",
+      "vintage_date": "2020-06-15",
+      "relative_path": "responses/realtime-2020-06-15.json"
+    },
+    {
+      "kind": "latest",
+      "as_of_date": "2020-06-15",
+      "vintage_date": "2020-08-01",
+      "relative_path": "responses/latest.json"
+    }
+  ]
+}
