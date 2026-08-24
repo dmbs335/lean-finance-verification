@@ -163,7 +163,7 @@ A bounded certificate is emitted only when every registered gate passes. The che
 
 `LeanFinance/ResearchAgent/` and `tools/research_agent/` provide two related contracts.
 
-The registered-plan harness runs six deterministic analyses in order and binds their reports by canonical digest:
+The registered-plan harness runs seven deterministic analyses in order and binds their reports plus the cross-certificate composition result by canonical digest:
 
 ```text
 fake-alpha audit
@@ -172,6 +172,7 @@ fake-alpha audit
 → crowding stress
 → liquidation stress
 → event study
+→ certificate composition
 → bounded certificate
 ```
 
@@ -220,6 +221,7 @@ tools/
 ├── certifiability_crowding/     confidence, allocation, capacity lifecycle
 ├── epistemic_liquidation/       dependency shocks and funding contagion
 ├── epistemic_event_study/       preregistered matched event analysis
+├── certificate_composition/     cross-certificate binding synthesis
 ├── research_agent/              ordered research and candidate review gates
 ├── pit_study/                   point-in-time study contracts
 ├── pit_vendor_import/           signed vendor package verification

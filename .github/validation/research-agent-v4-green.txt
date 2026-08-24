@@ -1,0 +1,7 @@
+validated_source_commit=9e5bf41a18afb12cb59ba35decc56fbc3166716f
+validated_tree=64df7e51b4bc7740330bdb6319f9a6a32b6276b7
+python=3.12
+research_agent_tests=success
+composition_tests=success
+curriculum=success
+lean_build=success
