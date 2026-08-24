@@ -29,11 +29,32 @@ not equivalent to acceptably bounded residual alpha uncertainty.
 A v2 certificate therefore does not imply that an empirical event-study
 protocol was registered or passed.
 
+## v3 → v4
+
+`lfv-proof-carrying-research-plan-v4` adds:
+
+- `analyses.certificate_composition`;
+- `gates.require_composition_verification`;
+- `gates.maximum_composition_evidence_cost`;
+- the formal `pipelineComposed` stage;
+- the certificate-composition report digest;
+- prefix-accurate rejected-stage reporting.
+
+A v3 certificate binds six local analysis reports by digest, but it does not
+prove that the reports refer to the same dataset, decisions, result, and causal
+pipeline. The v4 composition gate requires selected bridge evidence to verify
+the declared global pipeline claim and keeps its evidence cost within the
+registered budget.
+
+A rejected v4 report now lists only the stage prefix that actually passed. For
+example, a composition-cost failure includes `eventStudied` but omits
+`pipelineComposed` and `certified`.
+
 ## Migration rule
 
 Plans must be rewritten explicitly and recomputed under the new schema. Old
 reports remain evidence for their original schema only; changing the schema ID
 without adding the new analysis inputs and gates is rejected by the parser.
 
-The current checked-in fixture is v3 and contains six independent analysis
+The current checked-in fixture is v4 and contains seven independent analysis
 gates before the final `certified` stage.

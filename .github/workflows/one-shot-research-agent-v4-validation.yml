@@ -1,0 +1,116 @@
+name: One-shot research agent v4 validation
+
+on:
+  push:
+    branches:
+      - feature/research-agent-composition-gate
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/research-agent-composition-gate
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Align repository navigation with v4
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          readme = Path('README.md')
+          text = readme.read_text(encoding='utf-8')
+          text = text.replace(
+              'runs six deterministic analyses in order and binds their reports by canonical digest:',
+              'runs seven deterministic analyses in order and binds their reports plus the cross-certificate composition result by canonical digest:',
+          )
+          text = text.replace(
+              '→ event study\n→ bounded certificate',
+              '→ event study\n→ certificate composition\n→ bounded certificate',
+          )
+          text = text.replace(
+              '├── epistemic_event_study/       preregistered matched event analysis\n├── research_agent/',
+              '├── epistemic_event_study/       preregistered matched event analysis\n├── certificate_composition/     cross-certificate binding synthesis\n├── research_agent/',
+          )
+          readme.write_text(text, encoding='utf-8')
+
+          meta = Path('learning-app/data/meta.js')
+          raw = meta.read_text(encoding='utf-8').strip()
+          prefix = 'window.LFV_ACADEMY = '
+          data = json.loads(raw[len(prefix):-1])
+          for path in data['paths']:
+              if path['id'] == 'bounded-agent':
+                  path['label'] = 'Bounded Research Agent v4'
+                  path['description'] = (
+                      '일곱 분석과 cross-certificate composition을 등록하고 '
+                      'fail-closed certificate까지 따라갑니다.'
+                  )
+                  if 'certificate-composition' not in path['lessonIds']:
+                      position = path['lessonIds'].index('research-agent-gates')
+                      path['lessonIds'].insert(position, 'certificate-composition')
+          meta.write_text(
+              prefix + json.dumps(data, ensure_ascii=False, indent=2) + ';\n',
+              encoding='utf-8',
+          )
+          PY
+      - name: Test v4 research-agent contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tools/research_agent/tests -v
+          python -m unittest discover -s tools/certificate_composition/tests -v
+          first="$(mktemp)"
+          second="$(mktemp)"
+          python -m tools.research_agent --repository-root . run \
+            --plan examples/research_agent/plan.json \
+            --out "$first"
+          python -m tools.research_agent --repository-root . run \
+            --plan examples/research_agent/plan.json \
+            --out "$second"
+          cmp "$first" "$second"
+          python -m tools.research_agent --repository-root . verify \
+            --plan examples/research_agent/plan.json \
+            --report "$first"
+      - name: Validate learning app
+        run: |
+          python -m tools.learning_app.check_curriculum
+          python -m unittest discover -s tools/learning_app/tests -v
+          node --check learning-app/data/research.js
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+      - name: Commit validated integration and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add README.md learning-app/data/meta.js
+          validated_tree="$(git write-tree)"
+          mkdir -p .github/validation
+          cat > .github/validation/research-agent-v4-green.txt <<EOF
+          validated_source_commit=${GITHUB_SHA}
+          validated_tree=${validated_tree}
+          python=3.12
+          research_agent_tests=success
+          composition_tests=success
+          curriculum=success
+          lean_build=success
+          EOF
+          rm .github/workflows/one-shot-research-agent-v4-validation.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Integrate and validate research agent v4'
+          git push origin HEAD:feature/research-agent-composition-gate

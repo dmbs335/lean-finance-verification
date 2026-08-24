@@ -42,42 +42,43 @@ window.LFV_ACADEMY.lessons.push(...[
   {
     "id":"research-agent-gates","track":"robust","order":12,
     "title":"Proof-Carrying Research Agent Gates",
-    "subtitle":"등록된 여섯 분석을 fail-closed 순서로 실행하고 모든 gate가 통과할 때만 bounded certificate를 냅니다.",
-    "difficulty":"연구","minutes":44,
-    "covers":["research-agent","portfolio-research","liquidation-research"],
-    "prerequisites":["alpha-uncertainty","evidence-adjusted-portfolio","certifiability-crowding","epistemic-liquidation","epistemic-event-study"],
+    "subtitle":"등록된 일곱 분석과 cross-certificate binding을 fail-closed 순서로 실행합니다.",
+    "difficulty":"연구","minutes":46,
+    "covers":["research-agent","portfolio-research","liquidation-research","composition"],
+    "prerequisites":["alpha-uncertainty","evidence-adjusted-portfolio","certifiability-crowding","epistemic-liquidation","epistemic-event-study","certificate-composition"],
     "outcomes":[
-      "alpha audit와 alpha interval gate를 구분한다.",
-      "event-study 자체의 preregistered gate와 agent-level DID gate를 구분한다.",
-      "등록 plan과 여섯 analysis report digest가 certificate에 어떻게 결합되는지 설명한다.",
-      "gate 하나의 실패가 최종 certificate 발급을 막는 fail-closed 의미를 이해한다."
+      "여섯 local analysis gate와 composition gate를 구분한다.",
+      "local report digest를 나열하는 것과 같은 causal pipeline으로 binding하는 것의 차이를 설명한다.",
+      "등록 plan과 일곱 analysis report digest가 certificate에 어떻게 결합되는지 설명한다.",
+      "실패한 gate 이전까지만 completed stage로 기록되는 prefix semantics를 이해한다."
     ],
-    "concepts":["registered plan","analysis gate","alphaBounded","eventStudied","artifact digest","fail closed","bounded certificate"],
-    "why":"개별 분석이 모두 존재해도 실행 순서·입력·통과 기준이 사전에 고정되지 않으면 유리한 결과만 골라 보고할 수 있다.",
+    "concepts":["registered plan","analysis gate","eventStudied","pipelineComposed","bridge receipt","stage prefix","fail closed","bounded certificate"],
+    "why":"모든 local analysis가 green이어도 서로 다른 dataset·decision·result를 가리키면 global research claim은 거짓일 수 있다. 최종 인증에는 분석 통과와 cross-boundary composition이 모두 필요하다.",
     "assurance":{
-      "proves":["등록된 finite fixture와 threshold에서 여섯 분석을 정확히 재실행하고 모든 gate 통과 시에만 certificate를 발급함"],
-      "notProves":["agent가 새로운 전략이나 과학적 가설을 올바르게 생성함","실제 시장 인과효과","외부 데이터 진실성"]
+      "proves":["등록된 finite fixture와 threshold에서 일곱 분석을 재실행하고 global binding gate까지 통과할 때만 certificate를 발급함","composition cost 초과 시 local gate가 green이어도 pipelineComposed와 certified stage를 발급하지 않음"],
+      "notProves":["bridge digest가 현실의 올바른 causal boundary에서 측정됐음","agent가 과학적으로 중요한 가설을 생성함","실제 시장 인과효과"]
     },
     "sources":[
       "LeanFinance/ResearchAgent/Workflow.lean",
       "LeanFinance/ResearchAgent/Example.lean",
       "tools/research_agent/",
-      "examples/research_agent/plan.json"
+      "examples/research_agent/plan.json",
+      "tools/certificate_composition/"
     ],
-    "docs":["docs/PROOF_CARRYING_RESEARCH_AGENT.md"],
+    "docs":["docs/PROOF_CARRYING_RESEARCH_AGENT.md","docs/CERTIFICATE_COMPOSITION_LAW.md"],
     "commands":[
       "python -m unittest discover -s tools/research_agent/tests -v",
       "python -m tools.research_agent --repository-root . run --plan examples/research_agent/plan.json --out /tmp/research-agent.json"
     ],
     "challenge":{
-      "prompt":"event-study 자체 기준 700 bps는 통과했지만 agent plan의 최소 DID 900 bps는 못 넘으면?",
-      "options":["rejected이며 certificate 없음","event-study가 accepted이므로 무조건 certified","agent threshold를 사후 700으로 내림"],
+      "prompt":"여섯 local analysis가 모두 green이지만 binding receipt 최소비용 4가 등록 budget 3을 넘으면?",
+      "options":["rejected이며 eventStudied까지만 완료","local gate가 green이므로 자동 certified","global bundle을 사후 무료로 추가"],
       "answer":0,
-      "explanation":"분석 contract와 certificate 발급 contract는 둘 다 사전 고정되고 모두 통과해야 한다."
+      "explanation":"composition gate는 별도 등록 의무다. 실패하면 pipelineComposed와 certified stage는 완료되지 않는다."
     },
     "quiz":[
-      {"question":"v3 certificate가 bind하는 분석 report 수는?","choices":["6개","1개","무제한"],"answer":0,"explanation":"fake alpha, alpha interval, portfolio, crowding, liquidation, event study를 각각 digest로 묶는다."},
-      {"question":"이 harness가 autonomous scientist가 아닌 이유는?","choices":["가설 중요성·실제 데이터 타당성·인과 calibration을 판단하지 않아서","Python을 사용해서","stage가 여러 개라서"],"answer":0,"explanation":"기계적 gate 통과와 과학적 발견의 타당성은 별개다."}
+      {"question":"v4 certificate가 bind하는 analysis report 수는?","choices":["7개","6개","1개"],"answer":0,"explanation":"기존 여섯 분석에 certificate-composition report가 추가된다."},
+      {"question":"local report digest를 certificate에 나열하는 것만으로 부족한 이유는?","choices":["각 report가 같은 dataset→decision→result pipeline을 가리킨다는 cross-object identity를 보장하지 않아서","SHA-256 길이가 짧아서","report 수가 홀수라서"],"answer":0,"explanation":"local validity와 cross-boundary binding은 서로 다른 claim이다."}
     ]
   }
 ]);

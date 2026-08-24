@@ -18,9 +18,11 @@ python -m tools.research_agent --repository-root . verify \
   --report /tmp/lfv-research-agent.json
 ```
 
-The fixture is expected to finish with `certified-bounded` after six controlled analysis gates pass. Exact attack remediation, bounded alpha uncertainty, portfolio selection, capacity stress, liquidation stress, and matched event-study acceptance are separate requirements.
+The fixture is expected to finish with `certified-bounded` after seven controlled analysis gates pass. Exact attack remediation, bounded alpha uncertainty, portfolio selection, capacity stress, liquidation stress, matched event-study acceptance, and certificate composition are separate requirements.
 
-Set `maximum_certifiable_interval_width_bps` below 520, `minimum_adjusted_portfolio_gain` above 280, or `minimum_event_study_average_did_bps` above 850 to exercise fail-closed rejection.
+The composition fixture selects the two narrow bridge receipts at cost 4. Set `maximum_composition_evidence_cost` to 3 to verify that all local analyses can remain green while the final certificate is still rejected for insufficient composition budget.
+
+Other fail-closed controls include setting `maximum_certifiable_interval_width_bps` below 520, `minimum_adjusted_portfolio_gain` above 280, or `minimum_event_study_average_did_bps` above 850.
 
 ## Candidate review and evidence repair
 
