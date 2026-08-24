@@ -1,0 +1,28 @@
+{
+  "schema_version": "lfv-proof-carrying-execution-v1",
+  "name": "controlled-two-fill-buy-and-reconciliation",
+  "order": {
+    "id": "controlled-buy",
+    "side": "buy",
+    "authority": "microAutonomy",
+    "capital_cap_units": 100,
+    "authorized_qty": 100,
+    "limit_price": 10
+  },
+  "lifecycle": [
+    "proposed",
+    "shielded",
+    "authorized",
+    "submitted",
+    "acknowledged",
+    "partiallyFilled",
+    "filled",
+    "reconciled"
+  ],
+  "fills": [
+    {"id": "fill-1", "side": "buy", "qty": 40, "price": 10, "fee": 1},
+    {"id": "fill-2", "side": "buy", "qty": 60, "price": 10, "fee": 1}
+  ],
+  "initial_cash": 10000,
+  "initial_inventory": 0
+}
