@@ -28,3 +28,4 @@ import LeanFinance.Epistemic.SelectiveReceipt
 import LeanFinance.Epistemic.SelectiveReceiptExample
 import LeanFinance.Epistemic.ZeroKnowledgeReceipt
 import LeanFinance.Epistemic.ZeroKnowledgeReceiptExample
+import LeanFinance.Epistemic.CertificateComposition

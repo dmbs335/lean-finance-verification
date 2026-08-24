@@ -4,59 +4,473 @@ window.LFV_ACADEMY = {
   "subtitle": "금융 모델부터 proof-carrying evidence와 certifiable alpha까지",
   "repo": "dmbs335/lean-finance-verification",
   "tracks": [
-    {"id":"orientation","label":"0. 전체 지도","description":"프로젝트의 질문, Lean 코드 읽기, 보증 수준을 먼저 잡습니다."},
-    {"id":"finance","label":"1. 금융 모델","description":"게임이론·시장미시구조·제약·전략 생태계·certifiable alpha와 숨은 투자 위험을 다룹니다."},
-    {"id":"backtest","label":"2. Proof-Carrying Backtest","description":"시점 정합성, 계보, 검색 이력, 인증서와 어댑터를 연결합니다."},
-    {"id":"epistemic","label":"3. Evidence Separation","description":"관측 동치, 불가능성, cut set, CEGIS, refinement, debt를 학습합니다."},
-    {"id":"robust","label":"4. 견고성·확장성","description":"모델 불확실성, trust domain, multi-claim, taxonomy와 proof-gated research orchestration을 다룹니다."},
-    {"id":"infrastructure","label":"5. 실제 증거 인프라","description":"PIT vendor, timestamp, quorum, selective disclosure, ZK receipt와 CI 경계를 다룹니다."}
+    {
+      "id": "orientation",
+      "label": "0. 전체 지도",
+      "description": "프로젝트의 질문, Lean 코드 읽기, 보증 수준을 먼저 잡습니다."
+    },
+    {
+      "id": "finance",
+      "label": "1. 금융 모델",
+      "description": "게임이론·시장미시구조·제약·전략 생태계·certifiable alpha와 숨은 투자 위험을 다룹니다."
+    },
+    {
+      "id": "backtest",
+      "label": "2. Proof-Carrying Backtest",
+      "description": "시점 정합성, 계보, 검색 이력, 인증서와 어댑터를 연결합니다."
+    },
+    {
+      "id": "epistemic",
+      "label": "3. Evidence Separation",
+      "description": "관측 동치, 불가능성, cut set, CEGIS, refinement, debt를 학습합니다."
+    },
+    {
+      "id": "robust",
+      "label": "4. 견고성·확장성",
+      "description": "모델 불확실성, trust domain, multi-claim, taxonomy와 proof-gated research orchestration을 다룹니다."
+    },
+    {
+      "id": "infrastructure",
+      "label": "5. 실제 증거 인프라",
+      "description": "PIT vendor, timestamp, quorum, selective disclosure, ZK receipt와 CI 경계를 다룹니다."
+    }
   ],
   "coverageAreas": [
-    {"id":"core","label":"Core types","paths":["LeanFinance/Core.lean"]},
-    {"id":"game-theory","label":"GameTheory","paths":["LeanFinance/GameTheory.lean","LeanFinance/GameTheory/"]},
-    {"id":"market","label":"Market","paths":["LeanFinance/Market.lean","LeanFinance/Market/"]},
-    {"id":"constraints","label":"Constraints","paths":["LeanFinance/Constraints.lean","LeanFinance/Constraints/"]},
-    {"id":"dynamics","label":"Dynamics","paths":["LeanFinance/Dynamics.lean","LeanFinance/Dynamics/"]},
-    {"id":"inference","label":"Inference","paths":["LeanFinance/Inference.lean","LeanFinance/Inference/"]},
-    {"id":"strategy-ecology","label":"StrategyEcology","paths":["LeanFinance/StrategyEcology.lean","LeanFinance/StrategyEcology/"]},
-    {"id":"supply-chain","label":"SupplyChain","paths":["LeanFinance/SupplyChain.lean","LeanFinance/SupplyChain/"]},
-    {"id":"backtest","label":"Backtest contracts","paths":["LeanFinance/Backtest.lean","LeanFinance/Backtest/"]},
-    {"id":"certificate","label":"Certificate layer","paths":["LeanFinance/Certificate.lean","LeanFinance/Certificate/"]},
-    {"id":"epistemic","label":"Epistemic theory","paths":["LeanFinance/Epistemic.lean","LeanFinance/Epistemic/"]},
-    {"id":"generated","label":"Generated witnesses","paths":["LeanFinance/Generated.lean","LeanFinance/Generated/"]},
-    {"id":"alpha-research","label":"Alpha and uncertainty research","paths":["LeanFinance/Alpha.lean","LeanFinance/Alpha/","tools/fake_alpha_benchmark/","tools/certifiable_alpha_interval/","tools/certifiability_crowding/"]},
-    {"id":"portfolio-research","label":"Evidence-adjusted portfolio research","paths":["LeanFinance/Portfolio.lean","LeanFinance/Portfolio/","tools/evidence_portfolio/"]},
-    {"id":"liquidation-research","label":"Epistemic liquidation research","paths":["LeanFinance/Market/EpistemicLiquidation.lean","tools/epistemic_liquidation/"]},
-    {"id":"event-study","label":"Epistemic crowding event study","paths":["LeanFinance/Market/EpistemicEventStudy.lean","tools/epistemic_event_study/"]},
-    {"id":"research-agent","label":"Proof-carrying research agent","paths":["LeanFinance/ResearchAgent.lean","LeanFinance/ResearchAgent/","tools/research_agent/"]},
-    {"id":"adapter","label":"Reference adapter","paths":["tools/lfv_adapter/"]},
-    {"id":"evidence-synth","label":"Exact evidence synth","paths":["tools/evidence_synth/"]},
-    {"id":"workflow-cegis","label":"Workflow CEGIS","paths":["tools/workflow_cegis/"]},
-    {"id":"trace-refinement","label":"Trace refinement","paths":["tools/trace_refinement/"]},
-    {"id":"model-family","label":"Model-family synth","paths":["tools/model_family_synth/"]},
-    {"id":"robust-evidence","label":"Robust evidence","paths":["tools/robust_evidence/"]},
-    {"id":"multiclaim","label":"Multi-claim synth","paths":["tools/multiclaim_synth/"]},
-    {"id":"taxonomy","label":"Evidence taxonomy","paths":["tools/evidence_taxonomy/"]},
-    {"id":"symbolic","label":"Symbolic evidence","paths":["tools/symbolic_evidence/"]},
-    {"id":"pit-study","label":"PIT study","paths":["tools/pit_study/"]},
-    {"id":"pit-vendor","label":"Signed PIT vendor","paths":["tools/pit_vendor_import/"]},
-    {"id":"external-quorum","label":"External quorum","paths":["tools/external_quorum/"]},
-    {"id":"selective-receipt","label":"Selective receipt","paths":["tools/selective_receipt/"]},
-    {"id":"zk-receipt","label":"Experimental ZK receipt","paths":["tools/zk_receipt/"]},
-    {"id":"schemas","label":"Schemas","paths":["schemas/"]},
-    {"id":"examples","label":"Examples","paths":["examples/"]},
-    {"id":"ci","label":"CI and reproducibility","paths":[".github/workflows/lean.yml"]}
+    {
+      "id": "core",
+      "label": "Core types",
+      "paths": [
+        "LeanFinance/Core.lean"
+      ]
+    },
+    {
+      "id": "game-theory",
+      "label": "GameTheory",
+      "paths": [
+        "LeanFinance/GameTheory.lean",
+        "LeanFinance/GameTheory/"
+      ]
+    },
+    {
+      "id": "market",
+      "label": "Market",
+      "paths": [
+        "LeanFinance/Market.lean",
+        "LeanFinance/Market/"
+      ]
+    },
+    {
+      "id": "constraints",
+      "label": "Constraints",
+      "paths": [
+        "LeanFinance/Constraints.lean",
+        "LeanFinance/Constraints/"
+      ]
+    },
+    {
+      "id": "dynamics",
+      "label": "Dynamics",
+      "paths": [
+        "LeanFinance/Dynamics.lean",
+        "LeanFinance/Dynamics/"
+      ]
+    },
+    {
+      "id": "inference",
+      "label": "Inference",
+      "paths": [
+        "LeanFinance/Inference.lean",
+        "LeanFinance/Inference/"
+      ]
+    },
+    {
+      "id": "strategy-ecology",
+      "label": "StrategyEcology",
+      "paths": [
+        "LeanFinance/StrategyEcology.lean",
+        "LeanFinance/StrategyEcology/"
+      ]
+    },
+    {
+      "id": "supply-chain",
+      "label": "SupplyChain",
+      "paths": [
+        "LeanFinance/SupplyChain.lean",
+        "LeanFinance/SupplyChain/"
+      ]
+    },
+    {
+      "id": "backtest",
+      "label": "Backtest contracts",
+      "paths": [
+        "LeanFinance/Backtest.lean",
+        "LeanFinance/Backtest/"
+      ]
+    },
+    {
+      "id": "certificate",
+      "label": "Certificate layer",
+      "paths": [
+        "LeanFinance/Certificate.lean",
+        "LeanFinance/Certificate/"
+      ]
+    },
+    {
+      "id": "epistemic",
+      "label": "Epistemic theory",
+      "paths": [
+        "LeanFinance/Epistemic.lean",
+        "LeanFinance/Epistemic/"
+      ]
+    },
+    {
+      "id": "generated",
+      "label": "Generated witnesses",
+      "paths": [
+        "LeanFinance/Generated.lean",
+        "LeanFinance/Generated/"
+      ]
+    },
+    {
+      "id": "alpha-research",
+      "label": "Alpha and uncertainty research",
+      "paths": [
+        "LeanFinance/Alpha.lean",
+        "LeanFinance/Alpha/",
+        "tools/fake_alpha_benchmark/",
+        "tools/certifiable_alpha_interval/",
+        "tools/certifiability_crowding/"
+      ]
+    },
+    {
+      "id": "portfolio-research",
+      "label": "Evidence-adjusted portfolio research",
+      "paths": [
+        "LeanFinance/Portfolio.lean",
+        "LeanFinance/Portfolio/",
+        "tools/evidence_portfolio/"
+      ]
+    },
+    {
+      "id": "liquidation-research",
+      "label": "Epistemic liquidation research",
+      "paths": [
+        "LeanFinance/Market/EpistemicLiquidation.lean",
+        "tools/epistemic_liquidation/"
+      ]
+    },
+    {
+      "id": "event-study",
+      "label": "Epistemic crowding event study",
+      "paths": [
+        "LeanFinance/Market/EpistemicEventStudy.lean",
+        "tools/epistemic_event_study/"
+      ]
+    },
+    {
+      "id": "research-agent",
+      "label": "Proof-carrying research agent",
+      "paths": [
+        "LeanFinance/ResearchAgent.lean",
+        "LeanFinance/ResearchAgent/",
+        "tools/research_agent/"
+      ]
+    },
+    {
+      "id": "adapter",
+      "label": "Reference adapter",
+      "paths": [
+        "tools/lfv_adapter/"
+      ]
+    },
+    {
+      "id": "evidence-synth",
+      "label": "Exact evidence synth",
+      "paths": [
+        "tools/evidence_synth/"
+      ]
+    },
+    {
+      "id": "workflow-cegis",
+      "label": "Workflow CEGIS",
+      "paths": [
+        "tools/workflow_cegis/"
+      ]
+    },
+    {
+      "id": "trace-refinement",
+      "label": "Trace refinement",
+      "paths": [
+        "tools/trace_refinement/"
+      ]
+    },
+    {
+      "id": "model-family",
+      "label": "Model-family synth",
+      "paths": [
+        "tools/model_family_synth/"
+      ]
+    },
+    {
+      "id": "robust-evidence",
+      "label": "Robust evidence",
+      "paths": [
+        "tools/robust_evidence/"
+      ]
+    },
+    {
+      "id": "multiclaim",
+      "label": "Multi-claim synth",
+      "paths": [
+        "tools/multiclaim_synth/"
+      ]
+    },
+    {
+      "id": "taxonomy",
+      "label": "Evidence taxonomy",
+      "paths": [
+        "tools/evidence_taxonomy/"
+      ]
+    },
+    {
+      "id": "symbolic",
+      "label": "Symbolic evidence",
+      "paths": [
+        "tools/symbolic_evidence/"
+      ]
+    },
+    {
+      "id": "pit-study",
+      "label": "PIT study",
+      "paths": [
+        "tools/pit_study/"
+      ]
+    },
+    {
+      "id": "pit-vendor",
+      "label": "Signed PIT vendor",
+      "paths": [
+        "tools/pit_vendor_import/"
+      ]
+    },
+    {
+      "id": "external-quorum",
+      "label": "External quorum",
+      "paths": [
+        "tools/external_quorum/"
+      ]
+    },
+    {
+      "id": "selective-receipt",
+      "label": "Selective receipt",
+      "paths": [
+        "tools/selective_receipt/"
+      ]
+    },
+    {
+      "id": "zk-receipt",
+      "label": "Experimental ZK receipt",
+      "paths": [
+        "tools/zk_receipt/"
+      ]
+    },
+    {
+      "id": "schemas",
+      "label": "Schemas",
+      "paths": [
+        "schemas/"
+      ]
+    },
+    {
+      "id": "examples",
+      "label": "Examples",
+      "paths": [
+        "examples/"
+      ]
+    },
+    {
+      "id": "ci",
+      "label": "CI and reproducibility",
+      "paths": [
+        ".github/workflows/lean.yml"
+      ]
+    },
+    {
+      "id": "composition",
+      "label": "Certificate composition",
+      "paths": [
+        "LeanFinance/Epistemic/CertificateComposition.lean",
+        "tools/certificate_composition/"
+      ]
+    }
   ],
   "paths": [
-    {"id":"fast-tour","label":"90분 빠른 전체 투어","description":"핵심 질문과 end-to-end pipeline을 먼저 잡는 경로입니다.","lessonIds":["project-map","assurance-boundaries","artifact-identity","evidence-equivalence","cutsets-synthesis","workflow-cegis","generated-ci"]},
-    {"id":"finance-models","label":"금융 모델 정주행","description":"시장 모델에서 certifiable alpha와 empirical protocol까지 연결합니다.","lessonIds":["project-map","lean-reading","game-theory","market-microstructure","constraints-dynamics","hidden-state-inference","strategy-ecology","supply-chain","certifiable-alpha","fake-alpha","alpha-uncertainty","evidence-adjusted-portfolio","certifiability-crowding","epistemic-liquidation","epistemic-event-study"]},
-    {"id":"proof-carrying-backtest","label":"Proof-Carrying Backtest","description":"PIT data부터 외부 anchor와 certificate까지 연결합니다.","lessonIds":["project-map","assurance-boundaries","artifact-identity","pit-lineage","committed-search","proof-carrying-certificate","pit-vendor","timestamp-quorum","generated-ci"]},
-    {"id":"evidence-theory","label":"Evidence Separation 이론","description":"불가능성 정리에서 최소 증거 합성까지의 formal core입니다.","lessonIds":["lean-reading","evidence-equivalence","non-amplification","cutsets-synthesis","workflow-cegis","trace-refinement","evidence-debt","version-space","connectivity-robustness","multi-claim","taxonomy-symbolic"]},
-    {"id":"production-hardening","label":"실제 증거·프라이버시","description":"vendor, provider quorum, selective disclosure, ZK prototype, CI를 다룹니다.","lessonIds":["assurance-boundaries","pit-vendor","timestamp-quorum","selective-receipts","zk-receipts","generated-ci"]},
-    {"id":"hidden-investment-laws","label":"투자의 숨겨진 법칙","description":"검증 가능한 알파, 잔여 불확실성, crowding, liquidation과 event study를 연결합니다.","lessonIds":["strategy-ecology","evidence-debt","version-space","certifiable-alpha","fake-alpha","alpha-uncertainty","evidence-adjusted-portfolio","certifiability-crowding","epistemic-liquidation","epistemic-event-study","research-agent-gates"]},
-    {"id":"bounded-agent","label":"Bounded Research Agent","description":"여섯 분석을 등록하고 fail-closed certificate까지 따라갑니다.","lessonIds":["fake-alpha","alpha-uncertainty","evidence-adjusted-portfolio","certifiability-crowding","epistemic-liquidation","epistemic-event-study","research-agent-gates"]},
-    {"id":"empirical-protocol","label":"Epistemic Crowding 실증 프로토콜","description":"구조적 가설에서 preregistered matched event study와 agent gate까지 이동합니다.","lessonIds":["evidence-adjusted-portfolio","certifiability-crowding","epistemic-liquidation","epistemic-event-study","research-agent-gates"]},
-    {"id":"researcher","label":"논문·후속 연구 경로","description":"새 원리를 연구하거나 확장하기 위한 고급 경로입니다.","lessonIds":["hidden-state-inference","evidence-equivalence","non-amplification","evidence-debt","version-space","connectivity-robustness","multi-claim","taxonomy-symbolic","certifiable-alpha","fake-alpha","alpha-uncertainty","evidence-adjusted-portfolio","certifiability-crowding","epistemic-liquidation","epistemic-event-study","research-agent-gates","generated-ci"]}
+    {
+      "id": "fast-tour",
+      "label": "90분 빠른 전체 투어",
+      "description": "핵심 질문과 end-to-end pipeline을 먼저 잡는 경로입니다.",
+      "lessonIds": [
+        "project-map",
+        "assurance-boundaries",
+        "artifact-identity",
+        "evidence-equivalence",
+        "cutsets-synthesis",
+        "workflow-cegis",
+        "generated-ci"
+      ]
+    },
+    {
+      "id": "finance-models",
+      "label": "금융 모델 정주행",
+      "description": "시장 모델에서 certifiable alpha와 empirical protocol까지 연결합니다.",
+      "lessonIds": [
+        "project-map",
+        "lean-reading",
+        "game-theory",
+        "market-microstructure",
+        "constraints-dynamics",
+        "hidden-state-inference",
+        "strategy-ecology",
+        "supply-chain",
+        "certifiable-alpha",
+        "fake-alpha",
+        "alpha-uncertainty",
+        "evidence-adjusted-portfolio",
+        "certifiability-crowding",
+        "epistemic-liquidation",
+        "epistemic-event-study"
+      ]
+    },
+    {
+      "id": "proof-carrying-backtest",
+      "label": "Proof-Carrying Backtest",
+      "description": "PIT data부터 외부 anchor와 certificate까지 연결합니다.",
+      "lessonIds": [
+        "project-map",
+        "assurance-boundaries",
+        "artifact-identity",
+        "pit-lineage",
+        "committed-search",
+        "proof-carrying-certificate",
+        "pit-vendor",
+        "timestamp-quorum",
+        "generated-ci"
+      ]
+    },
+    {
+      "id": "evidence-theory",
+      "label": "Evidence Separation 이론",
+      "description": "불가능성 정리에서 최소 증거 합성까지의 formal core입니다.",
+      "lessonIds": [
+        "lean-reading",
+        "evidence-equivalence",
+        "non-amplification",
+        "cutsets-synthesis",
+        "workflow-cegis",
+        "trace-refinement",
+        "evidence-debt",
+        "version-space",
+        "connectivity-robustness",
+        "multi-claim",
+        "certificate-composition",
+        "taxonomy-symbolic"
+      ]
+    },
+    {
+      "id": "production-hardening",
+      "label": "실제 증거·프라이버시",
+      "description": "vendor, provider quorum, selective disclosure, ZK prototype, CI를 다룹니다.",
+      "lessonIds": [
+        "assurance-boundaries",
+        "pit-vendor",
+        "timestamp-quorum",
+        "selective-receipts",
+        "zk-receipts",
+        "generated-ci"
+      ]
+    },
+    {
+      "id": "hidden-investment-laws",
+      "label": "투자의 숨겨진 법칙",
+      "description": "검증 가능한 알파, 잔여 불확실성, crowding, liquidation과 event study를 연결합니다.",
+      "lessonIds": [
+        "strategy-ecology",
+        "evidence-debt",
+        "version-space",
+        "certifiable-alpha",
+        "fake-alpha",
+        "alpha-uncertainty",
+        "evidence-adjusted-portfolio",
+        "certifiability-crowding",
+        "epistemic-liquidation",
+        "epistemic-event-study",
+        "certificate-composition",
+        "research-agent-gates"
+      ]
+    },
+    {
+      "id": "bounded-agent",
+      "label": "Bounded Research Agent",
+      "description": "여섯 분석을 등록하고 fail-closed certificate까지 따라갑니다.",
+      "lessonIds": [
+        "fake-alpha",
+        "alpha-uncertainty",
+        "evidence-adjusted-portfolio",
+        "certifiability-crowding",
+        "epistemic-liquidation",
+        "epistemic-event-study",
+        "research-agent-gates"
+      ]
+    },
+    {
+      "id": "empirical-protocol",
+      "label": "Epistemic Crowding 실증 프로토콜",
+      "description": "구조적 가설에서 preregistered matched event study와 agent gate까지 이동합니다.",
+      "lessonIds": [
+        "evidence-adjusted-portfolio",
+        "certifiability-crowding",
+        "epistemic-liquidation",
+        "epistemic-event-study",
+        "research-agent-gates"
+      ]
+    },
+    {
+      "id": "researcher",
+      "label": "논문·후속 연구 경로",
+      "description": "새 원리를 연구하거나 확장하기 위한 고급 경로입니다.",
+      "lessonIds": [
+        "hidden-state-inference",
+        "evidence-equivalence",
+        "non-amplification",
+        "evidence-debt",
+        "version-space",
+        "connectivity-robustness",
+        "multi-claim",
+        "certificate-composition",
+        "taxonomy-symbolic",
+        "certifiable-alpha",
+        "fake-alpha",
+        "alpha-uncertainty",
+        "evidence-adjusted-portfolio",
+        "certifiability-crowding",
+        "epistemic-liquidation",
+        "epistemic-event-study",
+        "research-agent-gates",
+        "generated-ci"
+      ]
+    },
+    {
+      "id": "certificate-composition",
+      "label": "Certificate Composition",
+      "description": "Local proof에서 global pipeline binding까지 연결합니다.",
+      "lessonIds": [
+        "artifact-identity",
+        "evidence-equivalence",
+        "multi-claim",
+        "certificate-composition",
+        "generated-ci"
+      ]
+    }
   ],
   "lessons": []
 };
