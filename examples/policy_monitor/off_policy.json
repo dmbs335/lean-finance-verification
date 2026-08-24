@@ -1,0 +1,56 @@
+{
+  "schema_version": "lfv-policy-monitor-v1",
+  "name": "doubly-robust-anytime-authority-monitor",
+  "baseline_value_bps": 2,
+  "confidence_radius_bps": 2,
+  "required_improvement_bps": 2,
+  "minimum_effective_sample_size": 3,
+  "risk_ucb": 30,
+  "risk_budget": 40,
+  "current_authority": "recommend",
+  "model_shift": false,
+  "operational_breach": false,
+  "capital_caps": {
+    "observe": 0,
+    "shadow": 0,
+    "recommend": 0,
+    "microAutonomy": 10,
+    "boundedAutonomy": 100,
+    "fallback": 0,
+    "revoked": 0
+  },
+  "records": [
+    {
+      "id": "episode-1",
+      "behavior_probability_ppm": 500000,
+      "target_probability_ppm": 750000,
+      "reward_bps": 10,
+      "logged_action_model_bps": 6,
+      "target_policy_model_bps": 7
+    },
+    {
+      "id": "episode-2",
+      "behavior_probability_ppm": 500000,
+      "target_probability_ppm": 250000,
+      "reward_bps": 2,
+      "logged_action_model_bps": 4,
+      "target_policy_model_bps": 3
+    },
+    {
+      "id": "episode-3",
+      "behavior_probability_ppm": 800000,
+      "target_probability_ppm": 800000,
+      "reward_bps": 8,
+      "logged_action_model_bps": 5,
+      "target_policy_model_bps": 6
+    },
+    {
+      "id": "episode-4",
+      "behavior_probability_ppm": 400000,
+      "target_probability_ppm": 200000,
+      "reward_bps": 4,
+      "logged_action_model_bps": 3,
+      "target_policy_model_bps": 4
+    }
+  ]
+}
