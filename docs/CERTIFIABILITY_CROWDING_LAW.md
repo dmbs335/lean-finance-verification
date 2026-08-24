@@ -22,6 +22,24 @@ The deterministic fixture distinguishes three cases.
 
 The paradox is therefore not “proof destroys returns.” Evidence can improve knowledge while the induced allocation consumes a limited economic opportunity.
 
+## Three distinct alpha deaths
+
+The consolidated model distinguishes mechanisms that should not be reported as one generic “alpha decay.”
+
+### Epistemic death
+
+The evidence-supported alpha lower bound is nonpositive. The problem is research validity or unresolved uncertainty, not necessarily market capacity.
+
+### Capacity death
+
+Gross economic alpha remains positive, but modeled market impact and crowding consume the deployable edge. `limitedCapacitySignal` is the controlled example: its verified lower bound remains positive while deployable alpha becomes negative.
+
+### Ecological decay
+
+The gross economic edge itself declines because other market participants discover, copy, front-run, or strategically adapt to the signal. The current deterministic simulator holds gross economic alpha fixed and therefore does not estimate ecological decay; it only names the separate obligation.
+
+Lean carries a `CapacityExtinctionWitness` proving a transition from positive deployable alpha to capacity death and proves that capacity death does not imply epistemic death when the certifiable lower bound remains positive.
+
 ## Empirical status
 
 The response equations and parameters are controlled inputs, not estimates. A real test requires dated improvements in strategy credibility or verification, subsequent allocator flows, capacity measures, transaction costs, and controls for publication, ordinary performance chasing, factor crowding, and market conditions.
