@@ -1,0 +1,81 @@
+{
+  "schema_version": "lfv-epistemic-event-study-v1",
+  "name": "matched-vendor-methodology-shock-event-study",
+  "failed_domain": "vendor-a",
+  "preregistered_at": 90,
+  "event_time": 100,
+  "maximum_match_distance_bps": 500,
+  "maximum_absolute_pretrend_did_bps": 50,
+  "minimum_average_event_did_bps": 700,
+  "pairs": [
+    {
+      "id": "pair-value-quality",
+      "treated": {
+        "id": "vendorValue",
+        "evidence_domains": ["vendor-a", "engine-a"],
+        "baseline_outflow_bps": 100,
+        "pre_event_outflow_bps": 120,
+        "post_event_outflow_bps": 1220
+      },
+      "control": {
+        "id": "independentQuality",
+        "evidence_domains": ["vendor-c", "engine-d"],
+        "baseline_outflow_bps": 90,
+        "pre_event_outflow_bps": 110,
+        "post_event_outflow_bps": 210
+      },
+      "conventional_distance_bps": {
+        "return": 200,
+        "factor": 250,
+        "holdings": 300,
+        "liquidity": 180
+      }
+    },
+    {
+      "id": "pair-momentum-trend",
+      "treated": {
+        "id": "vendorMomentum",
+        "evidence_domains": ["vendor-a", "engine-b"],
+        "baseline_outflow_bps": 20,
+        "pre_event_outflow_bps": 30,
+        "post_event_outflow_bps": 930
+      },
+      "control": {
+        "id": "independentTrend",
+        "evidence_domains": ["vendor-b", "engine-c"],
+        "baseline_outflow_bps": 40,
+        "pre_event_outflow_bps": 50,
+        "post_event_outflow_bps": 150
+      },
+      "conventional_distance_bps": {
+        "return": 150,
+        "factor": 200,
+        "holdings": 280,
+        "liquidity": 220
+      }
+    },
+    {
+      "id": "pair-carry-defensive",
+      "treated": {
+        "id": "vendorCarry",
+        "evidence_domains": ["vendor-a", "engine-e"],
+        "baseline_outflow_bps": 100,
+        "pre_event_outflow_bps": 100,
+        "post_event_outflow_bps": 1000
+      },
+      "control": {
+        "id": "independentDefensive",
+        "evidence_domains": ["vendor-d", "engine-f"],
+        "baseline_outflow_bps": 100,
+        "pre_event_outflow_bps": 100,
+        "post_event_outflow_bps": 250
+      },
+      "conventional_distance_bps": {
+        "return": 300,
+        "factor": 350,
+        "holdings": 240,
+        "liquidity": 190
+      }
+    }
+  ]
+}

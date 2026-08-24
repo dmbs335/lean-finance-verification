@@ -7,3 +7,4 @@ import LeanFinance.Market.Liquidity
 import LeanFinance.Market.EquilibriumPrice
 import LeanFinance.Market.EpistemicCrowding
 import LeanFinance.Market.EpistemicLiquidation
+import LeanFinance.Market.EpistemicEventStudy
