@@ -41,7 +41,10 @@ theorem refined_lower_is_seven :
 theorem refinement_raises_robust_value : (1 : Int) ≤ 7 :=
   evidence_refinement_improves_robust_lower_bound
     outer refined value 1 7
-    (by intro model member; simp [outer, refined] at member ⊢; aesop)
+    (by
+      intro model member
+      simp [refined] at member
+      rcases member with rfl | rfl <;> simp [outer])
     outer_lower_is_one refined_lower_is_seven
 
 inductive Observation where
