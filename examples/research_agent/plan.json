@@ -1,0 +1,18 @@
+{
+  "schema_version": "lfv-proof-carrying-research-plan-v1",
+  "research_id": "certifiable-alpha-hidden-risk-study-v1",
+  "hypothesis": "Research evidence changes alpha ranking, portfolio selection, capacity use, and common liquidation risk under the declared controlled models.",
+  "analyses": {
+    "fake_alpha_benchmark": "examples/fake_alpha/controlled.json",
+    "evidence_portfolio": "examples/evidence_portfolio/hidden_common_risk.json",
+    "certifiability_crowding": "examples/certifiability_crowding/capacity.json",
+    "epistemic_liquidation": "examples/epistemic_liquidation/shared_vendor_shock.json"
+  },
+  "gates": {
+    "require_exact_alpha_recovery": true,
+    "minimum_adjusted_portfolio_gain": 200,
+    "require_all_crowding_laws": true,
+    "minimum_crowding_paradox_count": 2,
+    "minimum_hidden_common_risk_pairs": 1
+  }
+}
