@@ -10,15 +10,16 @@ inductive ResearchStage where
   | portfolioSelected
   | crowdingStressed
   | liquidationStressed
+  | eventStudied
   | certified
   deriving Repr, DecidableEq
 
 def requiredStages : List ResearchStage :=
   [.registered, .alphaAudited, .alphaBounded, .portfolioSelected,
-    .crowdingStressed, .liquidationStressed, .certified]
+    .crowdingStressed, .liquidationStressed, .eventStudied, .certified]
 
-/-- Normalized proof boundary emitted only after the finite analysis gates pass.
-    Digests bind the registered plan and externally generated reports. -/
+/-- Normalized proof boundary emitted only after every registered finite gate
+    passes. Digests bind the plan and externally generated reports. -/
 structure BoundedResearchCertificate where
   planDigest : String
   artifactDigests : List String
@@ -28,13 +29,15 @@ structure BoundedResearchCertificate where
   portfolioGatePassed : Bool
   crowdingGatePassed : Bool
   liquidationGatePassed : Bool
+  eventStudyGatePassed : Bool
   stageOrder : completedStages = requiredStages
   gateProof :
     alphaAuditPassed = true ∧
       alphaIntervalGatePassed = true ∧
         portfolioGatePassed = true ∧
           crowdingGatePassed = true ∧
-            liquidationGatePassed = true
+            liquidationGatePassed = true ∧
+              eventStudyGatePassed = true
 
 namespace BoundedResearchCertificate
 
@@ -44,7 +47,8 @@ theorem all_analysis_gates_pass
       certificate.alphaIntervalGatePassed = true ∧
         certificate.portfolioGatePassed = true ∧
           certificate.crowdingGatePassed = true ∧
-            certificate.liquidationGatePassed = true :=
+            certificate.liquidationGatePassed = true ∧
+              certificate.eventStudyGatePassed = true :=
   certificate.gateProof
 
 theorem follows_required_stage_order
