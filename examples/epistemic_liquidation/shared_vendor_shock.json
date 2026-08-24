@@ -1,0 +1,56 @@
+{
+  "schema_version": "lfv-epistemic-liquidation-v1",
+  "name": "shared-vendor-methodology-shock",
+  "low_return_correlation_threshold_bps": 1000,
+  "market_liquidity_units": 800,
+  "market_impact_scale_bps": 1000,
+  "shocks": [
+    {"domain": "vendor-a", "severity_bps": 10000}
+  ],
+  "strategies": [
+    {
+      "id": "globalValue",
+      "capital_units": 1000,
+      "liquidity_units": 800,
+      "impact_scale_bps": 600,
+      "market_exposure_bps": 7000,
+      "margin_buffer_bps": 200,
+      "margin_sensitivity_bps": 8000,
+      "dependencies": [
+        {"domain": "vendor-a", "withdrawal_bps_at_full_shock": 5000},
+        {"domain": "engine-a", "withdrawal_bps_at_full_shock": 2000}
+      ]
+    },
+    {
+      "id": "usMomentum",
+      "capital_units": 1200,
+      "liquidity_units": 900,
+      "impact_scale_bps": 650,
+      "market_exposure_bps": 6000,
+      "margin_buffer_bps": 150,
+      "margin_sensitivity_bps": 7000,
+      "dependencies": [
+        {"domain": "vendor-a", "withdrawal_bps_at_full_shock": 4500},
+        {"domain": "engine-b", "withdrawal_bps_at_full_shock": 1500}
+      ]
+    },
+    {
+      "id": "independentTrend",
+      "capital_units": 900,
+      "liquidity_units": 1200,
+      "impact_scale_bps": 400,
+      "market_exposure_bps": 5000,
+      "margin_buffer_bps": 300,
+      "margin_sensitivity_bps": 5000,
+      "dependencies": [
+        {"domain": "vendor-b", "withdrawal_bps_at_full_shock": 3000},
+        {"domain": "engine-c", "withdrawal_bps_at_full_shock": 1000}
+      ]
+    }
+  ],
+  "return_correlations": [
+    {"left": "globalValue", "right": "usMomentum", "correlation_bps": 200},
+    {"left": "globalValue", "right": "independentTrend", "correlation_bps": 100},
+    {"left": "usMomentum", "right": "independentTrend", "correlation_bps": -300}
+  ]
+}
