@@ -10,5 +10,6 @@ import LeanFinance.StrategyEcology
 import LeanFinance.SupplyChain
 import LeanFinance.Alpha
 import LeanFinance.Portfolio
+import LeanFinance.Control
 import LeanFinance.ResearchAgent
 import LeanFinance.Generated
