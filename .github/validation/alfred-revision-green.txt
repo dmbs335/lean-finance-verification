@@ -1,0 +1,3 @@
+validated_commit=9665963c75646463dc2180e6e202e941a81803c6
+python=3.12
+lean_build=success

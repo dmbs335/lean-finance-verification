@@ -13,4 +13,5 @@ import LeanFinance.Backtest.IntegrityCertificate
 import LeanFinance.Backtest.AdapterContract
 import LeanFinance.Backtest.PointInTimeData
 import LeanFinance.Backtest.VendorDataPackage
+import LeanFinance.Backtest.RevisionLeakage
 import LeanFinance.Examples.ProofCarryingBacktest

@@ -1,0 +1,32 @@
+{
+  "schema_version": "lfv-alfred-revision-study-v2",
+  "name": "controlled-alfred-revision-and-release-time-leakage",
+  "series_id": "TESTREV",
+  "observation_start": "2019-12-01",
+  "latest_vintage_date": "2020-08-01",
+  "value_scale": 1000,
+  "signal_threshold_scaled": 0,
+  "turnover_cost_bps": 1,
+  "decisions": [
+    {
+      "decision_at": "2020-03-15T09:00:00Z",
+      "as_of_date": "2020-03-15",
+      "realized_return_bps": 30
+    },
+    {
+      "decision_at": "2020-04-15T15:00:00Z",
+      "as_of_date": "2020-04-15",
+      "realized_return_bps": 40
+    },
+    {
+      "decision_at": "2020-05-15T15:00:00Z",
+      "as_of_date": "2020-05-15",
+      "realized_return_bps": -20
+    },
+    {
+      "decision_at": "2020-06-15T15:00:00Z",
+      "as_of_date": "2020-06-15",
+      "realized_return_bps": 10
+    }
+  ]
+}
