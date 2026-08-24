@@ -1,0 +1,57 @@
+name: One-shot autonomous pipeline validation
+
+on:
+  push:
+    branches:
+      - feature/autonomous-pipeline-composition-clean
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/autonomous-pipeline-composition-clean
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Validate execution and autonomous composition
+        run: |
+          python -m unittest discover -s tools/execution_harness/tests -v
+          python -m unittest discover -s tools/autonomous_pipeline/tests -v
+          report="$(mktemp)"
+          python -m tools.autonomous_pipeline analyze \
+            --model examples/autonomous_pipeline/pipeline.json \
+            --out "$report"
+          python -m tools.autonomous_pipeline verify \
+            --model examples/autonomous_pipeline/pipeline.json \
+            --report "$report"
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+      - name: Commit marker and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .github/validation
+          cat > .github/validation/autonomous-pipeline-green.txt <<EOF
+          validated_source_commit=${GITHUB_SHA}
+          execution=success
+          autonomous_pipeline=success
+          exact_recomputation=success
+          lean_build=success
+          EOF
+          rm .github/workflows/one-shot-autonomous-pipeline-validation.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Validate autonomous pipeline composition'
+          git push origin HEAD:feature/autonomous-pipeline-composition-clean
