@@ -54,6 +54,19 @@ class CertifiabilityCrowdingTests(unittest.TestCase):
             1,
         )
 
+    def test_limited_capacity_is_capacity_death_not_epistemic_death(self) -> None:
+        limited = next(
+            row for row in self.report["strategies"]
+            if row["strategy"] == "limitedCapacitySignal"
+        )
+        self.assertTrue(limited["capacity_death_after_verification"])
+        self.assertFalse(limited["epistemic_death_after_verification"])
+        self.assertEqual(
+            limited["alpha_death_modes_after_verification"], ["capacity"]
+        )
+        self.assertEqual(self.report["aggregate"]["capacity_death_count"], 1)
+        self.assertEqual(self.report["aggregate"]["epistemic_death_count"], 0)
+
     def test_zero_impact_changes_allocation_but_not_alpha(self) -> None:
         benchmark = next(
             row for row in self.report["strategies"]
@@ -65,6 +78,9 @@ class CertifiabilityCrowdingTests(unittest.TestCase):
         )
         self.assertEqual(benchmark["deployable_alpha_change_bps"], 0)
         self.assertFalse(benchmark["certifiability_crowding_paradox"])
+        self.assertEqual(
+            benchmark["alpha_death_modes_after_verification"], []
+        )
 
     def test_structural_law_holds_for_every_strategy(self) -> None:
         self.assertTrue(
@@ -77,7 +93,7 @@ class CertifiabilityCrowdingTests(unittest.TestCase):
 
     def test_tampering_is_rejected(self) -> None:
         tampered = copy.deepcopy(self.report)
-        tampered["aggregate"]["paradox_count"] = 0
+        tampered["aggregate"]["capacity_death_count"] = 0
         with self.assertRaisesRegex(ValidationError, "exact recomputation"):
             verify(self.scenario, tampered)
 
