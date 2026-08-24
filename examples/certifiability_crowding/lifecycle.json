@@ -1,0 +1,36 @@
+{
+  "schema_version": "lfv-certifiability-crowding-v1",
+  "name": "certifiability-allocation-capacity-lifecycle",
+  "strategies": [
+    {
+      "id": "scalableSignal",
+      "economic_alpha_bps": 60,
+      "initial_certifiability_bps": 2500,
+      "evidence_upgrade_bps": 4000,
+      "initial_capital": 1000,
+      "allocator_sensitivity_bps": 5000,
+      "capacity": 10000,
+      "impact_scale_bps": 100
+    },
+    {
+      "id": "capacityConstrainedAlpha",
+      "economic_alpha_bps": 40,
+      "initial_certifiability_bps": 2000,
+      "evidence_upgrade_bps": 6000,
+      "initial_capital": 1000,
+      "allocator_sensitivity_bps": 9000,
+      "capacity": 2500,
+      "impact_scale_bps": 100
+    },
+    {
+      "id": "alreadyCrowdedAlpha",
+      "economic_alpha_bps": 25,
+      "initial_certifiability_bps": 3000,
+      "evidence_upgrade_bps": 3000,
+      "initial_capital": 1200,
+      "allocator_sensitivity_bps": 8000,
+      "capacity": 3000,
+      "impact_scale_bps": 100
+    }
+  ]
+}
