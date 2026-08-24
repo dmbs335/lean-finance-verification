@@ -1,11 +1,11 @@
 window.LFV_ACADEMY = {
   "schemaVersion": "lfv-learning-curriculum-v2",
   "title": "Lean Finance Verification Academy",
-  "subtitle": "금융 모델부터 proof-carrying evidence까지",
+  "subtitle": "금융 모델부터 proof-carrying evidence와 certifiable alpha까지",
   "repo": "dmbs335/lean-finance-verification",
   "tracks": [
     {"id":"orientation","label":"0. 전체 지도","description":"프로젝트의 질문, Lean 코드 읽기, 보증 수준을 먼저 잡습니다."},
-    {"id":"finance","label":"1. 금융 모델","description":"게임이론·시장미시구조·제약·동역학·추론·전략 생태계·공급망을 다룹니다."},
+    {"id":"finance","label":"1. 금융 모델","description":"게임이론·시장미시구조·제약·전략 생태계·certifiable alpha와 숨은 투자 위험을 다룹니다."},
     {"id":"backtest","label":"2. Proof-Carrying Backtest","description":"시점 정합성, 계보, 검색 이력, 인증서와 어댑터를 연결합니다."},
     {"id":"epistemic","label":"3. Evidence Separation","description":"관측 동치, 불가능성, cut set, CEGIS, refinement, debt를 학습합니다."},
     {"id":"robust","label":"4. 견고성·확장성","description":"모델 불확실성, trust domain, multi-claim, taxonomy와 symbolic synthesis를 다룹니다."},
@@ -44,11 +44,12 @@ window.LFV_ACADEMY = {
   ],
   "paths": [
     {"id":"fast-tour","label":"90분 빠른 전체 투어","description":"핵심 질문과 end-to-end pipeline을 먼저 잡는 경로입니다.","lessonIds":["project-map","assurance-boundaries","artifact-identity","evidence-equivalence","cutsets-synthesis","workflow-cegis","generated-ci"]},
-    {"id":"finance-models","label":"금융 모델 정주행","description":"형식 검증 이전의 금융·시장 모델 계층을 체계적으로 학습합니다.","lessonIds":["project-map","lean-reading","game-theory","market-microstructure","constraints-dynamics","hidden-state-inference","strategy-ecology","supply-chain"]},
+    {"id":"finance-models","label":"금융 모델 정주행","description":"시장 모델에서 certifiable alpha와 hidden common risk까지 연결합니다.","lessonIds":["project-map","lean-reading","game-theory","market-microstructure","constraints-dynamics","hidden-state-inference","strategy-ecology","supply-chain","certifiable-alpha","fake-alpha","evidence-adjusted-portfolio","certifiability-crowding","epistemic-liquidation"]},
     {"id":"proof-carrying-backtest","label":"Proof-Carrying Backtest","description":"PIT data부터 외부 anchor와 certificate까지 연결합니다.","lessonIds":["project-map","assurance-boundaries","artifact-identity","pit-lineage","committed-search","proof-carrying-certificate","pit-vendor","timestamp-quorum","generated-ci"]},
     {"id":"evidence-theory","label":"Evidence Separation 이론","description":"불가능성 정리에서 최소 증거 합성까지의 formal core입니다.","lessonIds":["lean-reading","evidence-equivalence","non-amplification","cutsets-synthesis","workflow-cegis","trace-refinement","evidence-debt","version-space","connectivity-robustness","multi-claim","taxonomy-symbolic"]},
     {"id":"production-hardening","label":"실제 증거·프라이버시","description":"vendor, provider quorum, selective disclosure, ZK prototype, CI를 다룹니다.","lessonIds":["assurance-boundaries","pit-vendor","timestamp-quorum","selective-receipts","zk-receipts","generated-ci"]},
-    {"id":"researcher","label":"논문·후속 연구 경로","description":"새 원리를 연구하거나 확장하기 위한 고급 경로입니다.","lessonIds":["hidden-state-inference","evidence-equivalence","non-amplification","evidence-debt","version-space","connectivity-robustness","multi-claim","taxonomy-symbolic","generated-ci"]}
+    {"id":"hidden-investment-laws","label":"투자의 숨겨진 법칙","description":"검증 가능한 알파, 가짜 알파, evidence crowding과 liquidation을 한 흐름으로 학습합니다.","lessonIds":["strategy-ecology","evidence-debt","version-space","certifiable-alpha","fake-alpha","evidence-adjusted-portfolio","certifiability-crowding","epistemic-liquidation"]},
+    {"id":"researcher","label":"논문·후속 연구 경로","description":"새 원리를 연구하거나 확장하기 위한 고급 경로입니다.","lessonIds":["hidden-state-inference","evidence-equivalence","non-amplification","evidence-debt","version-space","connectivity-robustness","multi-claim","taxonomy-symbolic","certifiable-alpha","fake-alpha","evidence-adjusted-portfolio","certifiability-crowding","epistemic-liquidation","generated-ci"]}
   ],
   "lessons": []
 };
