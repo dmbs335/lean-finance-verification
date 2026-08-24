@@ -12,8 +12,9 @@ structure EvidenceState where
   deriving Repr
 
 /-- Conventional realized alpha is represented as an integer-scaled excess
-    return in the core research model. -/
-def RealizedAlpha := Int
+    return in the core research model. An abbreviation preserves the complete
+    executable and representational interface of `Int`. -/
+abbrev RealizedAlpha := Int
 
 /-- A conservative certifiable alpha interval. The lower bound is the alpha
     surviving all histories and models represented by the evidence state. -/
