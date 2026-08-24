@@ -1,0 +1,46 @@
+name: Evidence-Conditioned Robust Control CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: evidence-robust-control-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test robust model refinement, evidence actions, and capital gate
+        run: python -m unittest discover -s tools/evidence_robust_control/tests -v
+      - name: Recompute and verify robust-control report
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$(mktemp)"
+          python -m tools.evidence_robust_control analyze \
+            --model examples/evidence_robust_control/voi.json \
+            --out "$report"
+          python -m tools.evidence_robust_control verify \
+            --model examples/evidence_robust_control/voi.json \
+            --report "$report"
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
