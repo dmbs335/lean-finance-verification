@@ -1,0 +1,189 @@
+name: One-shot certificate composition validation
+
+on:
+  push:
+    branches:
+      - feature/certificate-composition-law
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/certificate-composition-law
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Integrate composition module into repository contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          epistemic = Path('LeanFinance/Epistemic.lean')
+          text = epistemic.read_text(encoding='utf-8')
+          line = 'import LeanFinance.Epistemic.CertificateComposition\n'
+          if line not in text:
+              text += line
+              epistemic.write_text(text, encoding='utf-8')
+
+          index = Path('learning-app/index.html')
+          html = index.read_text(encoding='utf-8')
+          if 'data/composition.js' not in html:
+              needle = '<script src="data/curriculum.js"></script>'
+              if needle not in html:
+                  raise SystemExit('curriculum script tag not found')
+              html = html.replace(
+                  needle,
+                  '<script src="data/composition.js"></script>' + needle,
+              )
+          html = html.replace('36개 레슨', '37개 레슨')
+          index.write_text(html, encoding='utf-8')
+
+          meta = Path('learning-app/data/meta.js')
+          raw = meta.read_text(encoding='utf-8').strip()
+          prefix = 'window.LFV_ACADEMY = '
+          if not raw.startswith(prefix) or not raw.endswith(';'):
+              raise SystemExit('unexpected meta.js wrapper')
+          data = json.loads(raw[len(prefix):-1])
+          if not any(area['id'] == 'composition' for area in data['coverageAreas']):
+              data['coverageAreas'].append({
+                  'id': 'composition',
+                  'label': 'Certificate composition',
+                  'paths': [
+                      'LeanFinance/Epistemic/CertificateComposition.lean',
+                      'tools/certificate_composition/',
+                  ],
+              })
+
+          def insert_after(values, anchor, item):
+              if item in values:
+                  return
+              position = values.index(anchor) + 1 if anchor in values else len(values)
+              values.insert(position, item)
+
+          for path in data['paths']:
+              ids = path['lessonIds']
+              if path['id'] == 'evidence-theory':
+                  insert_after(ids, 'multi-claim', 'certificate-composition')
+              elif path['id'] == 'hidden-investment-laws':
+                  insert_after(ids, 'epistemic-event-study', 'certificate-composition')
+              elif path['id'] == 'researcher':
+                  insert_after(ids, 'multi-claim', 'certificate-composition')
+          if not any(path['id'] == 'certificate-composition' for path in data['paths']):
+              data['paths'].append({
+                  'id': 'certificate-composition',
+                  'label': 'Certificate Composition',
+                  'description': 'Local proof에서 global pipeline binding까지 연결합니다.',
+                  'lessonIds': [
+                      'artifact-identity',
+                      'evidence-equivalence',
+                      'multi-claim',
+                      'certificate-composition',
+                      'generated-ci',
+                  ],
+              })
+          meta.write_text(
+              prefix + json.dumps(data, ensure_ascii=False, indent=2) + ';\n',
+              encoding='utf-8',
+          )
+
+          checker = Path('tools/learning_app/check_curriculum.py')
+          source = checker.read_text(encoding='utf-8')
+          replacements = [
+              (
+                  '"learning-app/data/research.js", "learning-app/data/event-study.js",\n',
+                  '"learning-app/data/research.js", "learning-app/data/event-study.js",\n    "learning-app/data/composition.js",\n',
+              ),
+              (
+                  '"event-study", "research-agent", "adapter", "evidence-synth", "workflow-cegis",\n',
+                  '"event-study", "composition", "research-agent", "adapter", "evidence-synth", "workflow-cegis",\n',
+              ),
+              (
+                  '"tools/epistemic_liquidation", "tools/epistemic_event_study",\n    "tools/research_agent",',
+                  '"tools/epistemic_liquidation", "tools/epistemic_event_study",\n    "tools/certificate_composition", "tools/research_agent",',
+              ),
+              (
+                  '"data/research.js","data/event-study.js","data/backtest.js",',
+                  '"data/research.js","data/event-study.js","data/composition.js","data/backtest.js",',
+              ),
+          ]
+          for old, new in replacements:
+              if old not in source:
+                  raise SystemExit(f'curriculum checker patch anchor missing: {old!r}')
+              source = source.replace(old, new, 1)
+          checker.write_text(source, encoding='utf-8')
+
+          readme = Path('learning-app/README.md')
+          text = readme.read_text(encoding='utf-8')
+          text = text.replace(
+              'six tracks, 36 lessons, and nine goal-oriented paths',
+              'six tracks, 37 lessons, and ten goal-oriented paths',
+          )
+          text = text.replace(
+              'preregistered matched event studies, signed evidence infrastructure',
+              'preregistered matched event studies, certificate composition, signed evidence infrastructure',
+          )
+          readme.write_text(text, encoding='utf-8')
+          PY
+      - name: Test exact composition synthesis
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tools/certificate_composition/tests -v
+          first="$(mktemp)"
+          second="$(mktemp)"
+          python -m tools.certificate_composition analyze \
+            --model examples/certificate_composition/research_bundle.json \
+            --out "$first"
+          python -m tools.certificate_composition analyze \
+            --model examples/certificate_composition/research_bundle.json \
+            --out "$second"
+          cmp "$first" "$second"
+          python -m tools.certificate_composition verify \
+            --model examples/certificate_composition/research_bundle.json \
+            --report "$first"
+      - name: Validate learning app
+        run: |
+          python -m tools.learning_app.check_curriculum
+          python -m unittest discover -s tools/learning_app/tests -v
+          node --check learning-app/data/composition.js
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+      - name: Commit validated integration and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add LeanFinance/Epistemic.lean \
+            learning-app/index.html \
+            learning-app/data/meta.js \
+            tools/learning_app/check_curriculum.py \
+            learning-app/README.md
+          validated_tree="$(git write-tree)"
+          mkdir -p .github/validation
+          cat > .github/validation/certificate-composition-green.txt <<EOF
+          validated_source_commit=${GITHUB_SHA}
+          validated_tree=${validated_tree}
+          python=3.12
+          composition_tests=success
+          curriculum=success
+          lean_build=success
+          EOF
+          rm .github/workflows/one-shot-certificate-composition-validation.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Integrate and validate certificate composition law'
+          git push origin HEAD:feature/certificate-composition-law
