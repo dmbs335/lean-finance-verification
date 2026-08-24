@@ -1,0 +1,42 @@
+{
+  "schema_version": "lfv-certifiability-crowding-v1",
+  "name": "certifiability-allocation-capacity-response",
+  "strategies": [
+    {
+      "id": "scalableValue",
+      "economic_alpha_bps": 500,
+      "initial_certifiable_lower_bps": 150,
+      "verified_certifiable_lower_bps": 420,
+      "initial_confidence_bps": 3000,
+      "verified_confidence_bps": 9000,
+      "allocator_capacity_units": 1000,
+      "strategy_capacity_units": 2000,
+      "impact_scale_bps": 500,
+      "description": "Evidence narrows uncertainty but greater allocation consumes part of a scalable edge."
+    },
+    {
+      "id": "limitedCapacitySignal",
+      "economic_alpha_bps": 700,
+      "initial_certifiable_lower_bps": 100,
+      "verified_certifiable_lower_bps": 600,
+      "initial_confidence_bps": 2000,
+      "verified_confidence_bps": 8000,
+      "allocator_capacity_units": 1000,
+      "strategy_capacity_units": 500,
+      "impact_scale_bps": 800,
+      "description": "A strong but capacity-limited edge becomes negative after verification attracts capital."
+    },
+    {
+      "id": "zeroImpactBenchmark",
+      "economic_alpha_bps": 300,
+      "initial_certifiable_lower_bps": 100,
+      "verified_certifiable_lower_bps": 250,
+      "initial_confidence_bps": 2000,
+      "verified_confidence_bps": 9000,
+      "allocator_capacity_units": 1000,
+      "strategy_capacity_units": 1000,
+      "impact_scale_bps": 0,
+      "description": "A zero-impact control where evidence changes allocation but not deployable alpha."
+    }
+  ]
+}
