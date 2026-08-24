@@ -29,9 +29,10 @@ def score
     - Int.ofNat (objective.debtPenalty * strategy.evidence.evidenceDebt)
     + Int.ofNat (objective.robustnessReward * strategy.evidence.robustness)
 
-/-- In the formal prototype, debt monotonicity is represented as an explicit
-    objective assumption. The market calibration problem is intentionally left
-    outside the theorem boundary. -/
+/-- Holding expected return, conventional risk, and evidence robustness fixed,
+    a weakly larger evidence debt cannot improve the declared objective. The
+    conclusion is structural in the supplied objective; whether markets price
+    this dimension remains an empirical question. -/
 theorem higher_debt_reduces_score
     (objective : PortfolioObjective)
     (strategyA strategyB : EvidenceAdjustedStrategy Strategy)
@@ -41,12 +42,34 @@ theorem higher_debt_reduces_score
     (sameRobustness :
       strategyA.evidence.robustness = strategyB.evidence.robustness)
     (higherDebt :
-      strategyB.evidence.evidenceDebt ≥ strategyA.evidence.evidenceDebt)
-    (debtMonotone :
-      objective.debtPenalty * strategyA.evidence.evidenceDebt ≤
-        objective.debtPenalty * strategyB.evidence.evidenceDebt) :
+      strategyB.evidence.evidenceDebt ≥ strategyA.evidence.evidenceDebt) :
     score objective strategyB ≤ score objective strategyA := by
-  simp [score, sameEconomics.1, sameEconomics.2, sameRobustness,
-    Int.ofNat_le.2 debtMonotone]
+  unfold score
+  rw [← sameEconomics.1, ← sameEconomics.2, ← sameRobustness]
+  have debtMonotone :
+      objective.debtPenalty * strategyA.evidence.evidenceDebt ≤
+        objective.debtPenalty * strategyB.evidence.evidenceDebt :=
+    Nat.mul_le_mul_left objective.debtPenalty higherDebt
+  have castDebt :
+      Int.ofNat
+          (objective.debtPenalty * strategyA.evidence.evidenceDebt) ≤
+        Int.ofNat
+          (objective.debtPenalty * strategyB.evidence.evidenceDebt) :=
+    Int.ofNat_le.2 debtMonotone
+  have subDebt :
+      strategyA.expectedReturn
+          - Int.ofNat (objective.riskPenalty * strategyA.risk)
+          - Int.ofNat
+              (objective.debtPenalty * strategyB.evidence.evidenceDebt) ≤
+        strategyA.expectedReturn
+          - Int.ofNat (objective.riskPenalty * strategyA.risk)
+          - Int.ofNat
+              (objective.debtPenalty * strategyA.evidence.evidenceDebt) :=
+    Int.sub_le_sub_left castDebt
+      (strategyA.expectedReturn
+        - Int.ofNat (objective.riskPenalty * strategyA.risk))
+  exact Int.add_le_add_right subDebt
+    (Int.ofNat
+      (objective.robustnessReward * strategyA.evidence.robustness))
 
 end LeanFinance.Portfolio

@@ -1,0 +1,103 @@
+{
+  "schema_version": "lfv-fake-alpha-benchmark-v1",
+  "name": "controlled-fake-alpha-ranking-benchmark",
+  "channels": [
+    {
+      "id": "pitDataReceipt",
+      "cost": 3,
+      "detects": ["futureInformation", "survivorshipBias"],
+      "description": "Point-in-time data and exact universe evidence."
+    },
+    {
+      "id": "searchLedger",
+      "cost": 2,
+      "detects": ["parameterMining"],
+      "description": "Committed complete search history."
+    },
+    {
+      "id": "evaluationContract",
+      "cost": 2,
+      "detects": ["costMutation", "benchmarkSwitching"],
+      "description": "Preregistered cost, benchmark, and metric contract."
+    },
+    {
+      "id": "unifiedResearchAttestation",
+      "cost": 8,
+      "detects": [
+        "futureInformation",
+        "survivorshipBias",
+        "parameterMining",
+        "costMutation",
+        "benchmarkSwitching"
+      ],
+      "description": "One integrated but more expensive research attestation."
+    }
+  ],
+  "experiments": [
+    {
+      "id": "cleanControl",
+      "clean_alpha_bps": 250,
+      "observed_alpha_bps": 250,
+      "distortions": [],
+      "description": "A clean strategy with the largest true alpha."
+    },
+    {
+      "id": "futureLeak",
+      "clean_alpha_bps": 80,
+      "observed_alpha_bps": 580,
+      "distortions": [
+        {"kind": "futureInformation", "inflation_bps": 500}
+      ],
+      "description": "Future information makes a weak strategy appear dominant."
+    },
+    {
+      "id": "survivorshipFiltered",
+      "clean_alpha_bps": 160,
+      "observed_alpha_bps": 460,
+      "distortions": [
+        {"kind": "survivorshipBias", "inflation_bps": 300}
+      ],
+      "description": "Future failures are removed from the historical universe."
+    },
+    {
+      "id": "parameterMine",
+      "clean_alpha_bps": 100,
+      "observed_alpha_bps": 500,
+      "distortions": [
+        {"kind": "parameterMining", "inflation_bps": 400}
+      ],
+      "description": "A hidden search selects an extreme lucky trial."
+    },
+    {
+      "id": "costMutated",
+      "clean_alpha_bps": 120,
+      "observed_alpha_bps": 300,
+      "distortions": [
+        {"kind": "costMutation", "inflation_bps": 180}
+      ],
+      "description": "Transaction costs are reduced after results are observed."
+    },
+    {
+      "id": "benchmarkSwitched",
+      "clean_alpha_bps": 140,
+      "observed_alpha_bps": 360,
+      "distortions": [
+        {"kind": "benchmarkSwitching", "inflation_bps": 220}
+      ],
+      "description": "A favorable benchmark is chosen after evaluation."
+    },
+    {
+      "id": "compoundAttack",
+      "clean_alpha_bps": 60,
+      "observed_alpha_bps": 1660,
+      "distortions": [
+        {"kind": "futureInformation", "inflation_bps": 500},
+        {"kind": "survivorshipBias", "inflation_bps": 300},
+        {"kind": "parameterMining", "inflation_bps": 400},
+        {"kind": "costMutation", "inflation_bps": 180},
+        {"kind": "benchmarkSwitching", "inflation_bps": 220}
+      ],
+      "description": "All declared distortions combine into the strongest apparent alpha."
+    }
+  ]
+}
