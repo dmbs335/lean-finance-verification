@@ -1,0 +1,100 @@
+{
+  "schema_version": "lfv-certificate-composition-v1",
+  "name": "dataset-decision-result-certificate-composition",
+  "components": [
+    {
+      "id": "dataset",
+      "description": "A locally valid data and lineage certificate."
+    },
+    {
+      "id": "decision",
+      "description": "A locally valid strategy-decision certificate."
+    },
+    {
+      "id": "result",
+      "description": "A locally valid result and evaluation certificate."
+    }
+  ],
+  "bindings": [
+    {
+      "id": "dataDecision",
+      "left": "dataset",
+      "right": "decision",
+      "channel_id": "dataDecisionBindingReceipt",
+      "cost": 2,
+      "description": "Binds the exact dataset digest into the decision certificate."
+    },
+    {
+      "id": "decisionResult",
+      "left": "decision",
+      "right": "result",
+      "channel_id": "decisionResultBindingReceipt",
+      "cost": 2,
+      "description": "Binds the exact decision digest into the result certificate."
+    }
+  ],
+  "local_summary_channel": {
+    "id": "localValiditySummary",
+    "cost": 1,
+    "description": "Reports only that every local certificate passed."
+  },
+  "global_bundle_channel": {
+    "id": "globalBundleBinding",
+    "cost": 6,
+    "description": "One integrated attestation over the complete research bundle."
+  },
+  "worlds": [
+    {
+      "id": "matched",
+      "local_claims": {
+        "dataset": true,
+        "decision": true,
+        "result": true
+      },
+      "bindings": {
+        "dataDecision": true,
+        "decisionResult": true
+      },
+      "global_claim": true
+    },
+    {
+      "id": "datasetSubstituted",
+      "local_claims": {
+        "dataset": true,
+        "decision": true,
+        "result": true
+      },
+      "bindings": {
+        "dataDecision": false,
+        "decisionResult": true
+      },
+      "global_claim": false
+    },
+    {
+      "id": "resultRelabeled",
+      "local_claims": {
+        "dataset": true,
+        "decision": true,
+        "result": true
+      },
+      "bindings": {
+        "dataDecision": true,
+        "decisionResult": false
+      },
+      "global_claim": false
+    },
+    {
+      "id": "bothSubstituted",
+      "local_claims": {
+        "dataset": true,
+        "decision": true,
+        "result": true
+      },
+      "bindings": {
+        "dataDecision": false,
+        "decisionResult": false
+      },
+      "global_claim": false
+    }
+  ]
+}
