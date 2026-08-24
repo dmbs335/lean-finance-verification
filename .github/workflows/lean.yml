@@ -51,6 +51,8 @@ jobs:
         run: python -m unittest discover -s tools/fake_alpha_benchmark/tests -v
       - name: Test evidence-adjusted portfolio synthesis
         run: python -m unittest discover -s tools/evidence_portfolio/tests -v
+      - name: Test certifiability-crowding law
+        run: python -m unittest discover -s tools/certifiability_crowding/tests -v
       - name: Test epistemic-liquidation dynamics
         run: python -m unittest discover -s tools/epistemic_liquidation/tests -v
       - name: Test point-in-time data study
