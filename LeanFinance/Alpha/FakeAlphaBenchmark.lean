@@ -55,7 +55,7 @@ def benchmarkInterval
     (experiment : AlphaExperiment)
     (detectedInflation : Nat)
     (state : EvidenceState) : CertifiableAlpha :=
-  { lowerBound := experiment.controlledGroundTruthAlpha
+  { lowerBound := controlledGroundTruthAlpha experiment
     upperBound := correctedAlpha experiment detectedInflation
     state := state }
 
@@ -66,7 +66,7 @@ theorem full_remediation_recovers_clean_alpha
     (detectedInflation : Nat)
     (complete : detectedInflation = totalInflation experiment.distortions) :
     correctedAlpha experiment detectedInflation =
-      experiment.controlledGroundTruthAlpha := by
+      controlledGroundTruthAlpha experiment := by
   simp [correctedAlpha, observedAlpha, controlledGroundTruthAlpha, complete]
 
 /-- Under complete remediation the controlled synthetic interval collapses to
