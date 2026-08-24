@@ -1,0 +1,54 @@
+{
+  "schema_version": "lfv-evidence-adjusted-portfolio-v1",
+  "name": "hidden-common-evidence-risk-selection",
+  "selection_size": 2,
+  "objective": {
+    "raw_risk_penalty": 1,
+    "risk_penalty": 1,
+    "debt_penalty": 20,
+    "robustness_reward": 20,
+    "dependency_penalty": 150
+  },
+  "strategies": [
+    {
+      "id": "vendorValue",
+      "observed_alpha_bps": 520,
+      "certifiable_lower_bps": 420,
+      "risk_units": 120,
+      "evidence_debt": 4,
+      "robustness": 1,
+      "domains": ["vendor-a", "engine-a"],
+      "description": "High observed alpha with weak evidence and vendor-a dependence."
+    },
+    {
+      "id": "vendorMomentum",
+      "observed_alpha_bps": 500,
+      "certifiable_lower_bps": 400,
+      "risk_units": 110,
+      "evidence_debt": 4,
+      "robustness": 1,
+      "domains": ["vendor-a", "engine-b"],
+      "description": "Another high observed-alpha strategy sharing vendor-a."
+    },
+    {
+      "id": "independentTrend",
+      "observed_alpha_bps": 390,
+      "certifiable_lower_bps": 340,
+      "risk_units": 100,
+      "evidence_debt": 1,
+      "robustness": 4,
+      "domains": ["vendor-b", "engine-c"],
+      "description": "Lower headline alpha with stronger and independent evidence."
+    },
+    {
+      "id": "independentQuality",
+      "observed_alpha_bps": 370,
+      "certifiable_lower_bps": 330,
+      "risk_units": 90,
+      "evidence_debt": 1,
+      "robustness": 4,
+      "domains": ["vendor-c", "engine-d"],
+      "description": "Independent evidence domains and a narrow certifiable interval."
+    }
+  ]
+}
