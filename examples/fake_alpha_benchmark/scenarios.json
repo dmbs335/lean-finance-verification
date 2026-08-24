@@ -1,0 +1,112 @@
+{
+  "schema_version": "lfv-fake-alpha-benchmark-v1",
+  "name": "research-integrity-fake-alpha-benchmark",
+  "model_uncertainty_bps": 6,
+  "sampling_uncertainty_bps": 4,
+  "architectures": [
+    {
+      "id": "reportOnly",
+      "channels": ["resultBundle", "rfc3161Anchor"]
+    },
+    {
+      "id": "provenanceOnly",
+      "channels": ["searchLedger", "universeSnapshot", "evaluationContract"]
+    },
+    {
+      "id": "proofCarrying",
+      "channels": [
+        "searchLedger",
+        "dataAccessReceipt",
+        "universeSnapshot",
+        "evaluationContract",
+        "executionReceipt",
+        "resultBundle",
+        "rfc3161Anchor"
+      ]
+    }
+  ],
+  "attacks": [
+    {
+      "id": "futureInformation",
+      "separators": ["dataAccessReceipt"]
+    },
+    {
+      "id": "survivorshipBias",
+      "separators": ["universeSnapshot"]
+    },
+    {
+      "id": "parameterMining",
+      "separators": ["searchLedger", "executionReceipt"]
+    },
+    {
+      "id": "costManipulation",
+      "separators": ["evaluationContract"]
+    },
+    {
+      "id": "benchmarkSwitching",
+      "separators": ["evaluationContract"]
+    },
+    {
+      "id": "hiddenExecution",
+      "separators": ["executionReceipt"]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "cleanStrategy",
+      "attack": null,
+      "economic_alpha_bps": 40,
+      "attack_bias_bps": 0,
+      "model_bias_bps": 5,
+      "sampling_noise_bps": -2
+    },
+    {
+      "id": "futureInformationStrategy",
+      "attack": "futureInformation",
+      "economic_alpha_bps": 40,
+      "attack_bias_bps": 60,
+      "model_bias_bps": 5,
+      "sampling_noise_bps": -2
+    },
+    {
+      "id": "survivorshipStrategy",
+      "attack": "survivorshipBias",
+      "economic_alpha_bps": 30,
+      "attack_bias_bps": 45,
+      "model_bias_bps": 3,
+      "sampling_noise_bps": 2
+    },
+    {
+      "id": "parameterMiningStrategy",
+      "attack": "parameterMining",
+      "economic_alpha_bps": 20,
+      "attack_bias_bps": 80,
+      "model_bias_bps": -4,
+      "sampling_noise_bps": 1
+    },
+    {
+      "id": "costManipulationStrategy",
+      "attack": "costManipulation",
+      "economic_alpha_bps": 35,
+      "attack_bias_bps": 25,
+      "model_bias_bps": 2,
+      "sampling_noise_bps": -3
+    },
+    {
+      "id": "benchmarkSwitchingStrategy",
+      "attack": "benchmarkSwitching",
+      "economic_alpha_bps": 25,
+      "attack_bias_bps": 30,
+      "model_bias_bps": 4,
+      "sampling_noise_bps": 2
+    },
+    {
+      "id": "hiddenExecutionStrategy",
+      "attack": "hiddenExecution",
+      "economic_alpha_bps": 10,
+      "attack_bias_bps": 70,
+      "model_bias_bps": 0,
+      "sampling_noise_bps": 5
+    }
+  ]
+}
