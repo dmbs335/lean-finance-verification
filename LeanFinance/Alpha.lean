@@ -1,4 +1,5 @@
 import LeanFinance.Alpha.Certifiable
+import LeanFinance.Alpha.EconomicDecomposition
 import LeanFinance.Alpha.FakeAlphaBenchmark
 import LeanFinance.Alpha.CertifiabilityCrowding
 import LeanFinance.Alpha.Uncertainty
