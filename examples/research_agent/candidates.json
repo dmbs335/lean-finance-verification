@@ -1,0 +1,95 @@
+{
+  "schema_version": "lfv-research-candidate-batch-v1",
+  "name": "proof-carrying-strategy-candidate-gates",
+  "channel_costs": {
+    "searchLedger": 2,
+    "dataAccessReceipt": 3,
+    "universeSnapshot": 3,
+    "evaluationContract": 2,
+    "executionReceipt": 4,
+    "resultBundle": 1,
+    "rfc3161Anchor": 1
+  },
+  "candidates": [
+    {
+      "id": "certifiableMomentum",
+      "observed_alpha_bps": 85,
+      "attack_cleaned_alpha_bps": 60,
+      "residual_uncertainty_bps": 20,
+      "market_impact_bps": 10,
+      "capacity_haircut_bps": 5,
+      "selected_evidence": [
+        "searchLedger",
+        "dataAccessReceipt",
+        "universeSnapshot",
+        "evaluationContract",
+        "executionReceipt",
+        "resultBundle",
+        "rfc3161Anchor"
+      ],
+      "obligations": [
+        {"id": "futureData", "separators": ["dataAccessReceipt"]},
+        {"id": "hiddenExecution", "separators": ["executionReceipt"]},
+        {"id": "survivorship", "separators": ["universeSnapshot"]}
+      ]
+    },
+    {
+      "id": "futureLeakCandidate",
+      "observed_alpha_bps": 120,
+      "attack_cleaned_alpha_bps": 120,
+      "residual_uncertainty_bps": 20,
+      "market_impact_bps": 5,
+      "capacity_haircut_bps": 5,
+      "selected_evidence": ["resultBundle", "rfc3161Anchor"],
+      "obligations": [
+        {"id": "futureData", "separators": ["dataAccessReceipt"]}
+      ]
+    },
+    {
+      "id": "parameterAndCostCandidate",
+      "observed_alpha_bps": 100,
+      "attack_cleaned_alpha_bps": 70,
+      "residual_uncertainty_bps": 20,
+      "market_impact_bps": 10,
+      "capacity_haircut_bps": 5,
+      "selected_evidence": ["resultBundle"],
+      "obligations": [
+        {
+          "id": "parameterMining",
+          "separators": ["searchLedger", "executionReceipt"]
+        },
+        {"id": "costMutation", "separators": ["evaluationContract"]}
+      ]
+    },
+    {
+      "id": "overcrowdedCandidate",
+      "observed_alpha_bps": 40,
+      "attack_cleaned_alpha_bps": 20,
+      "residual_uncertainty_bps": 10,
+      "market_impact_bps": 8,
+      "capacity_haircut_bps": 5,
+      "selected_evidence": ["searchLedger", "executionReceipt"],
+      "obligations": [
+        {
+          "id": "parameterMining",
+          "separators": ["searchLedger", "executionReceipt"]
+        }
+      ]
+    },
+    {
+      "id": "unobservableCandidate",
+      "observed_alpha_bps": 150,
+      "attack_cleaned_alpha_bps": 100,
+      "residual_uncertainty_bps": 20,
+      "market_impact_bps": 10,
+      "capacity_haircut_bps": 5,
+      "selected_evidence": ["resultBundle"],
+      "obligations": [
+        {
+          "id": "unmodeledHardwareBypass",
+          "separators": ["trustedHardwareReceipt"]
+        }
+      ]
+    }
+  ]
+}
