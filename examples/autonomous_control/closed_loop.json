@@ -1,0 +1,71 @@
+{
+  "schema_version": "lfv-autonomous-control-foundation-v1",
+  "name": "finite-safe-policy-improvement-foundation",
+  "horizon": 2,
+  "minimum_support": 50,
+  "required_improvement": 5,
+  "evaluation_states": ["normal", "stressed", "margin"],
+  "states": [
+    {
+      "id": "normal",
+      "safe": true,
+      "baseline_action": "hold",
+      "proposed_action": "increase",
+      "actions": [
+        {"id": "hold", "count": 500, "reward_lcb": 3, "next_states": ["normal"]},
+        {"id": "increase", "count": 120, "reward_lcb": 9, "next_states": ["normal", "stressed"]},
+        {"id": "reduce", "count": 300, "reward_lcb": 1, "next_states": ["normal"]}
+      ]
+    },
+    {
+      "id": "stressed",
+      "safe": true,
+      "baseline_action": "reduce",
+      "proposed_action": "increase",
+      "actions": [
+        {"id": "hold", "count": 40, "reward_lcb": -3, "next_states": ["stressed", "margin"]},
+        {"id": "increase", "count": 2, "reward_lcb": 12, "next_states": ["margin", "ruin"]},
+        {"id": "reduce", "count": 250, "reward_lcb": 0, "next_states": ["normal", "stressed"]}
+      ]
+    },
+    {
+      "id": "margin",
+      "safe": true,
+      "baseline_action": "reduce",
+      "proposed_action": "hold",
+      "actions": [
+        {"id": "hold", "count": 10, "reward_lcb": -8, "next_states": ["ruin"]},
+        {"id": "increase", "count": 0, "reward_lcb": 20, "next_states": ["ruin"]},
+        {"id": "reduce", "count": 180, "reward_lcb": -1, "next_states": ["stressed"]}
+      ]
+    },
+    {
+      "id": "ruin",
+      "safe": false,
+      "baseline_action": "hold",
+      "proposed_action": "hold",
+      "actions": [
+        {"id": "hold", "count": 0, "reward_lcb": -100, "next_states": ["ruin"]}
+      ]
+    }
+  ],
+  "authority": {
+    "current": "recommend",
+    "improvement_lcb": 6,
+    "effective_sample_size": 200,
+    "minimum_effective_sample_size": 100,
+    "risk_ucb": 30,
+    "risk_budget": 40,
+    "model_shift": false,
+    "operational_breach": false,
+    "capital_caps": {
+      "observe": 0,
+      "shadow": 0,
+      "recommend": 0,
+      "microAutonomy": 10,
+      "boundedAutonomy": 100,
+      "fallback": 0,
+      "revoked": 0
+    }
+  }
+}
