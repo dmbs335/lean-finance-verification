@@ -10,7 +10,6 @@ structure EvidenceActionCertificate (Observation : Type) where
   guarantee :
     ∀ observation,
       postQueryGuarantee ≤ postObservationValue observation
-  deriving Repr
 
 namespace EvidenceActionCertificate
 
