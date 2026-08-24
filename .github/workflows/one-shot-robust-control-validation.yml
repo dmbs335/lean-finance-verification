@@ -1,0 +1,59 @@
+name: One-shot robust control validation
+
+on:
+  push:
+    branches:
+      - feature/evidence-conditioned-robust-control-clean
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/evidence-conditioned-robust-control-clean
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Validate control, statistics, and robust decision layers
+        run: |
+          python -m unittest discover -s tools/autonomous_control/tests -v
+          python -m unittest discover -s tools/policy_monitor/tests -v
+          python -m unittest discover -s tools/evidence_robust_control/tests -v
+          report="$(mktemp)"
+          python -m tools.evidence_robust_control analyze \
+            --model examples/evidence_robust_control/voi.json \
+            --out "$report"
+          python -m tools.evidence_robust_control verify \
+            --model examples/evidence_robust_control/voi.json \
+            --report "$report"
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+      - name: Commit validation marker and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .github/validation
+          cat > .github/validation/evidence-robust-control-green.txt <<EOF
+          validated_source_commit=${GITHUB_SHA}
+          autonomous_control=success
+          policy_monitor=success
+          evidence_robust_control=success
+          exact_recomputation=success
+          lean_build=success
+          EOF
+          rm .github/workflows/one-shot-robust-control-validation.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Validate evidence-conditioned robust control'
+          git push origin HEAD:feature/evidence-conditioned-robust-control-clean
