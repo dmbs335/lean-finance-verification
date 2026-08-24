@@ -8,7 +8,7 @@ from tools.evidence_synth.canonical import canonical_bytes, load_json
 
 from .errors import ValidationError
 
-SCHEMA = "lfv-proof-carrying-research-plan-v2"
+SCHEMA = "lfv-proof-carrying-research-plan-v3"
 
 
 @dataclass(frozen=True)
@@ -18,6 +18,7 @@ class AnalysisPaths:
     evidence_portfolio: Path
     certifiability_crowding: Path
     epistemic_liquidation: Path
+    epistemic_event_study: Path
 
 
 @dataclass(frozen=True)
@@ -29,6 +30,8 @@ class Gates:
     require_all_crowding_laws: bool
     minimum_crowding_paradox_count: int
     minimum_hidden_common_risk_pairs: int
+    require_event_study_acceptance: bool
+    minimum_event_study_average_did_bps: int
 
 
 @dataclass(frozen=True)
@@ -103,7 +106,7 @@ def load_plan(path: Path, repository_root: Path) -> Plan:
     analysis_fields = {
         "fake_alpha_benchmark", "certifiable_alpha_interval",
         "evidence_portfolio", "certifiability_crowding",
-        "epistemic_liquidation",
+        "epistemic_liquidation", "epistemic_event_study",
     }
     if set(analyses_raw) != analysis_fields:
         raise ValidationError("$.analyses: fields do not match analysis schema")
@@ -121,6 +124,8 @@ def load_plan(path: Path, repository_root: Path) -> Plan:
         "require_positive_certifiable_lower_bound",
         "minimum_adjusted_portfolio_gain", "require_all_crowding_laws",
         "minimum_crowding_paradox_count", "minimum_hidden_common_risk_pairs",
+        "require_event_study_acceptance",
+        "minimum_event_study_average_did_bps",
     }
     if set(gates_raw) != gate_fields:
         raise ValidationError("$.gates: fields do not match gate schema")
@@ -152,6 +157,14 @@ def load_plan(path: Path, repository_root: Path) -> Plan:
         minimum_hidden_common_risk_pairs=_natural(
             gates_raw["minimum_hidden_common_risk_pairs"],
             "$.gates.minimum_hidden_common_risk_pairs",
+        ),
+        require_event_study_acceptance=_boolean(
+            gates_raw["require_event_study_acceptance"],
+            "$.gates.require_event_study_acceptance",
+        ),
+        minimum_event_study_average_did_bps=_natural(
+            gates_raw["minimum_event_study_average_did_bps"],
+            "$.gates.minimum_event_study_average_did_bps",
         ),
     )
     return Plan(

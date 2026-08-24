@@ -5,7 +5,7 @@ window.LFV_ACADEMY.lessons.push(...[
     "subtitle":"공통 evidence-domain 충격의 추가 설명력을 matched pretrend/DID gate로 검정합니다.",
     "difficulty":"연구","minutes":40,
     "covers":["event-study"],
-    "prerequisites":["epistemic-liquidation","research-agent-gates"],
+    "prerequisites":["epistemic-liquidation"],
     "outcomes":[
       "실패 domain 노출군과 비노출 대조군을 conventional dimensions로 사전 매칭한다.",
       "pretrend DID와 event DID를 분리하고 gate 실패 시 certificate를 거부한다.",

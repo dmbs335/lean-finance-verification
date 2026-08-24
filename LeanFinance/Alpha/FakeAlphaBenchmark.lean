@@ -1,4 +1,5 @@
 import LeanFinance.Alpha.Certifiable
+import LeanFinance.Alpha.EconomicDecomposition
 
 namespace LeanFinance.Alpha
 
@@ -23,13 +24,19 @@ def totalInflation (distortions : List DistortionAmount) : Nat :=
   distortions.foldl (fun total distortion =>
     total + distortion.inflationBps) 0
 
-/-- The benchmark keeps the distortion-free alpha separate from the observed
-    alpha generated after declared integrity failures. -/
+/-- A controlled synthetic experiment. `cleanAlpha` is the fixture's known
+    distortion-free ground truth. It is not, by itself, a claim that a real
+    strategy's economic expected alpha is known exactly. -/
 structure AlphaExperiment where
   experimentId : String
   cleanAlpha : RealizedAlpha
   distortions : List DistortionAmount
   deriving Repr
+
+/-- Explicit semantic alias used by reports and documentation. -/
+def controlledGroundTruthAlpha
+    (experiment : AlphaExperiment) : RealizedAlpha :=
+  experiment.cleanAlpha
 
 def observedAlpha (experiment : AlphaExperiment) : RealizedAlpha :=
   experiment.cleanAlpha + Int.ofNat (totalInflation experiment.distortions)
@@ -42,26 +49,29 @@ def correctedAlpha
     (detectedInflation : Nat) : RealizedAlpha :=
   observedAlpha experiment - Int.ofNat detectedInflation
 
-/-- A benchmark interval is grounded by the controlled clean alpha and bounded
-    above by the alpha remaining after detected distortions are removed. -/
+/-- A benchmark interval is grounded by the controlled synthetic alpha and
+    bounded above by the alpha remaining after detected inflation is removed. -/
 def benchmarkInterval
     (experiment : AlphaExperiment)
     (detectedInflation : Nat)
     (state : EvidenceState) : CertifiableAlpha :=
-  { lowerBound := experiment.cleanAlpha
+  { lowerBound := controlledGroundTruthAlpha experiment
     upperBound := correctedAlpha experiment detectedInflation
     state := state }
 
-/-- Detecting the complete declared distortion amount recovers the clean alpha. -/
+/-- Detecting the complete declared distortion amount recovers the synthetic
+    fixture's controlled ground truth. -/
 theorem full_remediation_recovers_clean_alpha
     (experiment : AlphaExperiment)
     (detectedInflation : Nat)
     (complete : detectedInflation = totalInflation experiment.distortions) :
-    correctedAlpha experiment detectedInflation = experiment.cleanAlpha := by
-  simp [correctedAlpha, observedAlpha, complete]
+    correctedAlpha experiment detectedInflation =
+      controlledGroundTruthAlpha experiment := by
+  simp [correctedAlpha, observedAlpha, controlledGroundTruthAlpha, complete]
 
-/-- Under complete remediation the controlled certifiable interval collapses to
-    the clean alpha point. -/
+/-- Under complete remediation the controlled synthetic interval collapses to
+    the fixture's known point. Economic, model, and sampling uncertainty remain
+    governed by `EconomicAlphaDecomposition` and `Alpha.Uncertainty`. -/
 theorem full_remediation_collapses_interval
     (experiment : AlphaExperiment)
     (state : EvidenceState) :

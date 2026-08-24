@@ -27,14 +27,22 @@ class EpistemicLiquidationTests(unittest.TestCase):
         path.write_text(json.dumps(raw), encoding="utf-8")
         return temporary, load_scenario(path)
 
-    def test_low_return_correlation_pair_has_hidden_common_risk(self) -> None:
+    def test_low_return_correlation_pair_has_hidden_dependency_risk(self) -> None:
         hidden = [pair for pair in self.report["pairs"] if pair["hidden_common_risk"]]
         self.assertEqual(len(hidden), 1)
+        pair = hidden[0]
         self.assertEqual(
-            {hidden[0]["left"], hidden[0]["right"]},
+            {pair["left"], pair["right"]},
             {"globalValue", "usMomentum"},
         )
-        self.assertEqual(hidden[0]["shared_failed_domains"], ["vendor-a"])
+        self.assertTrue(pair["low_return_correlation"])
+        self.assertTrue(pair["hidden_epistemic_crowding"])
+        self.assertEqual(pair["shared_dependency_domains"], ["vendor-a"])
+        self.assertGreater(pair["dependency_overlap_bps"], 0)
+        self.assertEqual(pair["shared_failed_domains"], ["vendor-a"])
+        self.assertEqual(
+            self.report["aggregate"]["hidden_epistemic_crowding_pairs"], 1
+        )
 
     def test_independent_strategy_avoids_first_round_evidence_withdrawal(self) -> None:
         independent = next(
@@ -43,6 +51,7 @@ class EpistemicLiquidationTests(unittest.TestCase):
         )
         self.assertEqual(independent["evidence_withdrawal_units"], 0)
         self.assertEqual(independent["failed_domains"], [])
+        self.assertNotIn("vendor-a", independent["dependency_domains"])
 
     def test_market_feedback_amplifies_the_initial_evidence_shock(self) -> None:
         aggregate = self.report["aggregate"]
@@ -57,7 +66,7 @@ class EpistemicLiquidationTests(unittest.TestCase):
             self.report["initial_market_impact_bps"],
         )
 
-    def test_removing_the_shared_vendor_shock_removes_epistemic_origin(self) -> None:
+    def test_removing_the_shock_preserves_overlap_but_removes_liquidation(self) -> None:
         temporary, scenario = self._mutated(
             lambda raw: raw.update(shocks=[])
         )
@@ -65,13 +74,16 @@ class EpistemicLiquidationTests(unittest.TestCase):
             report = simulate(scenario)
             self.assertEqual(report["aggregate"]["evidence_withdrawal_units"], 0)
             self.assertEqual(report["aggregate"]["hidden_common_risk_pairs"], 0)
+            self.assertEqual(
+                report["aggregate"]["hidden_epistemic_crowding_pairs"], 1
+            )
             self.assertEqual(report["final_market_impact_bps"], 0)
         finally:
             temporary.cleanup()
 
     def test_tampering_is_rejected(self) -> None:
         tampered = copy.deepcopy(self.report)
-        tampered["aggregate"]["total_withdrawal_units"] = 0
+        tampered["aggregate"]["hidden_epistemic_crowding_pairs"] = 0
         with self.assertRaisesRegex(ValidationError, "exact recomputation"):
             verify(self.scenario, tampered)
 

@@ -1,2 +1,3 @@
 import LeanFinance.ResearchAgent.Workflow
+import LeanFinance.ResearchAgent.Decision
 import LeanFinance.ResearchAgent.Example

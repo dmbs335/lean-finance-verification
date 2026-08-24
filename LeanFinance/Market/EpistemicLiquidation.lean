@@ -84,4 +84,41 @@ theorem shared_positive_shock_synchronizes_liquidation
     positive_evidence_shock_forces_withdrawal
       shock right lossPositive rightSensitivity⟩
 
+/-- Pair-level diagnostic separating conventional return co-movement from
+    overlap in data, model, execution, or evidence-provider domains. -/
+structure EpistemicDependencyPair where
+  returnCorrelationBps : Scalar
+  sharedDependencyCount : Nat
+  deriving Repr, DecidableEq
+
+/-- Historical return correlation is low relative to a declared threshold. -/
+def LowReturnCorrelation
+    (pair : EpistemicDependencyPair)
+    (thresholdBps : Nat) : Prop :=
+  pair.returnCorrelationBps.natAbs ≤ thresholdBps
+
+/-- Hidden epistemic crowding exists when conventional return correlation is low
+    but at least one research-validity dependency is shared. -/
+def HiddenEpistemicCrowding
+    (pair : EpistemicDependencyPair)
+    (thresholdBps : Nat) : Prop :=
+  LowReturnCorrelation pair thresholdBps ∧
+    0 < pair.sharedDependencyCount
+
+/-- The synchronized-liquidation mechanism itself requires no positive return-
+    correlation premise. Return correlation is a diagnostic, while the shared
+    evidence shock and allocator sensitivities drive the modeled withdrawal. -/
+theorem synchronized_liquidation_is_independent_of_return_correlation
+    (pair : EpistemicDependencyPair)
+    (thresholdBps : Nat)
+    (_hiddenCrowding : HiddenEpistemicCrowding pair thresholdBps)
+    (shock : EvidenceShock)
+    (left right : LiquidationParameters)
+    (lossPositive : 0 < shock.confidenceLoss)
+    (leftSensitivity : 0 < left.allocationSensitivity)
+    (rightSensitivity : 0 < right.allocationSensitivity) :
+    SynchronizedLiquidation shock left right :=
+  shared_positive_shock_synchronizes_liquidation
+    shock left right lossPositive leftSensitivity rightSensitivity
+
 end LeanFinance.Market
