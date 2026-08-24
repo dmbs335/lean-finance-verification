@@ -53,11 +53,13 @@ jobs:
         run: python -m unittest discover -s tools/certifiable_alpha_interval/tests -v
       - name: Test evidence-adjusted portfolio synthesis
         run: python -m unittest discover -s tools/evidence_portfolio/tests -v
-      - name: Test certifiability-crowding law
+      - name: Test certifiability-crowding law and alpha-death taxonomy
         run: python -m unittest discover -s tools/certifiability_crowding/tests -v
-      - name: Test epistemic-liquidation dynamics
+      - name: Test epistemic-liquidation dynamics and dependency overlap
         run: python -m unittest discover -s tools/epistemic_liquidation/tests -v
-      - name: Test proof-carrying research agent
+      - name: Test preregistered epistemic event study
+        run: python -m unittest discover -s tools/epistemic_event_study/tests -v
+      - name: Test proof-carrying research agent and candidate gates
         run: python -m unittest discover -s tools/research_agent/tests -v
       - name: Test point-in-time data study
         run: python -m unittest discover -s tools/pit_study/tests -v
