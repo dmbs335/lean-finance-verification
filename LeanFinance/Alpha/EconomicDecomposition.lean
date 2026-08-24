@@ -14,12 +14,13 @@ structure EconomicAlphaDecomposition where
 
 namespace EconomicAlphaDecomposition
 
-/-- The reported estimate before research-process integrity corrections. -/
+/-- The reported estimate before research-process integrity corrections. The
+    attack term is placed last so complete removal has a canonical normal form. -/
 def observedAlpha
     (decomposition : EconomicAlphaDecomposition) : RealizedAlpha :=
-  decomposition.attackBias +
-    (decomposition.economicAlpha +
-      decomposition.modelBias + decomposition.samplingNoise)
+  (decomposition.economicAlpha +
+    (decomposition.modelBias + decomposition.samplingNoise)) +
+      decomposition.attackBias
 
 /-- The estimate after every modeled research-process attack bias has been
     identified and removed. -/
@@ -34,7 +35,7 @@ theorem attack_cleaning_leaves_model_and_sampling_error
     (decomposition : EconomicAlphaDecomposition) :
     decomposition.attackCleanedAlpha =
       decomposition.economicAlpha +
-        decomposition.modelBias + decomposition.samplingNoise := by
+        (decomposition.modelBias + decomposition.samplingNoise) := by
   simp [attackCleanedAlpha, observedAlpha]
 
 /-- Exact recovery of economic alpha additionally requires the remaining model
@@ -45,13 +46,7 @@ theorem exact_economic_alpha_of_zero_residual
       decomposition.modelBias + decomposition.samplingNoise = 0) :
     decomposition.attackCleanedAlpha = decomposition.economicAlpha := by
   rw [attack_cleaning_leaves_model_and_sampling_error]
-  calc
-    decomposition.economicAlpha + decomposition.modelBias +
-        decomposition.samplingNoise =
-      decomposition.economicAlpha +
-        (decomposition.modelBias + decomposition.samplingNoise) := by
-          exact add_assoc _ _ _
-    _ = decomposition.economicAlpha := by simp [residualZero]
+  simp [residualZero]
 
 end EconomicAlphaDecomposition
 
