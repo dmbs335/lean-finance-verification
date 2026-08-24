@@ -18,6 +18,8 @@ REQUIRED_APP_FILES = (
     "learning-app/data/meta.js",
     "learning-app/data/orientation.js",
     "learning-app/data/finance.js",
+    "learning-app/data/alpha.js",
+    "learning-app/data/research.js",
     "learning-app/data/backtest.js",
     "learning-app/data/epistemic.js",
     "learning-app/data/robust.js",
@@ -33,8 +35,9 @@ REQUIRED_APP_FILES = (
 REQUIRED_COVERAGE_IDS = {
     "core", "game-theory", "market", "constraints", "dynamics",
     "inference", "strategy-ecology", "supply-chain", "backtest",
-    "certificate", "epistemic", "generated", "adapter",
-    "evidence-synth", "workflow-cegis", "trace-refinement",
+    "certificate", "epistemic", "generated", "alpha-research",
+    "portfolio-research", "liquidation-research", "research-agent",
+    "adapter", "evidence-synth", "workflow-cegis", "trace-refinement",
     "model-family", "robust-evidence", "multiclaim", "taxonomy",
     "symbolic", "pit-study", "pit-vendor", "external-quorum",
     "selective-receipt", "zk-receipt", "schemas", "examples", "ci",
@@ -48,6 +51,9 @@ REQUIRED_TOOL_DIRS = {
     "tools/trace_refinement", "tools/model_family_synth",
     "tools/robust_evidence", "tools/multiclaim_synth",
     "tools/evidence_taxonomy", "tools/symbolic_evidence",
+    "tools/fake_alpha_benchmark", "tools/certifiable_alpha_interval",
+    "tools/evidence_portfolio", "tools/certifiability_crowding",
+    "tools/epistemic_liquidation", "tools/research_agent",
     "tools/pit_study", "tools/pit_vendor_import", "tools/external_quorum",
     "tools/selective_receipt", "tools/zk_receipt",
 }
@@ -61,7 +67,7 @@ def _json_assignment(path: Path, prefix: str, suffix: str) -> Any:
     raw = path.read_text(encoding="utf-8").strip()
     if not raw.startswith(prefix) or not raw.endswith(suffix):
         raise CurriculumValidationError(
-            f"{path.relative_to(path.parents[2])} has an unexpected data wrapper"
+            f"{path.name} has an unexpected data wrapper"
         )
     payload = raw[len(prefix) : len(raw) - len(suffix)]
     try:
@@ -140,15 +146,10 @@ def _validate_dag(lesson_by_id: dict[str, dict[str, Any]]) -> None:
                 prerequisite in lesson_by_id,
                 f"lesson {lesson_id} has unknown prerequisite {prerequisite}",
             )
-            _require(
-                prerequisite != lesson_id,
-                f"lesson {lesson_id} cannot depend on itself",
-            )
+            _require(prerequisite != lesson_id, f"lesson {lesson_id} cannot depend on itself")
             outgoing[prerequisite].append(lesson_id)
             indegree[lesson_id] += 1
-    queue = deque(
-        sorted(lesson_id for lesson_id, degree in indegree.items() if degree == 0)
-    )
+    queue = deque(sorted(key for key, value in indegree.items() if value == 0))
     visited = 0
     while queue:
         current = queue.popleft()
@@ -166,49 +167,33 @@ def validate_curriculum(repository_root: Path) -> dict[str, Any]:
         _require((repository_root / relative).is_file(), f"missing app file: {relative}")
 
     curriculum = load_curriculum(repository_root)
-    _require(
-        curriculum.get("schemaVersion") == EXPECTED_SCHEMA,
-        f"expected curriculum schema {EXPECTED_SCHEMA}",
-    )
-    _require(
-        curriculum.get("repo") == "dmbs335/lean-finance-verification",
-        "curriculum repo link must target this repository",
-    )
+    _require(curriculum.get("schemaVersion") == EXPECTED_SCHEMA, f"expected curriculum schema {EXPECTED_SCHEMA}")
+    _require(curriculum.get("repo") == "dmbs335/lean-finance-verification", "curriculum repo link must target this repository")
 
     tracks = curriculum.get("tracks")
     coverage_areas = curriculum.get("coverageAreas")
     paths = curriculum.get("paths")
     lessons = curriculum.get("lessons")
-    for value, label in (
-        (tracks, "tracks"), (coverage_areas, "coverageAreas"),
-        (paths, "paths"), (lessons, "lessons"),
-    ):
+    for value, label in ((tracks, "tracks"), (coverage_areas, "coverageAreas"), (paths, "paths"), (lessons, "lessons")):
         _require(isinstance(value, list) and value, f"{label} must be non-empty")
 
     track_ids = [track.get("id") for track in tracks if isinstance(track, dict)]
     _require(len(track_ids) == len(tracks), "every track must be an object with id")
     _require(len(set(track_ids)) == len(track_ids), "track ids must be unique")
-    _require(
-        REQUIRED_TRACK_IDS.issubset(set(track_ids)),
-        f"missing required tracks: {sorted(REQUIRED_TRACK_IDS - set(track_ids))}",
-    )
+    _require(REQUIRED_TRACK_IDS.issubset(set(track_ids)), f"missing required tracks: {sorted(REQUIRED_TRACK_IDS - set(track_ids))}")
 
     coverage_ids = [area.get("id") for area in coverage_areas if isinstance(area, dict)]
-    _require(
-        len(coverage_ids) == len(coverage_areas),
-        "every coverage area must be an object with id",
-    )
+    _require(len(coverage_ids) == len(coverage_areas), "every coverage area must be an object with id")
     _require(len(set(coverage_ids)) == len(coverage_ids), "coverage ids must be unique")
-    _require(
-        REQUIRED_COVERAGE_IDS.issubset(set(coverage_ids)),
-        "curriculum does not cover every required project area",
-    )
+    _require(REQUIRED_COVERAGE_IDS.issubset(set(coverage_ids)), "curriculum does not cover every required project area")
+    for index, area in enumerate(coverage_areas):
+        for path_index, source in enumerate(_require_strings(area.get("paths"), f"coverageAreas[{index}].paths")):
+            _validate_repository_path(repository_root, source, f"coverageAreas[{index}].paths[{path_index}]")
 
-    _require(len(lessons) >= 24, "curriculum must contain at least 24 lessons")
+    _require(len(lessons) >= 30, "curriculum must contain at least 30 lessons")
     lesson_by_id: dict[str, dict[str, Any]] = {}
     represented_coverage: set[str] = set()
     represented_tracks: set[str] = set()
-
     for index, lesson in enumerate(lessons):
         path = f"lessons[{index}]"
         _require(isinstance(lesson, dict), f"{path} must be an object")
@@ -217,30 +202,14 @@ def validate_curriculum(repository_root: Path) -> dict[str, Any]:
         _require(lesson_id not in lesson_by_id, f"duplicate lesson id: {lesson_id}")
         lesson_by_id[lesson_id] = lesson
         for field in ("title", "subtitle", "difficulty", "why"):
-            _require(
-                isinstance(lesson.get(field), str) and lesson[field],
-                f"{path}.{field} must be non-empty",
-            )
-        _require(
-            isinstance(lesson.get("minutes"), int)
-            and not isinstance(lesson["minutes"], bool)
-            and lesson["minutes"] > 0,
-            f"{path}.minutes must be positive",
-        )
-        _require(
-            isinstance(lesson.get("order"), int)
-            and not isinstance(lesson["order"], bool)
-            and lesson["order"] > 0,
-            f"{path}.order must be positive",
-        )
+            _require(isinstance(lesson.get(field), str) and lesson[field], f"{path}.{field} must be non-empty")
+        _require(isinstance(lesson.get("minutes"), int) and not isinstance(lesson["minutes"], bool) and lesson["minutes"] > 0, f"{path}.minutes must be positive")
+        _require(isinstance(lesson.get("order"), int) and not isinstance(lesson["order"], bool) and lesson["order"] > 0, f"{path}.order must be positive")
         track = lesson.get("track")
         _require(track in set(track_ids), f"{path}.track is unknown: {track}")
         represented_tracks.add(track)
         covers = _require_strings(lesson.get("covers"), f"{path}.covers")
-        _require(
-            set(covers).issubset(set(coverage_ids)),
-            f"{path}.covers contains unknown coverage ids",
-        )
+        _require(set(covers).issubset(set(coverage_ids)), f"{path}.covers contains unknown coverage ids")
         represented_coverage.update(covers)
         _require_strings(lesson.get("prerequisites"), f"{path}.prerequisites", allow_empty=True)
         _require_strings(lesson.get("outcomes"), f"{path}.outcomes")
@@ -258,27 +227,15 @@ def validate_curriculum(repository_root: Path) -> dict[str, Any]:
             _validate_repository_path(repository_root, doc, f"{path}.docs[{doc_index}]")
         challenge = lesson.get("challenge")
         _require(isinstance(challenge, dict), f"{path}.challenge must be an object")
-        _require(
-            isinstance(challenge.get("prompt"), str) and challenge["prompt"],
-            f"{path}.challenge.prompt must be non-empty",
-        )
+        _require(isinstance(challenge.get("prompt"), str) and challenge["prompt"], f"{path}.challenge.prompt must be non-empty")
         _validate_question(challenge, f"{path}.challenge", choices_key="options")
         quiz = lesson.get("quiz")
-        _require(
-            isinstance(quiz, list) and len(quiz) >= 2,
-            f"{path}.quiz must contain at least two questions",
-        )
+        _require(isinstance(quiz, list) and len(quiz) >= 2, f"{path}.quiz must contain at least two questions")
         for question_index, question in enumerate(quiz):
             _validate_question(question, f"{path}.quiz[{question_index}]", choices_key="choices")
 
-    _require(
-        represented_tracks == set(track_ids),
-        f"tracks without lessons: {sorted(set(track_ids) - represented_tracks)}",
-    )
-    _require(
-        REQUIRED_COVERAGE_IDS.issubset(represented_coverage),
-        f"coverage areas without lessons: {sorted(REQUIRED_COVERAGE_IDS - represented_coverage)}",
-    )
+    _require(represented_tracks == set(track_ids), f"tracks without lessons: {sorted(set(track_ids) - represented_tracks)}")
+    _require(REQUIRED_COVERAGE_IDS.issubset(represented_coverage), f"coverage areas without lessons: {sorted(REQUIRED_COVERAGE_IDS - represented_coverage)}")
     _validate_dag(lesson_by_id)
 
     path_ids: set[str] = set()
@@ -296,29 +253,21 @@ def validate_curriculum(repository_root: Path) -> dict[str, Any]:
         _require(isinstance(learning_path.get("description"), str) and learning_path["description"], f"{path}.description must be non-empty")
 
     for tool_dir in REQUIRED_TOOL_DIRS:
-        _require(
-            (repository_root / tool_dir).is_dir(),
-            f"learning coverage expects missing tool directory: {tool_dir}",
-        )
+        _require((repository_root / tool_dir).is_dir(), f"learning coverage expects missing tool directory: {tool_dir}")
 
     html = (repository_root / "learning-app" / "index.html").read_text(encoding="utf-8")
-    for asset in (
+    assets = (
         "styles/base.css", "styles/layout.css", "styles/components.css",
-        "data/meta.js", "data/orientation.js", "data/finance.js",
-        "data/backtest.js", "data/epistemic.js", "data/robust.js",
+        "data/meta.js", "data/orientation.js", "data/finance.js", "data/alpha.js",
+        "data/research.js", "data/backtest.js", "data/epistemic.js", "data/robust.js",
         "data/infrastructure.js", "data/curriculum.js", "app/core.js",
         "app/render-a.js", "app/render-b.js", "app/main.js",
-    ):
+    )
+    for asset in assets:
         attribute = "href" if asset.endswith(".css") else "src"
         _require(f'{attribute}="{asset}"' in html, f"index.html must load {asset}")
-    _require(
-        not re.search(r'<(?:script|link)[^>]+https?://', html, re.IGNORECASE),
-        "learning app must not depend on external scripts or styles",
-    )
-    app_js = "\n".join(
-        path.read_text(encoding="utf-8")
-        for path in sorted((repository_root / "learning-app" / "app").glob("*.js"))
-    )
+    _require(not re.search(r'<(?:script|link)[^>]+https?://', html, re.IGNORECASE), "learning app must not depend on external scripts or styles")
+    app_js = "\n".join(path.read_text(encoding="utf-8") for path in sorted((repository_root / "learning-app" / "app").glob("*.js")))
     _require("window.LFV_CURRICULUM" in app_js, "browser code must consume the checked curriculum")
     _require("localStorage" in app_js, "browser code must preserve progress without a backend")
 
@@ -334,10 +283,16 @@ def validate_curriculum(repository_root: Path) -> dict[str, Any]:
 
 def main() -> int:
     repository_root = Path(__file__).resolve().parents[2]
-    summary = validate_curriculum(repository_root)
+    try:
+        summary = validate_curriculum(repository_root)
+    except CurriculumValidationError as exc:
+        print(f"error: {exc}")
+        return 2
     print(
-        "learning app validated: "
-        + " ".join(f"{key}={value}" for key, value in summary.items())
+        "learning curriculum valid: "
+        f"lessons={summary['lesson_count']} tracks={summary['track_count']} "
+        f"coverage={summary['coverage_count']} paths={summary['path_count']} "
+        f"sources={summary['source_count']} minutes={summary['minutes']}"
     )
     return 0
 
