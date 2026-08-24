@@ -30,9 +30,9 @@
     <section class="hero" aria-labelledby="hero-title">
       <div>
         <p class="eyebrow">Repository-guided curriculum</p>
-        <h2 id="hero-title">금융 모델부터 최소 증거 합성과 투자의 숨은 위험까지 연결해 학습합니다.</h2>
+        <h2 id="hero-title">금융 모델부터 최소 증거 합성, alpha uncertainty와 proof-gated research까지 연결합니다.</h2>
         <p class="hero-copy">
-          33개 레슨이 Lean source, Python tool, example fixture, 위협 모델을 직접 연결합니다.
+          35개 레슨이 Lean source, Python tool, example fixture, 위협 모델을 직접 연결합니다.
           각 레슨은 “무엇을 증명하는가”와 “무엇은 여전히 가정인가”를 함께 보여줍니다.
         </p>
       </div>
@@ -50,34 +50,25 @@
           <span>학습 경로</span>
           <select id="pathSelect"></select>
         </label>
-
         <label class="field search-field">
           <span>레슨 검색</span>
-          <input id="searchInput" type="search" placeholder="예: certifiable alpha, CEGIS, liquidity" autocomplete="off">
+          <input id="searchInput" type="search" placeholder="예: alpha interval, research agent, CEGIS" autocomplete="off">
           <kbd>/</kbd>
         </label>
-
         <div class="filter-block">
           <span class="field-label">트랙</span>
           <div id="trackFilters" class="chip-row"></div>
         </div>
-
         <div class="sidebar-meta">
-          <div class="progress-label">
-            <span>경로 진행률</span>
-            <strong id="pathProgressText">0 / 0</strong>
-          </div>
+          <div class="progress-label"><span>경로 진행률</span><strong id="pathProgressText">0 / 0</strong></div>
           <div class="progress-bar" aria-hidden="true"><span id="pathProgressBar"></span></div>
         </div>
-
         <nav id="lessonNav" class="lesson-nav" aria-label="레슨 목록"></nav>
-
         <div class="sidebar-actions">
           <button id="exportButton" class="button button-quiet" type="button">진행률 내보내기</button>
           <button id="resetButton" class="button button-danger" type="button">초기화</button>
         </div>
       </aside>
-
       <main id="main" class="main">
         <section id="overviewView" class="view"></section>
         <article id="lessonView" class="view hidden" aria-live="polite"></article>
@@ -86,22 +77,18 @@
       </main>
     </div>
   </div>
-
   <template id="lessonCardTemplate">
     <button class="lesson-card" type="button">
       <span class="lesson-card-index"></span>
-      <span class="lesson-card-copy">
-        <strong></strong>
-        <small></small>
-      </span>
+      <span class="lesson-card-copy"><strong></strong><small></small></span>
       <span class="lesson-card-status" aria-hidden="true"></span>
     </button>
   </template>
-
   <script src="data/meta.js"></script>
   <script src="data/orientation.js"></script>
   <script src="data/finance.js"></script>
   <script src="data/alpha.js"></script>
+  <script src="data/research.js"></script>
   <script src="data/backtest.js"></script>
   <script src="data/epistemic.js"></script>
   <script src="data/robust.js"></script>

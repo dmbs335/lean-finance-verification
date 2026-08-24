@@ -21,10 +21,12 @@ python -m tools.research_agent \
 ```
 
 The fixture is expected to finish with `certified-bounded`. That status means
-all four finite, controlled analysis gates passed and their canonical digests
-were bound to the registered plan. It does not certify a real trading strategy,
-real market data, or causal market calibration.
+all five finite, controlled analysis gates passed and their canonical digests
+were bound to the registered plan. In particular, exact attack remediation and
+an acceptably narrow, positive-lower-bound alpha interval are separate gates.
+It does not certify a real trading strategy, real market data, or causal market
+calibration.
 
-Increase `minimum_adjusted_portfolio_gain` above the controlled gain of 280 to
-exercise fail-closed behavior: the agent emits a diagnostic `rejected` report
-and no certificate.
+Decrease `maximum_certifiable_interval_width_bps` below 520 or increase
+`minimum_adjusted_portfolio_gain` above 280 to exercise fail-closed behavior:
+the agent emits a diagnostic `rejected` report and no certificate.

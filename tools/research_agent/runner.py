@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
+from tools.certifiable_alpha_interval.model import load_problem as load_alpha_interval
+from tools.certifiable_alpha_interval.solver import solve as solve_alpha_interval
 from tools.certifiability_crowding.model import load_scenario as load_crowding
 from tools.certifiability_crowding.simulator import simulate as simulate_crowding
 from tools.epistemic_liquidation.model import load_scenario as load_liquidation
@@ -16,9 +18,9 @@ from tools.fake_alpha_benchmark.solver import solve as solve_fake_alpha
 from .errors import ValidationError
 from .model import Plan
 
-REPORT_SCHEMA = "lfv-proof-carrying-research-agent-report-v1"
+REPORT_SCHEMA = "lfv-proof-carrying-research-agent-report-v2"
 STAGES = [
-    "registered", "alphaAudited", "portfolioSelected",
+    "registered", "alphaAudited", "alphaBounded", "portfolioSelected",
     "crowdingStressed", "liquidationStressed", "certified",
 ]
 
@@ -30,6 +32,9 @@ def _digest(value: Any) -> str:
 def run(plan: Plan) -> dict[str, Any]:
     fake_alpha = solve_fake_alpha(
         load_benchmark(plan.analyses.fake_alpha_benchmark)
+    )
+    alpha_interval = solve_alpha_interval(
+        load_alpha_interval(plan.analyses.certifiable_alpha_interval)
     )
     portfolio = solve_portfolio(
         load_portfolio(plan.analyses.evidence_portfolio)
@@ -46,11 +51,20 @@ def run(plan: Plan) -> dict[str, Any]:
         evaluation["exact_recovery"]
         for evaluation in selected_alpha["evaluations"]
     )
-    alpha_gate = (
-        exact_recovery
-        if plan.gates.require_exact_alpha_recovery
-        else True
+    alpha_gate = exact_recovery if plan.gates.require_exact_alpha_recovery else True
+
+    selected_interval = alpha_interval["selected"]
+    interval_lower, interval_upper = selected_interval["interval_bps"]
+    interval_width = selected_interval["interval_width_bps"]
+    positive_lower = interval_lower > 0
+    alpha_interval_gate = (
+        interval_width <= plan.gates.maximum_certifiable_interval_width_bps
+        and (
+            positive_lower
+            or not plan.gates.require_positive_certifiable_lower_bound
+        )
     )
+
     portfolio_gain = portfolio["adjusted_optimum_score_gain"]
     portfolio_gate = (
         portfolio_gain >= plan.gates.minimum_adjusted_portfolio_gain
@@ -72,6 +86,20 @@ def run(plan: Plan) -> dict[str, Any]:
             "exact_recovery": exact_recovery,
             "selected_channels": selected_alpha["channels"],
             "selected_cost": selected_alpha["cost"],
+        },
+        "alpha_interval": {
+            "passed": alpha_interval_gate,
+            "selected_channels": selected_interval["channels"],
+            "selected_cost": selected_interval["cost"],
+            "interval_bps": [interval_lower, interval_upper],
+            "interval_width_bps": interval_width,
+            "maximum_width_bps": (
+                plan.gates.maximum_certifiable_interval_width_bps
+            ),
+            "positive_lower_bound": positive_lower,
+            "positive_lower_bound_required": (
+                plan.gates.require_positive_certifiable_lower_bound
+            ),
         },
         "portfolio": {
             "passed": portfolio_gate,
@@ -97,6 +125,7 @@ def run(plan: Plan) -> dict[str, Any]:
     all_pass = all(gate["passed"] for gate in gates.values())
     artifact_digests = {
         "fake_alpha": _digest(fake_alpha),
+        "alpha_interval": _digest(alpha_interval),
         "portfolio": _digest(portfolio),
         "crowding": _digest(crowding),
         "liquidation": _digest(liquidation),
@@ -116,8 +145,9 @@ def run(plan: Plan) -> dict[str, Any]:
                 "artifact_sha256": artifact_digests,
                 "completed_stages": STAGES,
                 "residual_boundaries": [
-                    "finite declared distortions and strategy candidates",
-                    "declared portfolio governance weights",
+                    "finite declared distortions, models, and strategies",
+                    "declared statistical/model alpha envelopes",
+                    "declared deployment-cost and portfolio-governance inputs",
                     "controlled allocation, capacity, and impact equations",
                     "no claim of real-market causal calibration",
                 ],
