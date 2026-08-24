@@ -8,12 +8,13 @@ from tools.evidence_synth.canonical import canonical_bytes, load_json
 
 from .errors import ValidationError
 
-SCHEMA = "lfv-proof-carrying-research-plan-v1"
+SCHEMA = "lfv-proof-carrying-research-plan-v2"
 
 
 @dataclass(frozen=True)
 class AnalysisPaths:
     fake_alpha_benchmark: Path
+    certifiable_alpha_interval: Path
     evidence_portfolio: Path
     certifiability_crowding: Path
     epistemic_liquidation: Path
@@ -22,6 +23,8 @@ class AnalysisPaths:
 @dataclass(frozen=True)
 class Gates:
     require_exact_alpha_recovery: bool
+    maximum_certifiable_interval_width_bps: int
+    require_positive_certifiable_lower_bound: bool
     minimum_adjusted_portfolio_gain: int
     require_all_crowding_laws: bool
     minimum_crowding_paradox_count: int
@@ -98,8 +101,9 @@ def load_plan(path: Path, repository_root: Path) -> Plan:
 
     analyses_raw = _object(raw.get("analyses"), "$.analyses")
     analysis_fields = {
-        "fake_alpha_benchmark", "evidence_portfolio",
-        "certifiability_crowding", "epistemic_liquidation",
+        "fake_alpha_benchmark", "certifiable_alpha_interval",
+        "evidence_portfolio", "certifiability_crowding",
+        "epistemic_liquidation",
     }
     if set(analyses_raw) != analysis_fields:
         raise ValidationError("$.analyses: fields do not match analysis schema")
@@ -112,9 +116,11 @@ def load_plan(path: Path, repository_root: Path) -> Plan:
 
     gates_raw = _object(raw.get("gates"), "$.gates")
     gate_fields = {
-        "require_exact_alpha_recovery", "minimum_adjusted_portfolio_gain",
-        "require_all_crowding_laws", "minimum_crowding_paradox_count",
-        "minimum_hidden_common_risk_pairs",
+        "require_exact_alpha_recovery",
+        "maximum_certifiable_interval_width_bps",
+        "require_positive_certifiable_lower_bound",
+        "minimum_adjusted_portfolio_gain", "require_all_crowding_laws",
+        "minimum_crowding_paradox_count", "minimum_hidden_common_risk_pairs",
     }
     if set(gates_raw) != gate_fields:
         raise ValidationError("$.gates: fields do not match gate schema")
@@ -122,6 +128,14 @@ def load_plan(path: Path, repository_root: Path) -> Plan:
         require_exact_alpha_recovery=_boolean(
             gates_raw["require_exact_alpha_recovery"],
             "$.gates.require_exact_alpha_recovery",
+        ),
+        maximum_certifiable_interval_width_bps=_natural(
+            gates_raw["maximum_certifiable_interval_width_bps"],
+            "$.gates.maximum_certifiable_interval_width_bps",
+        ),
+        require_positive_certifiable_lower_bound=_boolean(
+            gates_raw["require_positive_certifiable_lower_bound"],
+            "$.gates.require_positive_certifiable_lower_bound",
         ),
         minimum_adjusted_portfolio_gain=_natural(
             gates_raw["minimum_adjusted_portfolio_gain"],

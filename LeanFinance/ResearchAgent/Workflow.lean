@@ -6,6 +6,7 @@ namespace LeanFinance.ResearchAgent
 inductive ResearchStage where
   | registered
   | alphaAudited
+  | alphaBounded
   | portfolioSelected
   | crowdingStressed
   | liquidationStressed
@@ -13,7 +14,7 @@ inductive ResearchStage where
   deriving Repr, DecidableEq
 
 def requiredStages : List ResearchStage :=
-  [.registered, .alphaAudited, .portfolioSelected,
+  [.registered, .alphaAudited, .alphaBounded, .portfolioSelected,
     .crowdingStressed, .liquidationStressed, .certified]
 
 /-- Normalized proof boundary emitted only after the finite analysis gates pass.
@@ -23,24 +24,27 @@ structure BoundedResearchCertificate where
   artifactDigests : List String
   completedStages : List ResearchStage
   alphaAuditPassed : Bool
+  alphaIntervalGatePassed : Bool
   portfolioGatePassed : Bool
   crowdingGatePassed : Bool
   liquidationGatePassed : Bool
   stageOrder : completedStages = requiredStages
   gateProof :
     alphaAuditPassed = true ∧
-      portfolioGatePassed = true ∧
-        crowdingGatePassed = true ∧
-          liquidationGatePassed = true
+      alphaIntervalGatePassed = true ∧
+        portfolioGatePassed = true ∧
+          crowdingGatePassed = true ∧
+            liquidationGatePassed = true
 
 namespace BoundedResearchCertificate
 
 theorem all_analysis_gates_pass
     (certificate : BoundedResearchCertificate) :
     certificate.alphaAuditPassed = true ∧
-      certificate.portfolioGatePassed = true ∧
-        certificate.crowdingGatePassed = true ∧
-          certificate.liquidationGatePassed = true :=
+      certificate.alphaIntervalGatePassed = true ∧
+        certificate.portfolioGatePassed = true ∧
+          certificate.crowdingGatePassed = true ∧
+            certificate.liquidationGatePassed = true :=
   certificate.gateProof
 
 theorem follows_required_stage_order

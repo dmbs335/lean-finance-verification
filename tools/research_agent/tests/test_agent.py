@@ -27,12 +27,17 @@ class ResearchAgentTests(unittest.TestCase):
             self.report["certificate"]["plan_sha256"],
             self.report["plan_sha256"],
         )
+        self.assertIn("alpha_interval", self.report["artifact_sha256"])
 
-    def test_all_four_analysis_gates_pass(self) -> None:
+    def test_all_five_analysis_gates_pass(self) -> None:
         self.assertTrue(all(
             gate["passed"] for gate in self.report["gates"].values()
         ))
         self.assertTrue(self.report["gates"]["alpha_audit"]["exact_recovery"])
+        interval = self.report["gates"]["alpha_interval"]
+        self.assertEqual(interval["interval_bps"], [30, 550])
+        self.assertEqual(interval["interval_width_bps"], 520)
+        self.assertTrue(interval["positive_lower_bound"])
         self.assertEqual(
             self.report["gates"]["portfolio"]["adjusted_score_gain"], 280
         )
@@ -41,7 +46,7 @@ class ResearchAgentTests(unittest.TestCase):
             self.report["gates"]["liquidation"]["hidden_common_risk_pairs"], 1
         )
 
-    def test_failed_gate_refuses_certificate(self) -> None:
+    def test_failed_portfolio_gate_refuses_certificate(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "plan.json"
             raw = json.loads(PLAN.read_text(encoding="utf-8"))
@@ -52,6 +57,17 @@ class ResearchAgentTests(unittest.TestCase):
             self.assertIsNone(report["certificate"])
             self.assertFalse(report["gates"]["portfolio"]["passed"])
             self.assertNotIn("certified", report["completed_stages"])
+
+    def test_too_narrow_alpha_gate_refuses_certificate(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "plan.json"
+            raw = json.loads(PLAN.read_text(encoding="utf-8"))
+            raw["gates"]["maximum_certifiable_interval_width_bps"] = 500
+            path.write_text(json.dumps(raw), encoding="utf-8")
+            report = run(load_plan(path, ROOT))
+            self.assertEqual(report["status"], "rejected")
+            self.assertIsNone(report["certificate"])
+            self.assertFalse(report["gates"]["alpha_interval"]["passed"])
 
     def test_unsafe_analysis_path_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -64,7 +80,7 @@ class ResearchAgentTests(unittest.TestCase):
 
     def test_report_tampering_is_rejected(self) -> None:
         tampered = copy.deepcopy(self.report)
-        tampered["status"] = "rejected"
+        tampered["gates"]["alpha_interval"]["interval_width_bps"] = 0
         with self.assertRaisesRegex(ValidationError, "exact recomputation"):
             verify(self.plan, tampered)
 
