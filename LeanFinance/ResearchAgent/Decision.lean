@@ -41,7 +41,7 @@ theorem advance_requires_integrity
       cases repairable : candidate.repairPossible <;>
         simp [candidateDecision, integrity, repairable] at advanced
   | true =>
-      exact integrity
+      rfl
 
 /-- Machine advancement also requires a positive deployable lower bound. -/
 theorem advance_requires_positive_deployable_lower_bound
