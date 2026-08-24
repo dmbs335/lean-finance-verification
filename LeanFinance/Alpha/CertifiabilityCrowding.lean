@@ -145,6 +145,6 @@ theorem capacity_death_does_not_imply_epistemic_death
       CapacityDeath economicAlpha response evidenceConfidence) :
     ¬ EpistemicDeath certifiableLower := by
   intro epistemicDead
-  exact (not_le_of_gt certifiablePositive) epistemicDead
+  exact (Int.not_lt_of_ge epistemicDead) certifiablePositive
 
 end LeanFinance.Alpha
