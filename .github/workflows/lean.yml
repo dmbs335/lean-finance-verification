@@ -108,9 +108,9 @@ jobs:
               --evidence-model "$out/evidence-model.canonical.json" \
               --synthesis "$out/global-synthesis.canonical.json" \
               --repair-synthesis "$out/repair-synthesis.canonical.json" \
-              --workflow-lean "$out/Search.lean" \
-              --evidence-lean "$out/Evidence.lean" \
-              --bridge-lean "$out/CEGIS.lean"
+              --workflow-lean "$out/WorkflowSearch.lean" \
+              --evidence-lean "$out/WorkflowEvidence.lean" \
+              --bridge-lean "$out/WorkflowCEGIS.lean"
           }
           generate "$first"
           generate "$second"
@@ -119,15 +119,15 @@ jobs:
             evidence-model.canonical.json \
             global-synthesis.canonical.json \
             repair-synthesis.canonical.json \
-            Search.lean \
-            Evidence.lean \
-            CEGIS.lean
+            WorkflowSearch.lean \
+            WorkflowEvidence.lean \
+            WorkflowCEGIS.lean
           do
             cmp "$first/$artifact" "$second/$artifact"
           done
-          cmp "$first/Search.lean" LeanFinance/Generated/WorkflowSearch.lean
-          cmp "$first/Evidence.lean" LeanFinance/Generated/WorkflowEvidence.lean
-          cmp "$first/CEGIS.lean" LeanFinance/Generated/WorkflowCEGIS.lean
+          cmp "$first/WorkflowSearch.lean" LeanFinance/Generated/WorkflowSearch.lean
+          cmp "$first/WorkflowEvidence.lean" LeanFinance/Generated/WorkflowEvidence.lean
+          cmp "$first/WorkflowCEGIS.lean" LeanFinance/Generated/WorkflowCEGIS.lean
           python -m tools.workflow_cegis verify \
             --model examples/workflow_cegis/search_integrity.json \
             --report "$first/report.canonical.json"
