@@ -1,3 +1,4 @@
 import LeanFinance.Execution.OrderLifecycle
 import LeanFinance.Execution.Ledger
+import LeanFinance.Execution.AutonomousPipeline
 import LeanFinance.Execution.Example
