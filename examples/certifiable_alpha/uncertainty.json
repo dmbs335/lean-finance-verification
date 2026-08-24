@@ -1,0 +1,21 @@
+{
+  "schema_version": "lfv-certifiable-alpha-interval-v1",
+  "name": "model-attack-deployment-alpha-uncertainty",
+  "models": [
+    {"id": "marketOnly", "lower_bps": 400, "upper_bps": 600},
+    {"id": "multiFactor", "lower_bps": 200, "upper_bps": 400},
+    {"id": "nonlinear", "lower_bps": 150, "upper_bps": 500}
+  ],
+  "distortions": [
+    {"kind": "futureInformation", "maximum_upward_inflation_bps": 300},
+    {"kind": "survivorshipBias", "maximum_upward_inflation_bps": 150},
+    {"kind": "parameterMining", "maximum_upward_inflation_bps": 200}
+  ],
+  "channels": [
+    {"id": "pitDataReceipt", "cost": 3, "detects": ["futureInformation", "survivorshipBias"]},
+    {"id": "searchLedger", "cost": 2, "detects": ["parameterMining"]},
+    {"id": "unifiedResearchAttestation", "cost": 6, "detects": ["futureInformation", "survivorshipBias", "parameterMining"]}
+  ],
+  "deployment_costs": {"minimum_bps": 50, "maximum_bps": 120},
+  "target_maximum_width_bps": 600
+}

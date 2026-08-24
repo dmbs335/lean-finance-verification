@@ -49,6 +49,8 @@ jobs:
         run: python -m unittest discover -s tools/symbolic_evidence/tests -v
       - name: Test fake-alpha benchmark
         run: python -m unittest discover -s tools/fake_alpha_benchmark/tests -v
+      - name: Test certifiable-alpha interval synthesis
+        run: python -m unittest discover -s tools/certifiable_alpha_interval/tests -v
       - name: Test evidence-adjusted portfolio synthesis
         run: python -m unittest discover -s tools/evidence_portfolio/tests -v
       - name: Test certifiability-crowding law
