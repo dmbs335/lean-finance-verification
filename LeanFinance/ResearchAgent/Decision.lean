@@ -36,8 +36,12 @@ theorem advance_requires_integrity
     (advanced :
       candidateDecision candidate = .advanceToHumanReview) :
     candidate.integrityVerified = true := by
-  cases integrity : candidate.integrityVerified <;>
-    simp [candidateDecision, integrity] at advanced ⊢
+  cases integrity : candidate.integrityVerified with
+  | false =>
+      cases repairable : candidate.repairPossible <;>
+        simp [candidateDecision, integrity, repairable] at advanced
+  | true =>
+      exact integrity
 
 /-- Machine advancement also requires a positive deployable lower bound. -/
 theorem advance_requires_positive_deployable_lower_bound
@@ -47,7 +51,8 @@ theorem advance_requires_positive_deployable_lower_bound
     0 < candidate.deployableLowerBoundBps := by
   cases integrity : candidate.integrityVerified with
   | false =>
-      simp [candidateDecision, integrity] at advanced
+      cases repairable : candidate.repairPossible <;>
+        simp [candidateDecision, integrity, repairable] at advanced
   | true =>
       by_cases positive : 0 < candidate.deployableLowerBoundBps
       · exact positive
