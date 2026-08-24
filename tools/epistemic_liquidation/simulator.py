@@ -8,7 +8,7 @@ from tools.evidence_synth.canonical import canonical_bytes
 from .errors import ValidationError
 from .model import Scenario, Strategy
 
-REPORT_SCHEMA = "lfv-epistemic-liquidation-report-v1"
+REPORT_SCHEMA = "lfv-epistemic-liquidation-report-v2"
 
 
 def _shock_map(scenario: Scenario) -> dict[str, int]:
@@ -44,6 +44,19 @@ def _market_impact(
     ) // scenario.market_liquidity_units
 
 
+def _dependency_domains(strategy: Strategy) -> set[str]:
+    return {dependency.domain for dependency in strategy.dependencies}
+
+
+def _dependency_overlap_bps(left: Strategy, right: Strategy) -> int:
+    left_domains = _dependency_domains(left)
+    right_domains = _dependency_domains(right)
+    union = left_domains | right_domains
+    if not union:
+        return 0
+    return (len(left_domains & right_domains) * 10000) // len(union)
+
+
 def simulate(scenario: Scenario) -> dict[str, Any]:
     shocks = _shock_map(scenario)
     first_round: list[dict[str, Any]] = []
@@ -64,6 +77,7 @@ def simulate(scenario: Scenario) -> dict[str, Any]:
         first_round.append(
             {
                 "strategy": strategy.id,
+                "dependency_domains": sorted(_dependency_domains(strategy)),
                 "failed_domains": failed_domains,
                 "evidence_withdrawal_bps": withdrawal_bps,
                 "evidence_withdrawal_units": evidence_withdrawal,
@@ -116,10 +130,19 @@ def simulate(scenario: Scenario) -> dict[str, Any]:
     pairs: list[dict[str, Any]] = []
     for left_index, left in enumerate(final_rows):
         for right in final_rows[left_index + 1 :]:
-            pair = tuple(sorted((left["strategy"], right["strategy"])))
-            correlation = correlation_by_pair.get(pair)
+            pair_key = tuple(sorted((left["strategy"], right["strategy"])))
+            correlation = correlation_by_pair.get(pair_key)
             if correlation is None:
                 continue
+            left_strategy = strategy_by_id[left["strategy"]]
+            right_strategy = strategy_by_id[right["strategy"]]
+            shared_dependencies = sorted(
+                _dependency_domains(left_strategy)
+                & _dependency_domains(right_strategy)
+            )
+            overlap_bps = _dependency_overlap_bps(
+                left_strategy, right_strategy
+            )
             shared_failed = sorted(
                 set(left["failed_domains"]) & set(right["failed_domains"])
             )
@@ -132,16 +155,20 @@ def simulate(scenario: Scenario) -> dict[str, Any]:
                 abs(correlation)
                 <= scenario.low_return_correlation_threshold_bps
             )
+            hidden_crowding = low_return_correlation and bool(shared_dependencies)
             pairs.append(
                 {
                     "left": left["strategy"],
                     "right": right["strategy"],
                     "return_correlation_bps": correlation,
+                    "low_return_correlation": low_return_correlation,
+                    "shared_dependency_domains": shared_dependencies,
+                    "dependency_overlap_bps": overlap_bps,
+                    "hidden_epistemic_crowding": hidden_crowding,
                     "shared_failed_domains": shared_failed,
                     "synchronized_evidence_liquidation": synchronized,
-                    "low_return_correlation": low_return_correlation,
                     "hidden_common_risk": (
-                        synchronized and low_return_correlation
+                        synchronized and hidden_crowding
                     ),
                 }
             )
@@ -170,8 +197,22 @@ def simulate(scenario: Scenario) -> dict[str, Any]:
                 evidence_withdrawal_total + margin_withdrawal_total
             ),
             "feedback_amplification_units": margin_withdrawal_total,
+            "hidden_epistemic_crowding_pairs": sum(
+                1 for pair in pairs
+                if pair["hidden_epistemic_crowding"]
+            ),
             "hidden_common_risk_pairs": sum(
                 1 for pair in pairs if pair["hidden_common_risk"]
+            ),
+        },
+        "interpretation": {
+            "dependency_overlap": (
+                "shared data, model, execution, or evidence domains; it is "
+                "distinct from return correlation"
+            ),
+            "hidden_common_risk": (
+                "low return correlation, shared dependency exposure, and "
+                "synchronized first-round evidence withdrawal"
             ),
         },
     }
