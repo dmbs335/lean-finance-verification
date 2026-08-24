@@ -45,7 +45,13 @@ theorem exact_economic_alpha_of_zero_residual
       decomposition.modelBias + decomposition.samplingNoise = 0) :
     decomposition.attackCleanedAlpha = decomposition.economicAlpha := by
   rw [attack_cleaning_leaves_model_and_sampling_error]
-  omega
+  calc
+    decomposition.economicAlpha + decomposition.modelBias +
+        decomposition.samplingNoise =
+      decomposition.economicAlpha +
+        (decomposition.modelBias + decomposition.samplingNoise) := by
+          exact add_assoc _ _ _
+    _ = decomposition.economicAlpha := by simp [residualZero]
 
 end EconomicAlphaDecomposition
 
