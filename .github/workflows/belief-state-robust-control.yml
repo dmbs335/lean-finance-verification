@@ -1,0 +1,46 @@
+name: Belief-State Robust Control CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: belief-state-control-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test exact belief updates and robust action selection
+        run: python -m unittest discover -s tools/belief_control/tests -v
+      - name: Recompute and verify belief-control report
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$(mktemp)"
+          python -m tools.belief_control analyze \
+            --model examples/belief_control/hidden_regime.json \
+            --out "$report"
+          python -m tools.belief_control verify \
+            --model examples/belief_control/hidden_regime.json \
+            --report "$report"
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
