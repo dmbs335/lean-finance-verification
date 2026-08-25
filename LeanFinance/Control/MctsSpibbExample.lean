@@ -12,26 +12,26 @@ inductive Action where
   deriving Repr, DecidableEq
 
 def safe : Action → Prop
-  | .hold | .increase | .reduce | .query => True
+  | Action.hold | Action.increase | Action.reduce | Action.query => True
 
 def count : Action → Nat
-  | .hold => 500
-  | .increase => 10
-  | .reduce => 20
-  | .query => 120
+  | Action.hold => 500
+  | Action.increase => 10
+  | Action.reduce => 20
+  | Action.query => 120
 
 theorem query_is_spibb_admissible :
-    MctsSpibbAdmissible safe count 50 .hold .query := by
+    MctsSpibbAdmissible safe count 50 Action.hold Action.query := by
   simp [MctsSpibbAdmissible, safe, count]
 
 theorem unsupported_increase_is_not_admissible :
-    ¬ MctsSpibbAdmissible safe count 50 .hold .increase := by
+    ¬ MctsSpibbAdmissible safe count 50 Action.hold Action.increase := by
   simp [MctsSpibbAdmissible, safe, count]
 
 def certificate : MctsSpibbRootCertificate Action :=
-  { baseline := .hold
-    proposal := .query
-    selected := .query
+  { baseline := Action.hold
+    proposal := Action.query
+    selected := Action.query
     safe := safe
     count := count
     minimumCount := 50
@@ -45,11 +45,11 @@ theorem controlled_query_is_safe : safe certificate.proposal :=
   certificate.proposal_is_safe
 
 theorem exact_margin_preserves_query :
-    gateMctsRootAction .hold .query 1 2 1 = .query := by
+    gateMctsRootAction Action.hold Action.query 1 2 1 = Action.query := by
   decide
 
 theorem higher_margin_falls_back_to_hold :
-    gateMctsRootAction .hold .query 1 2 2 = .hold := by
+    gateMctsRootAction Action.hold Action.query 1 2 2 = Action.hold := by
   decide
 
 end LeanFinance.Control.MctsSpibbExample
