@@ -32,8 +32,12 @@ def certificate : ProspectiveBacktestAdmissionCertificate :=
     outcome := outcome
     executedTrialIds := [11, 12]
     selectedTrialId := 11
-    preregistered := by decide
-    outcomeMature := by decide
+    preregistered := by
+      change (10 : Nat) < 20 ∧ 20 ≤ 20 ∧ 20 < 50
+      exact ⟨by decide, by decide, by decide⟩
+    outcomeMature := by
+      change (20 : Nat) = 20 ∧ (50 : Nat) = 50 ∧ 50 ≤ 60
+      exact ⟨rfl, rfl, by decide⟩
     strictPointInTime := rfl
     codeBound := true
     parametersBound := true
