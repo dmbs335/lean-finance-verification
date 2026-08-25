@@ -1,0 +1,65 @@
+name: One-shot belief-state robust control validation
+
+on:
+  push:
+    branches:
+      - feature/belief-state-robust-control
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/belief-state-robust-control
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Validate control, execution, composition, and belief layers
+        run: |
+          python -m unittest discover -s tools/autonomous_control/tests -v
+          python -m unittest discover -s tools/policy_monitor/tests -v
+          python -m unittest discover -s tools/evidence_robust_control/tests -v
+          python -m unittest discover -s tools/execution_harness/tests -v
+          python -m unittest discover -s tools/autonomous_pipeline/tests -v
+          python -m unittest discover -s tools/belief_control/tests -v
+          report="$(mktemp)"
+          python -m tools.belief_control analyze \
+            --model examples/belief_control/hidden_regime.json \
+            --out "$report"
+          python -m tools.belief_control verify \
+            --model examples/belief_control/hidden_regime.json \
+            --report "$report"
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+      - name: Commit marker and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .github/validation
+          cat > .github/validation/belief-state-control-green.txt <<EOF
+          validated_source_commit=${GITHUB_SHA}
+          autonomous_control=success
+          policy_monitor=success
+          robust_control=success
+          execution=success
+          autonomous_pipeline=success
+          belief_control=success
+          exact_recomputation=success
+          lean_build=success
+          EOF
+          rm .github/workflows/one-shot-belief-control-validation.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Validate belief-state robust control'
+          git push origin HEAD:feature/belief-state-robust-control
