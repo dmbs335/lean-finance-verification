@@ -1,0 +1,58 @@
+name: One-shot safe tree policy search validation
+
+on:
+  push:
+    branches:
+      - feature/safe-tree-policy-search-clean
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/safe-tree-policy-search-clean
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test exact support-constrained robust search
+        run: |
+          python -m unittest discover -s tools/safe_tree_search/tests -v
+          report="$(mktemp)"
+          python -m tools.safe_tree_search analyze \
+            --model examples/safe_tree_search/controlled.json \
+            --out "$report"
+          python -m tools.safe_tree_search verify \
+            --model examples/safe_tree_search/controlled.json \
+            --report "$report"
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+      - name: Commit marker and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .github/validation
+          cat > .github/validation/safe-tree-search-green.txt <<EOF
+          validated_source_commit=${GITHUB_SHA}
+          safe_action_filter=success
+          support_constraint=success
+          baseline_totality=success
+          robust_backup=success
+          exact_recomputation=success
+          lean_build=success
+          EOF
+          rm .github/workflows/one-shot-safe-tree-validation.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Validate safe support-constrained tree policy search'
+          git push origin HEAD:feature/safe-tree-policy-search-clean
