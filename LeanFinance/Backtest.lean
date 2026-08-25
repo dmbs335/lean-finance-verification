@@ -14,4 +14,6 @@ import LeanFinance.Backtest.AdapterContract
 import LeanFinance.Backtest.PointInTimeData
 import LeanFinance.Backtest.VendorDataPackage
 import LeanFinance.Backtest.RevisionLeakage
+import LeanFinance.Backtest.ProspectiveAdmission
+import LeanFinance.Backtest.ProspectiveAdmissionExample
 import LeanFinance.Examples.ProofCarryingBacktest

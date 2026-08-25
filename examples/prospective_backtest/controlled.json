@@ -1,0 +1,41 @@
+{
+  "schema_version": "lfv-prospective-backtest-admission-v1",
+  "name": "controlled-prospective-backtest-admission",
+  "plan": {
+    "plan_id": "prospective-alpha-2027",
+    "registered_at": "2026-09-01T00:00:00Z",
+    "first_decision_at": "2027-01-01T00:00:00Z",
+    "outcome_start_at": "2027-01-01T00:00:00Z",
+    "outcome_end_at": "2027-12-31T23:59:59Z",
+    "primary_trial_id": "primary-policy",
+    "registered_trial_ids": ["primary-policy", "baseline-control"],
+    "minimum_result_lcb_bps": 3,
+    "code_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "parameter_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "metric_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "benchmark_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "cost_model_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "universe_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "execution": {
+    "selected_trial_id": "primary-policy",
+    "executed_trial_ids": ["primary-policy", "baseline-control"],
+    "code_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "parameter_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "metric_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "benchmark_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "cost_model_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "universe_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "outcome": {
+    "window_start_at": "2027-01-01T00:00:00Z",
+    "window_end_at": "2027-12-31T23:59:59Z",
+    "available_at": "2028-01-02T00:00:00Z",
+    "strict_pit_verified": true,
+    "data_lineage_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "result_lcb_bps": 5
+  },
+  "search_ledger": {
+    "all_executed_trials_disclosed": true
+  }
+}
