@@ -1,0 +1,53 @@
+{
+  "schema_version": "lfv-autonomous-pipeline-composition-v1",
+  "name": "dataset-state-policy-decision-execution-reconciliation",
+  "artifacts": {
+    "dataset": {
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "input_sha256": [],
+      "local_valid": true
+    },
+    "state": {
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "input_sha256": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+      "local_valid": true
+    },
+    "policy": {
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "input_sha256": [],
+      "local_valid": true
+    },
+    "decision": {
+      "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "input_sha256": [
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ],
+      "local_valid": true
+    },
+    "authorization": {
+      "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "input_sha256": ["dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"],
+      "local_valid": true
+    },
+    "execution": {
+      "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "input_sha256": ["eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
+      "local_valid": true
+    },
+    "reconciliation": {
+      "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "input_sha256": ["ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"],
+      "local_valid": true
+    }
+  },
+  "channels": [
+    {"id": "localValiditySummary", "kind": "local-summary", "cost": 1, "covers": []},
+    {"id": "datasetStateBindingReceipt", "kind": "bridge", "cost": 1, "covers": ["datasetState"]},
+    {"id": "decisionInputBindingReceipt", "kind": "bridge", "cost": 2, "covers": ["stateDecision", "policyDecision"]},
+    {"id": "decisionAuthorizationBindingReceipt", "kind": "bridge", "cost": 1, "covers": ["decisionAuthorization"]},
+    {"id": "authorizationExecutionBindingReceipt", "kind": "bridge", "cost": 1, "covers": ["authorizationExecution"]},
+    {"id": "executionReconciliationBindingReceipt", "kind": "bridge", "cost": 1, "covers": ["executionReconciliation"]},
+    {"id": "globalAutonomousBundle", "kind": "global-bundle", "cost": 9, "covers": []}
+  ]
+}
