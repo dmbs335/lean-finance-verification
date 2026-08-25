@@ -1,0 +1,48 @@
+{
+  "schema_version": "lfv-safe-tree-policy-search-v1",
+  "name": "finite-horizon-safe-spibb-tree-foundation",
+  "root_state": "normal",
+  "horizon": 3,
+  "minimum_support": 50,
+  "discount": {"numerator": 9, "denominator": 10},
+  "states": [
+    {
+      "id": "normal",
+      "baseline_action": "hold",
+      "terminal_value_lcb": 0,
+      "actions": [
+        {"id": "hold", "support_count": 500, "safe": true, "reward_lcb": 1, "next_states": ["normal"]},
+        {"id": "increase", "support_count": 120, "safe": true, "reward_lcb": 7, "next_states": ["normal", "stressed"]},
+        {"id": "leverage", "support_count": 5, "safe": true, "reward_lcb": 20, "next_states": ["normal", "stressed"]},
+        {"id": "jump", "support_count": 100, "safe": false, "reward_lcb": 30, "next_states": ["ruin"]}
+      ]
+    },
+    {
+      "id": "stressed",
+      "baseline_action": "reduce",
+      "terminal_value_lcb": -5,
+      "actions": [
+        {"id": "reduce", "support_count": 250, "safe": true, "reward_lcb": -1, "next_states": ["normal", "stressed"]},
+        {"id": "hold", "support_count": 20, "safe": true, "reward_lcb": 0, "next_states": ["stressed", "margin"]},
+        {"id": "increase", "support_count": 100, "safe": false, "reward_lcb": 8, "next_states": ["margin", "ruin"]}
+      ]
+    },
+    {
+      "id": "margin",
+      "baseline_action": "reduce",
+      "terminal_value_lcb": -20,
+      "actions": [
+        {"id": "reduce", "support_count": 180, "safe": true, "reward_lcb": -3, "next_states": ["stressed"]},
+        {"id": "hold", "support_count": 10, "safe": false, "reward_lcb": 0, "next_states": ["margin", "ruin"]}
+      ]
+    },
+    {
+      "id": "ruin",
+      "baseline_action": "hold",
+      "terminal_value_lcb": -100,
+      "actions": [
+        {"id": "hold", "support_count": 0, "safe": true, "reward_lcb": -100, "next_states": ["ruin"]}
+      ]
+    }
+  ]
+}
