@@ -1,0 +1,48 @@
+name: One-shot rebase belief-state robust control
+
+on:
+  push:
+    branches:
+      - feature/belief-state-robust-control
+
+permissions:
+  contents: write
+
+jobs:
+  rebase-clean:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/belief-state-robust-control
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Reapply only the belief-state layer onto merged main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main feature/belief-state-robust-control
+          git cat-file -e origin/main:LeanFinance/Execution/AutonomousPipeline.lean
+          git switch -C feature/belief-state-robust-control-clean origin/main
+          git checkout origin/feature/belief-state-robust-control -- \
+            .github/workflows/belief-state-robust-control.yml \
+            LeanFinance/Control.lean \
+            LeanFinance/Control/BeliefState.lean \
+            LeanFinance/Control/BeliefExample.lean \
+            docs/BELIEF_STATE_ROBUST_CONTROL.md \
+            examples/belief_control/hidden_regime.json \
+            tools/belief_control/__init__.py \
+            tools/belief_control/__main__.py \
+            tools/belief_control/cli.py \
+            tools/belief_control/errors.py \
+            tools/belief_control/model.py \
+            tools/belief_control/solver.py \
+            tools/belief_control/tests/__init__.py \
+            tools/belief_control/tests/test_belief.py
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Add belief-state robust control foundation'
+          git push --force origin HEAD:feature/belief-state-robust-control-clean
