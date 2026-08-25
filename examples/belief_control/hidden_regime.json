@@ -1,0 +1,33 @@
+{
+  "schema_version": "lfv-belief-state-robust-control-v1",
+  "name": "hidden-regime-belief-update-and-robust-action",
+  "prior_weights": {"bull": 2, "base": 5, "bear": 3},
+  "actions": [
+    {
+      "id": "hold",
+      "execution_cost_bps": 0,
+      "hidden_values_bps": {"bull": 2, "base": 2, "bear": 1}
+    },
+    {
+      "id": "increase",
+      "execution_cost_bps": 1,
+      "hidden_values_bps": {"bull": 10, "base": 6, "bear": -10}
+    },
+    {
+      "id": "reduce",
+      "execution_cost_bps": 1,
+      "hidden_values_bps": {"bull": -5, "base": 4, "bear": 9}
+    }
+  ],
+  "observations": [
+    {
+      "id": "stable",
+      "likelihood_weights": {"bull": 4, "base": 2, "bear": 0}
+    },
+    {
+      "id": "stress",
+      "likelihood_weights": {"bull": 0, "base": 1, "bear": 4}
+    }
+  ],
+  "query_cost_bps": 1
+}

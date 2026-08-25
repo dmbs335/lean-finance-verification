@@ -5,5 +5,7 @@ import LeanFinance.Control.BaselinePolicy
 import LeanFinance.Control.Authority
 import LeanFinance.Control.Ambiguity
 import LeanFinance.Control.EvidenceAction
+import LeanFinance.Control.BeliefState
 import LeanFinance.Control.Example
 import LeanFinance.Control.RobustExample
+import LeanFinance.Control.BeliefExample
