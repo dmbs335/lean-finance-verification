@@ -1,0 +1,27 @@
+{
+  "schema_version": "lfv-mcts-spibb-planner-v1",
+  "name": "bounded-mcts-spibb-with-exact-root-gate",
+  "robust_model": "examples/robust_pomdp/two_step.json",
+  "simulations": 128,
+  "exploration_milli": 1400,
+  "minimum_support": 50,
+  "required_root_margin_bps": 1,
+  "baseline_policy": {
+    "uncertain": "hold",
+    "stable": "hold",
+    "stress": "reduce",
+    "terminal": "hold"
+  },
+  "safe_actions": {
+    "uncertain": ["hold", "increase", "reduce", "query"],
+    "stable": ["hold", "increase", "reduce"],
+    "stress": ["hold", "reduce"],
+    "terminal": ["hold"]
+  },
+  "support_counts": {
+    "uncertain": {"hold": 500, "increase": 10, "reduce": 20, "query": 120},
+    "stable": {"hold": 500, "increase": 100, "reduce": 80},
+    "stress": {"hold": 20, "increase": 0, "reduce": 250},
+    "terminal": {"hold": 500}
+  }
+}

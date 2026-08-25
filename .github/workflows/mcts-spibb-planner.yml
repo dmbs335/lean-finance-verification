@@ -1,0 +1,46 @@
+name: MCTS-SPIBB Planner CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: mcts-spibb-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test bounded safe baseline-constrained search
+        run: python -m unittest discover -s tools/mcts_spibb/tests -v
+      - name: Recompute and verify MCTS-SPIBB report
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$(mktemp)"
+          python -m tools.mcts_spibb --repository-root . analyze \
+            --plan examples/mcts_spibb/planner.json \
+            --out "$report"
+          python -m tools.mcts_spibb --repository-root . verify \
+            --plan examples/mcts_spibb/planner.json \
+            --report "$report"
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
