@@ -52,10 +52,18 @@ def queryCertificate : RobustBellmanActionCertificate Model :=
     backup := queryBackup
     valid := by
       intro model _member
-      cases model <;> decide
+      cases model
+      · change 0 < 1 ∧ 0 < 4
+        decide
+      · change 0 < 1 ∧ 0 < 4
+        decide
     sound := by
       intro model _member
-      cases model <;> decide }
+      cases model
+      · change (4 : Int) * 2 ≤ 14
+        decide
+      · change (4 : Int) * 2 ≤ 10
+        decide }
 
 def stateCertificate : RobustBellmanStateCertificate Model Action :=
   { selectedAction := .query
@@ -77,8 +85,8 @@ theorem query_is_the_best_declared_robust_action
   stateCertificate.selected_dominates_every_declared_action action
 
 theorem query_lower_holds_in_the_adverse_model :
-    (queryBackup .adverse).LowerBound 2 :=
-  stateCertificate.selected_lower_holds_for_every_model
-    .adverse (by simp [stateCertificate, queryCertificate])
+    (queryBackup .adverse).LowerBound 2 := by
+  change (4 : Int) * 2 ≤ 10
+  decide
 
 end LeanFinance.Control.RobustBellmanExample
