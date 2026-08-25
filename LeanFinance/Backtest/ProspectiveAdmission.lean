@@ -61,12 +61,18 @@ structure ProspectiveBacktestAdmissionCertificate where
   preregistered : plan.Preregistered
   outcomeMature : outcome.MatureFor plan
   strictPointInTime : outcome.strictPointInTime = true
-  codeBound : Prop
-  parametersBound : Prop
-  metricBound : Prop
-  benchmarkBound : Prop
-  costModelBound : Prop
-  universeBound : Prop
+  codeBound : Bool
+  parametersBound : Bool
+  metricBound : Bool
+  benchmarkBound : Bool
+  costModelBound : Bool
+  universeBound : Bool
+  codeBoundProof : codeBound = true
+  parametersBoundProof : parametersBound = true
+  metricBoundProof : metricBound = true
+  benchmarkBoundProof : benchmarkBound = true
+  costModelBoundProof : costModelBound = true
+  universeBoundProof : universeBound = true
   completeTrialLedger : executedTrialIds = plan.registeredTrialIds
   primaryTrialSelected : selectedTrialId = plan.primaryTrialId
   lowerBoundPasses :
@@ -79,12 +85,12 @@ theorem all_admission_gates
     certificate.plan.Preregistered ∧
       certificate.outcome.MatureFor certificate.plan ∧
         certificate.outcome.strictPointInTime = true ∧
-          certificate.codeBound ∧
-            certificate.parametersBound ∧
-              certificate.metricBound ∧
-                certificate.benchmarkBound ∧
-                  certificate.costModelBound ∧
-                    certificate.universeBound ∧
+          certificate.codeBound = true ∧
+            certificate.parametersBound = true ∧
+              certificate.metricBound = true ∧
+                certificate.benchmarkBound = true ∧
+                  certificate.costModelBound = true ∧
+                    certificate.universeBound = true ∧
                       certificate.executedTrialIds =
                         certificate.plan.registeredTrialIds ∧
                         certificate.selectedTrialId =
@@ -94,12 +100,12 @@ theorem all_admission_gates
   ⟨certificate.preregistered,
     certificate.outcomeMature,
     certificate.strictPointInTime,
-    certificate.codeBound,
-    certificate.parametersBound,
-    certificate.metricBound,
-    certificate.benchmarkBound,
-    certificate.costModelBound,
-    certificate.universeBound,
+    certificate.codeBoundProof,
+    certificate.parametersBoundProof,
+    certificate.metricBoundProof,
+    certificate.benchmarkBoundProof,
+    certificate.costModelBoundProof,
+    certificate.universeBoundProof,
     certificate.completeTrialLedger,
     certificate.primaryTrialSelected,
     certificate.lowerBoundPasses⟩
