@@ -1,0 +1,46 @@
+name: Robust POMDP Bellman CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: robust-pomdp-bellman-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test exact finite-horizon robust Bellman recursion
+        run: python -m unittest discover -s tools/robust_pomdp/tests -v
+      - name: Recompute and verify robust-POMDP report
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$(mktemp)"
+          python -m tools.robust_pomdp analyze \
+            --model examples/robust_pomdp/two_step.json \
+            --out "$report"
+          python -m tools.robust_pomdp verify \
+            --model examples/robust_pomdp/two_step.json \
+            --report "$report"
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false

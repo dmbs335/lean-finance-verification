@@ -1,0 +1,135 @@
+{
+  "schema_version": "lfv-robust-pomdp-bellman-v1",
+  "name": "two-step-evidence-query-under-model-ambiguity",
+  "horizon": 2,
+  "discount": {"numerator": 1, "denominator": 1},
+  "models": ["optimistic", "adverse"],
+  "initial_belief": "uncertain",
+  "beliefs": [
+    {
+      "id": "uncertain",
+      "actions": [
+        {
+          "id": "hold",
+          "execution_cost_bps": 0,
+          "reward_bps": {"optimistic": 1, "adverse": 1},
+          "transitions": {
+            "optimistic": [{"next": "terminal", "weight": 1}],
+            "adverse": [{"next": "terminal", "weight": 1}]
+          }
+        },
+        {
+          "id": "increase",
+          "execution_cost_bps": 1,
+          "reward_bps": {"optimistic": 7, "adverse": -7},
+          "transitions": {
+            "optimistic": [{"next": "terminal", "weight": 1}],
+            "adverse": [{"next": "terminal", "weight": 1}]
+          }
+        },
+        {
+          "id": "reduce",
+          "execution_cost_bps": 1,
+          "reward_bps": {"optimistic": -2, "adverse": 5},
+          "transitions": {
+            "optimistic": [{"next": "terminal", "weight": 1}],
+            "adverse": [{"next": "terminal", "weight": 1}]
+          }
+        },
+        {
+          "id": "query",
+          "execution_cost_bps": 1,
+          "reward_bps": {"optimistic": 0, "adverse": 0},
+          "transitions": {
+            "optimistic": [
+              {"next": "stable", "weight": 3},
+              {"next": "stress", "weight": 1}
+            ],
+            "adverse": [
+              {"next": "stable", "weight": 1},
+              {"next": "stress", "weight": 3}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "stable",
+      "actions": [
+        {
+          "id": "hold",
+          "execution_cost_bps": 0,
+          "reward_bps": {"optimistic": 2, "adverse": 2},
+          "transitions": {
+            "optimistic": [{"next": "terminal", "weight": 1}],
+            "adverse": [{"next": "terminal", "weight": 1}]
+          }
+        },
+        {
+          "id": "increase",
+          "execution_cost_bps": 1,
+          "reward_bps": {"optimistic": 8, "adverse": 6},
+          "transitions": {
+            "optimistic": [{"next": "terminal", "weight": 1}],
+            "adverse": [{"next": "terminal", "weight": 1}]
+          }
+        },
+        {
+          "id": "reduce",
+          "execution_cost_bps": 1,
+          "reward_bps": {"optimistic": -3, "adverse": -1},
+          "transitions": {
+            "optimistic": [{"next": "terminal", "weight": 1}],
+            "adverse": [{"next": "terminal", "weight": 1}]
+          }
+        }
+      ]
+    },
+    {
+      "id": "stress",
+      "actions": [
+        {
+          "id": "hold",
+          "execution_cost_bps": 0,
+          "reward_bps": {"optimistic": 0, "adverse": -1},
+          "transitions": {
+            "optimistic": [{"next": "terminal", "weight": 1}],
+            "adverse": [{"next": "terminal", "weight": 1}]
+          }
+        },
+        {
+          "id": "increase",
+          "execution_cost_bps": 0,
+          "reward_bps": {"optimistic": -5, "adverse": -10},
+          "transitions": {
+            "optimistic": [{"next": "terminal", "weight": 1}],
+            "adverse": [{"next": "terminal", "weight": 1}]
+          }
+        },
+        {
+          "id": "reduce",
+          "execution_cost_bps": 1,
+          "reward_bps": {"optimistic": 5, "adverse": 4},
+          "transitions": {
+            "optimistic": [{"next": "terminal", "weight": 1}],
+            "adverse": [{"next": "terminal", "weight": 1}]
+          }
+        }
+      ]
+    },
+    {
+      "id": "terminal",
+      "actions": [
+        {
+          "id": "hold",
+          "execution_cost_bps": 0,
+          "reward_bps": {"optimistic": 0, "adverse": 0},
+          "transitions": {
+            "optimistic": [{"next": "terminal", "weight": 1}],
+            "adverse": [{"next": "terminal", "weight": 1}]
+          }
+        }
+      ]
+    }
+  ]
+}
