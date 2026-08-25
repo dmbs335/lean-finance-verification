@@ -1,0 +1,46 @@
+name: Prospective Backtest Admission CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: prospective-backtest-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test preregistration, untouched-window maturity, and admission
+        run: python -m unittest discover -s tools/prospective_backtest/tests -v
+      - name: Recompute and verify controlled admission report
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$(mktemp)"
+          python -m tools.prospective_backtest analyze \
+            --package examples/prospective_backtest/controlled.json \
+            --out "$report"
+          python -m tools.prospective_backtest verify \
+            --package examples/prospective_backtest/controlled.json \
+            --report "$report"
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
