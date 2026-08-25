@@ -34,7 +34,7 @@ theorem controlled_mixture_crosses_twenty :
 
 theorem controlled_anytime_monitor_is_eligible :
     certificate.Eligible := by
-  exact ⟨by decide, by decide, by decide, rfl, rfl⟩
+  exact ⟨controlled_mixture_crosses_twenty, by decide, by decide, rfl, rfl⟩
 
 theorem shifted_monitor_is_not_eligible :
     ¬ ({ certificate with modelShift := true }).Eligible := by
