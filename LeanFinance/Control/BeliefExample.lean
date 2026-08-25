@@ -53,7 +53,9 @@ theorem stress_removes_bull :
 
 theorem stable_refines_prior : SupportRefines stableBelief prior := by
   intro hidden supported
-  cases hidden <;> decide
+  cases hidden <;>
+    simp [FiniteBelief.Supported, stableBelief, posterior, prior, kernel]
+      at supported ⊢
 
 def increaseValue : Hidden → Int
   | .bull => 9
@@ -63,19 +65,28 @@ def increaseValue : Hidden → Int
 theorem prior_increase_lower_is_negative_eleven :
     GreatestBeliefLowerBound prior increaseValue (-11) := by
   constructor
-  · intro hidden supported
+  · intro hidden _supported
     cases hidden <;> decide
   · intro candidate lower
-    have witness := lower .bear (by decide)
+    have witness := lower .bear (by
+      simp [FiniteBelief.Supported, prior])
     simpa [increaseValue] using witness
 
 theorem stable_increase_lower_is_five :
     GreatestBeliefLowerBound stableBelief increaseValue 5 := by
   constructor
   · intro hidden supported
-    cases hidden <;> decide
+    cases hidden with
+    | bull => decide
+    | base => decide
+    | bear =>
+        have impossible : False := by
+          simpa [FiniteBelief.Supported, stableBelief, posterior, prior,
+            kernel] using supported
+        exact False.elim impossible
   · intro candidate lower
-    have witness := lower .base (by decide)
+    have witness := lower .base (by
+      simp [FiniteBelief.Supported, stableBelief, posterior, prior, kernel])
     simpa [increaseValue] using witness
 
 theorem stable_observation_raises_increase_lower_bound :
