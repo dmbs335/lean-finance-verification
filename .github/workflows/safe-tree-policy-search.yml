@@ -1,0 +1,46 @@
+name: Safe Tree Policy Search CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: safe-tree-policy-search-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test robust finite-horizon support-constrained search
+        run: python -m unittest discover -s tools/safe_tree_search/tests -v
+      - name: Recompute and verify controlled tree-search report
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$(mktemp)"
+          python -m tools.safe_tree_search analyze \
+            --model examples/safe_tree_search/controlled.json \
+            --out "$report"
+          python -m tools.safe_tree_search verify \
+            --model examples/safe_tree_search/controlled.json \
+            --report "$report"
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
