@@ -46,7 +46,10 @@ theorem accepted_has_all_bindings
               binding.executionAuthorizationDigest ∧
               binding.executionDigest =
                 binding.reconciliationExecutionDigest := by
-  simpa [bound] using accepted
+  simp [bound] at accepted
+  rcases accepted with ⟨⟨⟨⟨⟨hDataset, hState⟩, hPolicy⟩,
+    hDecision⟩, hAuthorization⟩, hExecution⟩
+  exact ⟨hDataset, hState, hPolicy, hDecision, hAuthorization, hExecution⟩
 
 end AutonomousPipelineBinding
 
