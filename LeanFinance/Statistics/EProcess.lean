@@ -16,6 +16,14 @@ def Le (left right : RationalEvidence) : Prop :=
 
 instance : LE RationalEvidence := ⟨Le⟩
 
+/-- Finite rational evidence comparisons are executable because both sides reduce
+    to a decidable natural-number inequality. -/
+instance (left right : RationalEvidence) : Decidable (left ≤ right) := by
+  change Decidable (
+    left.numerator * right.denominator ≤
+      right.numerator * left.denominator)
+  infer_instance
+
 theorem le_iff_cross_multiply
     (left right : RationalEvidence) :
     left ≤ right ↔
