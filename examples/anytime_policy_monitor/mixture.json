@@ -1,0 +1,49 @@
+{
+  "schema_version": "lfv-anytime-policy-monitor-v1",
+  "name": "bounded-mixture-e-process-policy-monitor",
+  "null_mean_bps_max": 0,
+  "reward_bound_bps": 10,
+  "alpha": {"numerator": 1, "denominator": 20},
+  "minimum_observations": 7,
+  "current_authority": "recommend",
+  "risk_ucb": 30,
+  "risk_budget": 40,
+  "model_shift": false,
+  "operational_breach": false,
+  "capital_caps": {
+    "observe": 0,
+    "shadow": 0,
+    "recommend": 0,
+    "microAutonomy": 10,
+    "boundedAutonomy": 100,
+    "fallback": 0,
+    "revoked": 0
+  },
+  "components": [
+    {
+      "id": "lambda-quarter",
+      "bet": {"numerator": 1, "denominator": 4},
+      "mixture_weight": {"numerator": 1, "denominator": 3}
+    },
+    {
+      "id": "lambda-half",
+      "bet": {"numerator": 1, "denominator": 2},
+      "mixture_weight": {"numerator": 1, "denominator": 3}
+    },
+    {
+      "id": "lambda-three-quarters",
+      "bet": {"numerator": 3, "denominator": 4},
+      "mixture_weight": {"numerator": 1, "denominator": 3}
+    }
+  ],
+  "observations": [
+    {"id": "observation-1", "observed_improvement_bps": 10},
+    {"id": "observation-2", "observed_improvement_bps": 10},
+    {"id": "observation-3", "observed_improvement_bps": 10},
+    {"id": "observation-4", "observed_improvement_bps": 10},
+    {"id": "observation-5", "observed_improvement_bps": 10},
+    {"id": "observation-6", "observed_improvement_bps": 10},
+    {"id": "observation-7", "observed_improvement_bps": 10},
+    {"id": "observation-8", "observed_improvement_bps": 10}
+  ]
+}

@@ -1,0 +1,46 @@
+name: Anytime Policy Monitor CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: anytime-policy-monitor-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test exact mixture e-process and authority gates
+        run: python -m unittest discover -s tools/anytime_policy_monitor/tests -v
+      - name: Recompute and verify anytime monitor report
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$(mktemp)"
+          python -m tools.anytime_policy_monitor analyze \
+            --model examples/anytime_policy_monitor/mixture.json \
+            --out "$report"
+          python -m tools.anytime_policy_monitor verify \
+            --model examples/anytime_policy_monitor/mixture.json \
+            --report "$report"
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false

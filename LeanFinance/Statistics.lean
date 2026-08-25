@@ -1,4 +1,6 @@
 import LeanFinance.Statistics.OffPolicy
 import LeanFinance.Statistics.ConfidenceSequence
+import LeanFinance.Statistics.EProcess
 import LeanFinance.Statistics.Promotion
 import LeanFinance.Statistics.Example
+import LeanFinance.Statistics.AnytimeExample
