@@ -35,12 +35,18 @@ def certificate : ProspectiveBacktestAdmissionCertificate :=
     preregistered := by decide
     outcomeMature := by decide
     strictPointInTime := rfl
-    codeBound := True
-    parametersBound := True
-    metricBound := True
-    benchmarkBound := True
-    costModelBound := True
-    universeBound := True
+    codeBound := true
+    parametersBound := true
+    metricBound := true
+    benchmarkBound := true
+    costModelBound := true
+    universeBound := true
+    codeBoundProof := rfl
+    parametersBoundProof := rfl
+    metricBoundProof := rfl
+    benchmarkBoundProof := rfl
+    costModelBoundProof := rfl
+    universeBoundProof := rfl
     completeTrialLedger := rfl
     primaryTrialSelected := rfl
     lowerBoundPasses := by decide }
@@ -49,12 +55,12 @@ theorem controlled_certificate_passes_every_gate :
     certificate.plan.Preregistered ∧
       certificate.outcome.MatureFor certificate.plan ∧
         certificate.outcome.strictPointInTime = true ∧
-          certificate.codeBound ∧
-            certificate.parametersBound ∧
-              certificate.metricBound ∧
-                certificate.benchmarkBound ∧
-                  certificate.costModelBound ∧
-                    certificate.universeBound ∧
+          certificate.codeBound = true ∧
+            certificate.parametersBound = true ∧
+              certificate.metricBound = true ∧
+                certificate.benchmarkBound = true ∧
+                  certificate.costModelBound = true ∧
+                    certificate.universeBound = true ∧
                       certificate.executedTrialIds =
                         certificate.plan.registeredTrialIds ∧
                         certificate.selectedTrialId =
