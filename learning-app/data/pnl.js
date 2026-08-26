@@ -7,7 +7,7 @@ window.LFV_ACADEMY.lessons.push(...[
     "subtitle":"1·2차 risk attribution, non-market PnL, residual과 same-pipeline binding을 하나의 closure certificate로 묶습니다.",
     "difficulty":"연구",
     "minutes":42,
-    "covers":["pnl-explain","formula-contract","composition","backtest"],
+    "covers":["formula-contract","composition","backtest"],
     "prerequisites":["formula-contract","certificate-composition","temporal-noninterference"],
     "outcomes":[
       "GS Quant-style 1·2차 attribution을 local quadratic formula로 해석한다.",
