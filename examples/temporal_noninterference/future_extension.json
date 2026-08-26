@@ -1,0 +1,41 @@
+{
+  "schema_version": "lfv-temporal-noninterference-v1",
+  "name": "future-extension-causal-data-semantics",
+  "cutoff": 6,
+  "query_times": [2, 4, 6],
+  "base_points": [
+    {"id": "p1", "time": 1, "available_at": 1, "value": 100},
+    {"id": "p3", "time": 3, "available_at": 3, "value": 110},
+    {"id": "p5", "time": 5, "available_at": 5, "value": 120}
+  ],
+  "extension_points": [
+    {"id": "futureExtreme", "time": 10, "available_at": 10, "value": 999}
+  ],
+  "transforms": [
+    {
+      "id": "directObservation",
+      "kind": "direct",
+      "expected_noninterfering": true
+    },
+    {
+      "id": "causalForwardFill",
+      "kind": "causal_forward_fill",
+      "expected_noninterfering": true
+    },
+    {
+      "id": "terminalValueFillBug",
+      "kind": "terminal_value_fill",
+      "expected_noninterfering": false
+    },
+    {
+      "id": "twoSidedInterpolation",
+      "kind": "two_sided_linear_interpolation",
+      "expected_noninterfering": false
+    },
+    {
+      "id": "wholeSampleCentering",
+      "kind": "whole_sample_centered",
+      "expected_noninterfering": false
+    }
+  ]
+}
