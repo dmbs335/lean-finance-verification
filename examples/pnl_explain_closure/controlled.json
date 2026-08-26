@@ -1,0 +1,353 @@
+{
+  "schema_version": "lfv-pnl-explain-closure-v1",
+  "name": "controlled-gs-quant-style-pnl-explain-closure",
+  "pnl_unit": "registered-integer-pnl-units",
+  "upstream_reference": {
+    "repository": "goldmansachs/gs-quant",
+    "branch": "master",
+    "commit": "fa9dd42f0677a0d2fb5819fca6e2f67de9458c06",
+    "release": "2.1.6",
+    "module": "gs_quant.backtests.backtest_objects",
+    "symbol": "BackTest.pnl_explain",
+    "coverage_status": "STATIC_REVIEW_THEORY_MAPPED"
+  },
+  "cases": [
+    {
+      "id": "closed-small-residual",
+      "decision_at": 20,
+      "tolerance_units": 2,
+      "expected_status": "CLOSED",
+      "pipeline_binding": {
+        "portfolio_hash": "portfolio-p1",
+        "market_data_before_hash": "market-before-a",
+        "market_data_after_hash": "market-after-b",
+        "model_id": "risk-model-x",
+        "model_version": "v1",
+        "valuation_before": 10,
+        "valuation_after": 20
+      },
+      "factors": [
+        {
+          "id": "delta-gamma",
+          "base_value_units": 1000,
+          "first_sensitivity": 10,
+          "half_second_sensitivity": 2,
+          "market_move": 3,
+          "claimed_first_order_pnl": 30,
+          "claimed_second_order_pnl": 18,
+          "available_at": 20,
+          "binding": {
+            "portfolio_hash": "portfolio-p1",
+            "market_data_before_hash": "market-before-a",
+            "market_data_after_hash": "market-after-b",
+            "model_id": "risk-model-x",
+            "model_version": "v1",
+            "valuation_before": 10,
+            "valuation_after": 20
+          }
+        },
+        {
+          "id": "vega-convexity",
+          "base_value_units": 500,
+          "first_sensitivity": -4,
+          "half_second_sensitivity": 1,
+          "market_move": 2,
+          "claimed_first_order_pnl": -8,
+          "claimed_second_order_pnl": 4,
+          "available_at": 20,
+          "binding": {
+            "portfolio_hash": "portfolio-p1",
+            "market_data_before_hash": "market-before-a",
+            "market_data_after_hash": "market-after-b",
+            "model_id": "risk-model-x",
+            "model_version": "v1",
+            "valuation_before": 10,
+            "valuation_after": 20
+          }
+        }
+      ],
+      "non_market": {
+        "carry": 6,
+        "trades": 5,
+        "cashflows": 10,
+        "transaction_cost": 7,
+        "model_revision": 2
+      },
+      "result": {
+        "realized_pnl": 61,
+        "generated_at": 20,
+        "binding": {
+          "portfolio_hash": "portfolio-p1",
+          "market_data_before_hash": "market-before-a",
+          "market_data_after_hash": "market-after-b",
+          "model_id": "risk-model-x",
+          "model_version": "v1",
+          "valuation_before": 10,
+          "valuation_after": 20
+        }
+      }
+    },
+    {
+      "id": "partial-material-residual",
+      "decision_at": 20,
+      "tolerance_units": 2,
+      "expected_status": "PARTIAL",
+      "pipeline_binding": {
+        "portfolio_hash": "portfolio-p1",
+        "market_data_before_hash": "market-before-a",
+        "market_data_after_hash": "market-after-b",
+        "model_id": "risk-model-x",
+        "model_version": "v1",
+        "valuation_before": 10,
+        "valuation_after": 20
+      },
+      "factors": [
+        {
+          "id": "delta-gamma",
+          "base_value_units": 1000,
+          "first_sensitivity": 10,
+          "half_second_sensitivity": 2,
+          "market_move": 3,
+          "claimed_first_order_pnl": 30,
+          "claimed_second_order_pnl": 18,
+          "available_at": 20,
+          "binding": {
+            "portfolio_hash": "portfolio-p1",
+            "market_data_before_hash": "market-before-a",
+            "market_data_after_hash": "market-after-b",
+            "model_id": "risk-model-x",
+            "model_version": "v1",
+            "valuation_before": 10,
+            "valuation_after": 20
+          }
+        },
+        {
+          "id": "vega-convexity",
+          "base_value_units": 500,
+          "first_sensitivity": -4,
+          "half_second_sensitivity": 1,
+          "market_move": 2,
+          "claimed_first_order_pnl": -8,
+          "claimed_second_order_pnl": 4,
+          "available_at": 20,
+          "binding": {
+            "portfolio_hash": "portfolio-p1",
+            "market_data_before_hash": "market-before-a",
+            "market_data_after_hash": "market-after-b",
+            "model_id": "risk-model-x",
+            "model_version": "v1",
+            "valuation_before": 10,
+            "valuation_after": 20
+          }
+        }
+      ],
+      "non_market": {
+        "carry": 6,
+        "trades": 5,
+        "cashflows": 10,
+        "transaction_cost": 7,
+        "model_revision": 2
+      },
+      "result": {
+        "realized_pnl": 70,
+        "generated_at": 20,
+        "binding": {
+          "portfolio_hash": "portfolio-p1",
+          "market_data_before_hash": "market-before-a",
+          "market_data_after_hash": "market-after-b",
+          "model_id": "risk-model-x",
+          "model_version": "v1",
+          "valuation_before": 10,
+          "valuation_after": 20
+        }
+      }
+    },
+    {
+      "id": "open-substituted-portfolio",
+      "decision_at": 20,
+      "tolerance_units": 2,
+      "expected_status": "OPEN",
+      "pipeline_binding": {
+        "portfolio_hash": "portfolio-p1",
+        "market_data_before_hash": "market-before-a",
+        "market_data_after_hash": "market-after-b",
+        "model_id": "risk-model-x",
+        "model_version": "v1",
+        "valuation_before": 10,
+        "valuation_after": 20
+      },
+      "factors": [
+        {
+          "id": "delta-gamma",
+          "base_value_units": 1000,
+          "first_sensitivity": 10,
+          "half_second_sensitivity": 2,
+          "market_move": 3,
+          "claimed_first_order_pnl": 30,
+          "claimed_second_order_pnl": 18,
+          "available_at": 20,
+          "binding": {
+            "portfolio_hash": "portfolio-substituted",
+            "market_data_before_hash": "market-before-a",
+            "market_data_after_hash": "market-after-b",
+            "model_id": "risk-model-x",
+            "model_version": "v1",
+            "valuation_before": 10,
+            "valuation_after": 20
+          }
+        },
+        {
+          "id": "vega-convexity",
+          "base_value_units": 500,
+          "first_sensitivity": -4,
+          "half_second_sensitivity": 1,
+          "market_move": 2,
+          "claimed_first_order_pnl": -8,
+          "claimed_second_order_pnl": 4,
+          "available_at": 20,
+          "binding": {
+            "portfolio_hash": "portfolio-p1",
+            "market_data_before_hash": "market-before-a",
+            "market_data_after_hash": "market-after-b",
+            "model_id": "risk-model-x",
+            "model_version": "v1",
+            "valuation_before": 10,
+            "valuation_after": 20
+          }
+        }
+      ],
+      "non_market": {
+        "carry": 6,
+        "trades": 5,
+        "cashflows": 10,
+        "transaction_cost": 7,
+        "model_revision": 2
+      },
+      "result": {
+        "realized_pnl": 61,
+        "generated_at": 20,
+        "binding": {
+          "portfolio_hash": "portfolio-p1",
+          "market_data_before_hash": "market-before-a",
+          "market_data_after_hash": "market-after-b",
+          "model_id": "risk-model-x",
+          "model_version": "v1",
+          "valuation_before": 10,
+          "valuation_after": 20
+        }
+      }
+    },
+    {
+      "id": "open-formula-mismatch",
+      "decision_at": 20,
+      "tolerance_units": 2,
+      "expected_status": "OPEN",
+      "pipeline_binding": {
+        "portfolio_hash": "portfolio-p1",
+        "market_data_before_hash": "market-before-a",
+        "market_data_after_hash": "market-after-b",
+        "model_id": "risk-model-x",
+        "model_version": "v1",
+        "valuation_before": 10,
+        "valuation_after": 20
+      },
+      "factors": [
+        {
+          "id": "delta-gamma",
+          "base_value_units": 1000,
+          "first_sensitivity": 10,
+          "half_second_sensitivity": 2,
+          "market_move": 3,
+          "claimed_first_order_pnl": 31,
+          "claimed_second_order_pnl": 18,
+          "available_at": 20,
+          "binding": {
+            "portfolio_hash": "portfolio-p1",
+            "market_data_before_hash": "market-before-a",
+            "market_data_after_hash": "market-after-b",
+            "model_id": "risk-model-x",
+            "model_version": "v1",
+            "valuation_before": 10,
+            "valuation_after": 20
+          }
+        }
+      ],
+      "non_market": {
+        "carry": 0,
+        "trades": 0,
+        "cashflows": 0,
+        "transaction_cost": 0,
+        "model_revision": 0
+      },
+      "result": {
+        "realized_pnl": 49,
+        "generated_at": 20,
+        "binding": {
+          "portfolio_hash": "portfolio-p1",
+          "market_data_before_hash": "market-before-a",
+          "market_data_after_hash": "market-after-b",
+          "model_id": "risk-model-x",
+          "model_version": "v1",
+          "valuation_before": 10,
+          "valuation_after": 20
+        }
+      }
+    },
+    {
+      "id": "open-future-attribution",
+      "decision_at": 20,
+      "tolerance_units": 2,
+      "expected_status": "OPEN",
+      "pipeline_binding": {
+        "portfolio_hash": "portfolio-p1",
+        "market_data_before_hash": "market-before-a",
+        "market_data_after_hash": "market-after-b",
+        "model_id": "risk-model-x",
+        "model_version": "v1",
+        "valuation_before": 10,
+        "valuation_after": 20
+      },
+      "factors": [
+        {
+          "id": "delta-gamma",
+          "base_value_units": 1000,
+          "first_sensitivity": 10,
+          "half_second_sensitivity": 2,
+          "market_move": 3,
+          "claimed_first_order_pnl": 30,
+          "claimed_second_order_pnl": 18,
+          "available_at": 21,
+          "binding": {
+            "portfolio_hash": "portfolio-p1",
+            "market_data_before_hash": "market-before-a",
+            "market_data_after_hash": "market-after-b",
+            "model_id": "risk-model-x",
+            "model_version": "v1",
+            "valuation_before": 10,
+            "valuation_after": 20
+          }
+        }
+      ],
+      "non_market": {
+        "carry": 0,
+        "trades": 0,
+        "cashflows": 0,
+        "transaction_cost": 0,
+        "model_revision": 0
+      },
+      "result": {
+        "realized_pnl": 48,
+        "generated_at": 20,
+        "binding": {
+          "portfolio_hash": "portfolio-p1",
+          "market_data_before_hash": "market-before-a",
+          "market_data_after_hash": "market-after-b",
+          "model_id": "risk-model-x",
+          "model_version": "v1",
+          "valuation_before": 10,
+          "valuation_after": 20
+        }
+      }
+    }
+  ]
+}
