@@ -16,6 +16,8 @@ import LeanFinance.Epistemic.ObservationBoundary
 import LeanFinance.Epistemic.TransitionSeparation
 import LeanFinance.Epistemic.VersionSpace
 import LeanFinance.Epistemic.VersionSpaceExample
+import LeanFinance.Epistemic.ResearchVersionSpace
+import LeanFinance.Epistemic.ResearchVersionSpaceExample
 import LeanFinance.Epistemic.CEGISConvergence
 import LeanFinance.Epistemic.CEGISConvergenceExample
 import LeanFinance.Epistemic.MultiClaim
