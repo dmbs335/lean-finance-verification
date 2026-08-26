@@ -31,8 +31,8 @@ def safeEngine :
     TemporalEngine ControlledData ControlledPrefix ControlledOutput :=
   { causalPrefix := causalPrefix
     run := fun data => { mark := data.pastValue }
-    runFromPrefix := fun _cutoff prefix =>
-      { mark := prefix.pastValue }
+    runFromPrefix := fun _cutoff inputPrefix =>
+      { mark := inputPrefix.pastValue }
     outputPrefix := outputPrefix }
 
 theorem safe_engine_factors :
@@ -49,8 +49,8 @@ def futureSensitiveEngine :
     TemporalEngine ControlledData ControlledPrefix ControlledOutput :=
   { causalPrefix := causalPrefix
     run := fun data => { mark := data.futureValue }
-    runFromPrefix := fun _cutoff prefix =>
-      { mark := prefix.pastValue }
+    runFromPrefix := fun _cutoff inputPrefix =>
+      { mark := inputPrefix.pastValue }
     outputPrefix := outputPrefix }
 
 def baseData : ControlledData :=
@@ -65,7 +65,8 @@ def futureSensitiveCounterexample :
     left := baseData
     right := futureExtendedData
     sameCausalPrefix := rfl
-    differentOutput := by decide }
+    differentOutput := by
+      decide }
 
 theorem future_sensitive_engine_is_not_safe :
     ¬ futureSensitiveEngine.TemporalNoninterference :=
@@ -84,6 +85,6 @@ def lateSameBarObservation : TimedObservation :=
 
 theorem observation_time_does_not_imply_availability :
     ¬ lateSameBarObservation.UsableAt 25 := by
-  decide
+  simp [TimedObservation.UsableAt, lateSameBarObservation]
 
 end LeanFinance.Backtest.TemporalNoninterferenceExample
