@@ -4,7 +4,7 @@
 
 Run `python -m http.server 8000` from the repository root and open `http://localhost:8000/learning-app/`.
 
-The curriculum contains six tracks and 38 lessons. It now spans finance and market models, proof-carrying backtests, temporal noninterference, evidence separation, robust synthesis, certifiable-alpha uncertainty, evidence-adjusted portfolios, certifiability–crowding, epistemic liquidation, preregistered matched event studies, certificate composition, signed evidence infrastructure, privacy receipts, and fail-closed research-agent orchestration.
+The curriculum contains six tracks and 39 lessons. It now spans finance and market models, proof-carrying backtests, temporal noninterference, evidence separation, action-semantics and unified research version spaces, robust synthesis, certifiable-alpha uncertainty, evidence-adjusted portfolios, certifiability–crowding, epistemic liquidation, preregistered matched event studies, certificate composition, signed evidence infrastructure, privacy receipts, and fail-closed research-agent orchestration.
 
 Every lesson states both what the referenced source can prove or mechanically check and what remains an empirical, cryptographic, model-completeness, provider, or operational assumption.
 
