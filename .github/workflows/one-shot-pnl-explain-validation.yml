@@ -39,7 +39,10 @@ jobs:
               needle = '<script src="data/curriculum.js"></script>'
               if needle not in html:
                   raise SystemExit('curriculum script tag not found')
-              html = html.replace(needle, '<script src="data/pnl.js"></script>' + needle)
+              html = html.replace(
+                  needle,
+                  '<script src="data/pnl.js"></script>' + needle,
+              )
           html = html.replace('39개 레슨', '40개 레슨')
           html = html.replace(
               '금융 모델부터 causal backtest와 proof-carrying formula application까지 연결합니다.',
@@ -57,7 +60,11 @@ jobs:
               data['coverageAreas'].append({
                   'id': 'pnl-explain',
                   'label': 'Proof-carrying PnL explain closure',
-                  'paths': ['LeanFinance/PnL.lean', 'LeanFinance/PnL/', 'tools/pnl_explain_closure/'],
+                  'paths': [
+                      'LeanFinance/PnL.lean',
+                      'LeanFinance/PnL/',
+                      'tools/pnl_explain_closure/',
+                  ],
               })
 
           def insert_after(items, anchor, value):
@@ -79,17 +86,37 @@ jobs:
                   'id': 'pnl-explain',
                   'label': 'Proof-Carrying PnL Explain',
                   'description': 'Taylor attribution에서 residual closure와 same-pipeline binding까지 연결합니다.',
-                  'lessonIds': ['temporal-noninterference', 'formula-contract', 'certificate-composition', 'pnl-explain-closure'],
+                  'lessonIds': [
+                      'temporal-noninterference',
+                      'formula-contract',
+                      'certificate-composition',
+                      'pnl-explain-closure',
+                  ],
               })
-          meta.write_text(prefix + json.dumps(data, ensure_ascii=False, indent=2) + ';\n', encoding='utf-8')
+          meta.write_text(
+              prefix + json.dumps(data, ensure_ascii=False, indent=2) + ';\n',
+              encoding='utf-8',
+          )
 
           checker = Path('tools/learning_app/check_curriculum.py')
           source = checker.read_text(encoding='utf-8')
           replacements = [
-              ('"learning-app/data/formula.js",\n', '"learning-app/data/formula.js",\n    "learning-app/data/pnl.js",\n'),
-              ('"formula-contract", "research-agent",', '"formula-contract", "pnl-explain", "research-agent",'),
-              ('"tools/formula_contract", "tools/research_agent",', '"tools/formula_contract", "tools/pnl_explain_closure", "tools/research_agent",'),
-              ('"data/temporal.js","data/formula.js","data/curriculum.js",', '"data/temporal.js","data/formula.js","data/pnl.js","data/curriculum.js",'),
+              (
+                  '"learning-app/data/formula.js",\n',
+                  '"learning-app/data/formula.js",\n    "learning-app/data/pnl.js",\n',
+              ),
+              (
+                  '"formula-contract", "research-agent",',
+                  '"formula-contract", "pnl-explain", "research-agent",',
+              ),
+              (
+                  '"tools/formula_contract", "tools/research_agent",',
+                  '"tools/formula_contract", "tools/pnl_explain_closure", "tools/research_agent",',
+              ),
+              (
+                  '"data/temporal.js","data/formula.js","data/curriculum.js",',
+                  '"data/temporal.js","data/formula.js","data/pnl.js","data/curriculum.js",',
+              ),
           ]
           for old, new in replacements:
               if old not in source:
@@ -99,7 +126,8 @@ jobs:
 
           academy_readme = Path('learning-app/README.md')
           text = academy_readme.read_text(encoding='utf-8')
-          text = text.replace('39 lessons', '40 lessons').replace('39개 레슨', '40개 레슨')
+          text = text.replace('39 lessons', '40 lessons')
+          text = text.replace('39개 레슨', '40개 레슨')
           if 'proof-carrying PnL explain closure' not in text:
               text += '\n\nThe finance research path also covers proof-carrying PnL explain closure: exact local formula checks, temporal and model binding, residual tolerance, and CLOSED/PARTIAL/OPEN classification.\n'
           academy_readme.write_text(text, encoding='utf-8')
@@ -118,10 +146,16 @@ jobs:
           python -m unittest discover -s tools/pnl_explain_closure/tests -v
           first="$(mktemp)"
           second="$(mktemp)"
-          python -m tools.pnl_explain_closure analyze --model examples/pnl_explain_closure/controlled.json --out "$first"
-          python -m tools.pnl_explain_closure analyze --model examples/pnl_explain_closure/controlled.json --out "$second"
+          python -m tools.pnl_explain_closure analyze \
+            --model examples/pnl_explain_closure/controlled.json \
+            --out "$first"
+          python -m tools.pnl_explain_closure analyze \
+            --model examples/pnl_explain_closure/controlled.json \
+            --out "$second"
           cmp "$first" "$second"
-          python -m tools.pnl_explain_closure verify --model examples/pnl_explain_closure/controlled.json --report "$first"
+          python -m tools.pnl_explain_closure verify \
+            --model examples/pnl_explain_closure/controlled.json \
+            --report "$first"
       - name: Validate academy
         run: |
           python -m tools.learning_app.check_curriculum
@@ -135,7 +169,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git add README.md learning-app/index.html learning-app/data/meta.js learning-app/README.md tools/learning_app/check_curriculum.py
+          git add README.md \
+            learning-app/index.html \
+            learning-app/data/meta.js \
+            learning-app/README.md \
+            tools/learning_app/check_curriculum.py
           validated_tree="$(git write-tree)"
           mkdir -p .github/validation
           cat > .github/validation/pnl-explain-closure-green.txt <<EOF
@@ -149,8 +187,7 @@ jobs:
           gs_quant_direct_runtime=not_executed
           gs_quant_static_target=fa9dd42f0677a0d2fb5819fca6e2f67de9458c06
           EOF
-          rm .github/workflows/one-shot-vendor-rebase.yml
-          rm -f .github/workflows/one-shot-pnl-explain-validation.yml
+          rm .github/workflows/one-shot-pnl-explain-validation.yml
           git add -A
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

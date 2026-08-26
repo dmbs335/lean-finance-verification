@@ -1,0 +1,253 @@
+{
+  "schema_version": "lfv-pnl-explain-closure-v1",
+  "name": "gs-quant-pnl-explain-controlled-closure",
+  "value_unit": "USD",
+  "upstream_target": {
+    "repository": "goldmansachs/gs-quant",
+    "version": "2.1.5",
+    "module": "gs_quant.backtests.backtest_objects",
+    "class": "BackTest",
+    "method": "pnl_explain",
+    "coverage": "CONTROLLED_FORMULA_CONFORMANCE"
+  },
+  "cases": [
+    {
+      "id": "exactQuadratic",
+      "scaling_factor": 1,
+      "first_order_risk": 10,
+      "second_order_risk": 4,
+      "market_move": 2,
+      "realized_pnl": 28,
+      "residual_tolerance": 0,
+      "local_validity": {
+        "greeks": true,
+        "market_move": true,
+        "result": true
+      },
+      "artifacts": {
+        "greeks": {
+          "position_id": "position-a",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-02T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "market_move": {
+          "position_id": "position-a",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-02T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "result": {
+          "position_id": "position-a",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-02T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        }
+      }
+    },
+    {
+      "id": "boundedResidual",
+      "scaling_factor": 1,
+      "first_order_risk": 5,
+      "second_order_risk": 2,
+      "market_move": 3,
+      "realized_pnl": 26,
+      "residual_tolerance": 3,
+      "local_validity": {
+        "greeks": true,
+        "market_move": true,
+        "result": true
+      },
+      "artifacts": {
+        "greeks": {
+          "position_id": "position-b",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-03T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "market_move": {
+          "position_id": "position-b",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-03T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "result": {
+          "position_id": "position-b",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-03T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        }
+      }
+    },
+    {
+      "id": "materialResidual",
+      "scaling_factor": 1,
+      "first_order_risk": 5,
+      "second_order_risk": 2,
+      "market_move": 3,
+      "realized_pnl": 35,
+      "residual_tolerance": 3,
+      "local_validity": {
+        "greeks": true,
+        "market_move": true,
+        "result": true
+      },
+      "artifacts": {
+        "greeks": {
+          "position_id": "position-c",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-04T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "market_move": {
+          "position_id": "position-c",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-04T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "result": {
+          "position_id": "position-c",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-04T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        }
+      }
+    },
+    {
+      "id": "modelSubstituted",
+      "scaling_factor": 1,
+      "first_order_risk": 10,
+      "second_order_risk": 4,
+      "market_move": 2,
+      "realized_pnl": 28,
+      "residual_tolerance": 0,
+      "local_validity": {
+        "greeks": true,
+        "market_move": true,
+        "result": true
+      },
+      "artifacts": {
+        "greeks": {
+          "position_id": "position-d",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-05T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "market_move": {
+          "position_id": "position-d",
+          "model_id": "model-v2",
+          "valuation_time": "2024-01-05T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "result": {
+          "position_id": "position-d",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-05T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        }
+      }
+    },
+    {
+      "id": "positionSubstituted",
+      "scaling_factor": 1,
+      "first_order_risk": 10,
+      "second_order_risk": 4,
+      "market_move": 2,
+      "realized_pnl": 28,
+      "residual_tolerance": 0,
+      "local_validity": {
+        "greeks": true,
+        "market_move": true,
+        "result": true
+      },
+      "artifacts": {
+        "greeks": {
+          "position_id": "position-e",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-08T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "market_move": {
+          "position_id": "position-other",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-08T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "result": {
+          "position_id": "position-e",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-08T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        }
+      }
+    },
+    {
+      "id": "valuationTimeSubstituted",
+      "scaling_factor": 1,
+      "first_order_risk": 10,
+      "second_order_risk": 4,
+      "market_move": 2,
+      "realized_pnl": 28,
+      "residual_tolerance": 0,
+      "local_validity": {
+        "greeks": true,
+        "market_move": true,
+        "result": true
+      },
+      "artifacts": {
+        "greeks": {
+          "position_id": "position-f",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-09T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "market_move": {
+          "position_id": "position-f",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-09T15:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "result": {
+          "position_id": "position-f",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-09T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        }
+      }
+    },
+    {
+      "id": "invalidGreeksCertificate",
+      "scaling_factor": 1,
+      "first_order_risk": 10,
+      "second_order_risk": 4,
+      "market_move": 2,
+      "realized_pnl": 28,
+      "residual_tolerance": 0,
+      "local_validity": {
+        "greeks": false,
+        "market_move": true,
+        "result": true
+      },
+      "artifacts": {
+        "greeks": {
+          "position_id": "position-g",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-10T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "market_move": {
+          "position_id": "position-g",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-10T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        },
+        "result": {
+          "position_id": "position-g",
+          "model_id": "model-v1",
+          "valuation_time": "2024-01-10T16:00:00Z",
+          "formula_id": "gsq-pnl-explain-v1"
+        }
+      }
+    }
+  ]
+}

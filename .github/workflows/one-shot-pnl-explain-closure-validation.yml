@@ -1,0 +1,271 @@
+name: One-shot PnL explain closure validation
+
+on:
+  push:
+    branches:
+      - feature/pnl-explain-closure
+
+concurrency:
+  group: one-shot-pnl-explain-closure
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/pnl-explain-closure
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Integrate PnL theory into repository contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          def append_import(path: str, import_line: str) -> None:
+              target = Path(path)
+              text = target.read_text(encoding='utf-8') if target.exists() else ''
+              line = import_line + '\n'
+              if line not in text:
+                  if text and not text.endswith('\n'):
+                      text += '\n'
+                  text += line
+                  target.write_text(text, encoding='utf-8')
+
+          append_import(
+              'LeanFinance/Formula.lean',
+              'import LeanFinance.Formula.Approximation',
+          )
+          append_import('LeanFinance.lean', 'import LeanFinance.PnL')
+
+          index = Path('learning-app/index.html')
+          html = index.read_text(encoding='utf-8')
+          if 'data/pnl.js' not in html:
+              needle = '<script src="data/curriculum.js"></script>'
+              if needle not in html:
+                  raise SystemExit('curriculum script tag not found')
+              html = html.replace(
+                  needle,
+                  '<script src="data/pnl.js"></script>' + needle,
+                  1,
+              )
+              count_match = re.search(r'(\d+)개 레슨', html)
+              if count_match:
+                  old = int(count_match.group(1))
+                  html = html.replace(
+                      f'{old}개 레슨', f'{old + 1}개 레슨', 1
+                  )
+          index.write_text(html, encoding='utf-8')
+
+          meta = Path('learning-app/data/meta.js')
+          raw = meta.read_text(encoding='utf-8').strip()
+          prefix = 'window.LFV_ACADEMY = '
+          if not raw.startswith(prefix) or not raw.endswith(';'):
+              raise SystemExit('unexpected meta.js wrapper')
+          data = json.loads(raw[len(prefix):-1])
+          if not any(area['id'] == 'pnl-explain' for area in data['coverageAreas']):
+              data['coverageAreas'].append({
+                  'id': 'pnl-explain',
+                  'label': 'Proof-carrying PnL explain',
+                  'paths': [
+                      'LeanFinance/PnL.lean',
+                      'LeanFinance/PnL/',
+                      'tools/pnl_explain_closure/',
+                  ],
+              })
+
+          def insert_after(values, anchor, item):
+              if item in values:
+                  return
+              position = values.index(anchor) + 1 if anchor in values else len(values)
+              values.insert(position, item)
+
+          for path in data['paths']:
+              ids = path['lessonIds']
+              if path['id'] in {
+                  'evidence-theory',
+                  'hidden-investment-laws',
+                  'researcher',
+              }:
+                  insert_after(ids, 'certificate-composition', 'pnl-explain-closure')
+          if not any(path['id'] == 'pnl-explain-closure' for path in data['paths']):
+              data['paths'].append({
+                  'id': 'pnl-explain-closure',
+                  'label': 'Proof-Carrying PnL Explain',
+                  'description': (
+                      'Taylor attribution에서 residual과 cross-object binding '
+                      'certificate까지 연결합니다.'
+                  ),
+                  'lessonIds': [
+                      'certificate-composition',
+                      'pnl-explain-closure',
+                      'generated-ci',
+                  ],
+              })
+          meta.write_text(
+              prefix + json.dumps(data, ensure_ascii=False, indent=2) + ';\n',
+              encoding='utf-8',
+          )
+
+          checker = Path('tools/learning_app/check_curriculum.py')
+          source = checker.read_text(encoding='utf-8')
+          replacements = [
+              (
+                  '"learning-app/data/composition.js"',
+                  '"learning-app/data/composition.js",\n    "learning-app/data/pnl.js"',
+              ),
+              (
+                  '"composition"',
+                  '"composition", "pnl-explain"',
+              ),
+              (
+                  '"tools/certificate_composition"',
+                  '"tools/certificate_composition", "tools/pnl_explain_closure"',
+              ),
+              (
+                  '"data/composition.js"',
+                  '"data/composition.js", "data/pnl.js"',
+              ),
+          ]
+          for old, new in replacements:
+              if new in source:
+                  continue
+              if old not in source:
+                  raise SystemExit(f'curriculum checker anchor missing: {old}')
+              source = source.replace(old, new, 1)
+          checker.write_text(source, encoding='utf-8')
+
+          academy_readme = Path('learning-app/README.md')
+          text = academy_readme.read_text(encoding='utf-8')
+          text = re.sub(
+              r'(six tracks and )(\d+)( lessons)',
+              lambda m: m.group(1) + str(int(m.group(2)) + 1) + m.group(3),
+              text,
+              count=1,
+          ) if 'proof-carrying PnL explain' not in text else text
+          if 'proof-carrying PnL explain' not in text:
+              text = text.replace(
+                  'certificate composition,',
+                  'certificate composition, proof-carrying PnL explain,',
+                  1,
+              )
+          academy_readme.write_text(text, encoding='utf-8')
+
+          root_readme = Path('README.md')
+          text = root_readme.read_text(encoding='utf-8')
+          section = '''\n## Proof-carrying PnL explain\n\n`LeanFinance/PnL/` and `tools/pnl_explain_closure/` separate exact or bounded attribution arithmetic from the position, model, valuation-time, and formula bindings required for a global explanation. An exact quadratic model closes at second order, while zero residual with a substituted model or portfolio remains `OPEN`. The optional GS Quant conformance test imports the public `BackTest.pnl_explain` source from `gs-quant==2.1.5`; it does not claim direct runtime or Marquee coverage.\n\n'''
+          marker = '## Build and validation\n'
+          if '## Proof-carrying PnL explain\n' not in text:
+              if marker not in text:
+                  raise SystemExit('root README build marker missing')
+              text = text.replace(marker, section + marker, 1)
+          root_readme.write_text(text, encoding='utf-8')
+
+          claims = Path('docs/FORMAL_CLAIMS.md')
+          text = claims.read_text(encoding='utf-8')
+          claims_section = '''\n## Reading PnL explain closure\n\nA `CLOSED` controlled PnL explanation means the declared local greeks, market-move, and result certificates are valid, their position/model/valuation-time/formula identities agree, and the exact residual is within the registered tolerance. `PARTIAL` preserves valid bindings but reports a material residual. `OPEN` means the local artifacts cannot be composed, even when their arithmetic residual is zero. The Lean theorem establishes exact first/second-order closure only for the declared quadratic value model; arbitrary instruments still require a defensible higher-order residual bound and externally truthful artifact identities.\n'''
+          if '## Reading PnL explain closure\n' not in text:
+              text += claims_section
+              claims.write_text(text, encoding='utf-8')
+
+          lean_ci = Path('.github/workflows/lean.yml')
+          source = lean_ci.read_text(encoding='utf-8')
+          step = '''      - name: Test proof-carrying PnL explain closure\n        run: python -m unittest discover -s tools/pnl_explain_closure/tests -v\n'''
+          if 'tools/pnl_explain_closure/tests' not in source:
+              anchor = '      - name: Test proof-carrying research agent'
+              if anchor not in source:
+                  anchor = '      - name: Test point-in-time data study'
+              if anchor not in source:
+                  raise SystemExit('Lean CI insertion anchor missing')
+              source = source.replace(anchor, step + anchor, 1)
+              lean_ci.write_text(source, encoding='utf-8')
+          PY
+      - name: Install pinned public GS Quant package
+        run: python -m pip install "gs-quant==2.1.5"
+      - name: Test exact closure and upstream source conformance
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tools/pnl_explain_closure/tests -v
+          first="$(mktemp)"
+          second="$(mktemp)"
+          python -m tools.pnl_explain_closure analyze \
+            --model examples/pnl_explain_closure/cases.json \
+            --out "$first"
+          python -m tools.pnl_explain_closure analyze \
+            --model examples/pnl_explain_closure/cases.json \
+            --out "$second"
+          cmp "$first" "$second"
+          python -m tools.pnl_explain_closure verify \
+            --model examples/pnl_explain_closure/cases.json \
+            --report "$first"
+      - name: Validate learning app
+        run: |
+          python -m tools.learning_app.check_curriculum
+          python -m unittest discover -s tools/learning_app/tests -v
+          node --check learning-app/data/pnl.js
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+      - name: Commit validated integration and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add LeanFinance.lean \
+            LeanFinance/Formula.lean \
+            learning-app/index.html \
+            learning-app/data/meta.js \
+            tools/learning_app/check_curriculum.py \
+            learning-app/README.md \
+            README.md \
+            docs/FORMAL_CLAIMS.md \
+            .github/workflows/lean.yml
+          validated_tree="$(git write-tree)"
+          mkdir -p .github/validation
+          source_sha="$(python - <<'PY'
+          import hashlib
+          import inspect
+          from gs_quant.backtests.backtest_objects import BackTest
+          print(hashlib.sha256(inspect.getsource(BackTest.pnl_explain).encode()).hexdigest())
+          PY
+          )"
+          package_version="$(python - <<'PY'
+          from importlib.metadata import version
+          print(version('gs-quant'))
+          PY
+          )"
+          upstream_head="$(git ls-remote https://github.com/goldmansachs/gs-quant.git refs/heads/master | awk '{print $1}')"
+          cat > .github/validation/pnl-explain-closure-green.txt <<EOF
+          validated_source_commit=${GITHUB_SHA}
+          validated_tree=${validated_tree}
+          python=3.12
+          gs_quant_package=${package_version}
+          gs_quant_master=${upstream_head}
+          pnl_explain_source_sha256=${source_sha}
+          direct_runtime_methods=0
+          upstream_source_conformance_methods=1
+          closure_tests=success
+          deterministic_reproduction=success
+          curriculum=success
+          lean_build=success
+          EOF
+          rm .github/workflows/one-shot-pnl-explain-closure-validation.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Integrate and validate PnL explain closure'
+          git push origin HEAD:feature/pnl-explain-closure
