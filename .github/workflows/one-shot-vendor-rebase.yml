@@ -1,116 +1,68 @@
-name: One-shot research version-space validation
+name: One-shot vendor branch integration
 
 on:
   push:
     branches:
-      - feature/unified-research-version-space-clean
+      - feature/signed-pit-vendor-import
 
 permissions:
   contents: write
 
 jobs:
-  repair-and-validate:
+  integrate:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: feature/unified-research-version-space-clean
+          ref: feature/signed-pit-vendor-import
           fetch-depth: 0
           persist-credentials: true
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-      - name: Register research-version-space coverage
+      - name: Merge current main and normalize integration points
         shell: bash
         run: |
           set -euo pipefail
+          git fetch origin main
+          if ! git merge --no-commit --no-ff origin/main; then
+            git checkout --theirs -- .github/workflows/lean.yml LeanFinance/Backtest.lean
+            git add .github/workflows/lean.yml LeanFinance/Backtest.lean
+          fi
+
           python - <<'PY'
           from pathlib import Path
-          import json
 
-          path = Path('learning-app/data/meta.js')
-          raw = path.read_text(encoding='utf-8').strip()
-          prefix = 'window.LFV_ACADEMY = '
-          if not raw.startswith(prefix) or not raw.endswith(';'):
-              raise SystemExit('unexpected meta.js wrapper')
-          data = json.loads(raw[len(prefix):-1])
-          if not any(area['id'] == 'research-version-space' for area in data['coverageAreas']):
-              data['coverageAreas'].append({
-                  'id': 'research-version-space',
-                  'label': 'Unified research version space',
-                  'paths': [
-                      'LeanFinance/Epistemic/ResearchVersionSpace.lean',
-                      'LeanFinance/Epistemic/ResearchVersionSpaceExample.lean',
-                      'tools/research_version_space/',
-                  ],
-              })
+          backtest = Path('LeanFinance/Backtest.lean')
+          text = backtest.read_text()
+          line = 'import LeanFinance.Backtest.VendorDataPackage\n'
+          if line not in text:
+              marker = 'import LeanFinance.Examples.ProofCarryingBacktest\n'
+              if marker in text:
+                  text = text.replace(marker, line + marker)
+              else:
+                  text += ('\n' if not text.endswith('\n') else '') + line
+              backtest.write_text(text)
 
-          def insert_after(items, anchor, value):
-              if value in items:
-                  return
-              position = items.index(anchor) + 1 if anchor in items else len(items)
-              items.insert(position, value)
+          workflow = Path('.github/workflows/lean.yml')
+          text = workflow.read_text()
+          step = '''      - name: Test signed PIT vendor package import
+        run: python -m unittest discover -s tools/pit_vendor_import/tests -v
+'''
+          if 'tools/pit_vendor_import/tests' not in text:
+              marker = '      - uses: leanprover/lean-action@v1\n'
+              if marker not in text:
+                  raise SystemExit('lean-action marker not found')
+              text = text.replace(marker, step + marker)
+              workflow.write_text(text)
 
-          for learning_path in data['paths']:
-              ids = learning_path['lessonIds']
-              if learning_path['id'] == 'evidence-theory':
-                  insert_after(ids, 'version-space', 'research-version-space')
-              elif learning_path['id'] == 'hidden-investment-laws':
-                  insert_after(ids, 'alpha-uncertainty', 'research-version-space')
-              elif learning_path['id'] == 'researcher':
-                  insert_after(ids, 'version-space', 'research-version-space')
-          if not any(item['id'] == 'research-version-space' for item in data['paths']):
-              data['paths'].append({
-                  'id': 'research-version-space',
-                  'label': 'Unified Research Version Space',
-                  'description': '데이터·모델·탐색·실행·universe uncertainty를 하나의 admissible-world calculus로 분석합니다.',
-                  'lessonIds': ['version-space', 'temporal-noninterference', 'formula-contract', 'alpha-uncertainty', 'research-version-space'],
-              })
-          path.write_text(prefix + json.dumps(data, ensure_ascii=False, indent=2) + ';\n', encoding='utf-8')
+          example = Path('LeanFinance/Examples/VendorDataPackage.lean')
+          text = example.read_text()
+          text = text.replace('kind := .prices', 'kind := VendorFileKind.prices')
+          example.write_text(text)
           PY
-      - name: Validate research version-space and academy
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m unittest discover -s tools/research_version_space/tests -v
-          first="$(mktemp)"
-          second="$(mktemp)"
-          python -m tools.research_version_space analyze --model examples/research_version_space/five_dimensions.json --out "$first"
-          python -m tools.research_version_space analyze --model examples/research_version_space/five_dimensions.json --out "$second"
-          cmp "$first" "$second"
-          python -m tools.research_version_space verify --model examples/research_version_space/five_dimensions.json --report "$first"
-          python -m tools.learning_app.check_curriculum
-          python -m unittest discover -s tools/learning_app/tests -v
-          node --check learning-app/data/research-version-space.js
-      - uses: leanprover/lean-action@v1
-        with:
-          build: true
-          test: false
-      - name: Commit validated curriculum integration
-        shell: bash
-        run: |
-          set -euo pipefail
-          git add learning-app/data/meta.js
-          validated_tree="$(git write-tree)"
-          mkdir -p .github/validation
-          cat > .github/validation/research-version-space-green.txt <<EOF
-          validated_source_commit=${GITHUB_SHA}
-          validated_tree=${validated_tree}
-          python=3.12
-          version_space_tests=success
-          deterministic_reproduction=success
-          curriculum=success
-          lean_build=success
-          EOF
+
           rm .github/workflows/one-shot-vendor-rebase.yml
-          rm -f .github/workflows/one-shot-version-space-curriculum-fix.yml
           git add -A
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'Register and validate research version-space curriculum'
-          git push origin HEAD:feature/unified-research-version-space-clean
+          git commit -m 'Integrate signed PIT vendor import with current main'
+          git push origin HEAD:feature/signed-pit-vendor-import
