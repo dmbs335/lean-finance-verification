@@ -1,0 +1,10 @@
+validated_source_commit=7f5a5ca9c3ac3a1573ed5e8d6e642da6e7e6192f
+temporal_workflow_run=32965773069
+learning_app_workflow_run=32965772860
+python=3.12
+temporal_tests=success
+deterministic_replay=success
+curriculum=success
+javascript_syntax=success
+lean_build=success
+note=The contemporaneous aggregate Lean CI completed every Python and reproducibility step successfully; its Lean step failed before build because the external Lean toolchain download returned a transient TLS handshake failure.
