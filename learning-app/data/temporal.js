@@ -7,7 +7,7 @@ window.LFV_ACADEMY.lessons.push(...[
     "subtitle":"미래 데이터·미래 수정·표현 변경이 과거 signal·order·PnL prefix를 바꾸지 못하게 합니다.",
     "difficulty":"연구",
     "minutes":42,
-    "covers":["backtest","temporal-noninterference","pit-study"],
+    "covers":["backtest","pit-study"],
     "prerequisites":["pit-lineage","proof-carrying-certificate"],
     "outcomes":[
       "causal-prefix equivalence와 output-prefix invariance를 정의한다.",
