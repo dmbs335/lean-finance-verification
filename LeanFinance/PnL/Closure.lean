@@ -17,15 +17,14 @@ structure AttributionBinding where
 
 namespace AttributionBinding
 
-/-- Minimal structural obligations for a binding identity. -/
+/-- Minimal executable structural obligations for a binding identity. -/
 def WellFormed (binding : AttributionBinding) : Bool :=
-  decide (
-    NonEmptyString binding.portfolioHash ∧
-      NonEmptyString binding.marketDataBeforeHash ∧
-        NonEmptyString binding.marketDataAfterHash ∧
-          NonEmptyString binding.modelId ∧
-            NonEmptyString binding.modelVersion ∧
-              binding.valuationBefore ≤ binding.valuationAfter)
+  binding.portfolioHash != "" &&
+    binding.marketDataBeforeHash != "" &&
+      binding.marketDataAfterHash != "" &&
+        binding.modelId != "" &&
+          binding.modelVersion != "" &&
+            decide (binding.valuationBefore ≤ binding.valuationAfter)
 
 end AttributionBinding
 
@@ -67,7 +66,9 @@ def modeledAfterValue (factor : LocalQuadraticAttribution) : Int :=
 theorem exact_local_quadratic_closure
     (factor : LocalQuadraticAttribution) :
     factor.modeledAfterValue - factor.baseValue = factor.explainedPnl := by
-  simp [modeledAfterValue]
+  change factor.baseValue + factor.explainedPnl - factor.baseValue =
+    factor.explainedPnl
+  exact add_sub_cancel_left factor.baseValue factor.explainedPnl
 
 /-- The implementation-reported first- and second-order terms match the exact
     registered local quadratic expression. -/
