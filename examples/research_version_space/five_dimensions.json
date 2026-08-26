@@ -1,0 +1,93 @@
+{
+  "schema_version": "lfv-research-version-space-v1",
+  "name": "data-model-search-execution-universe-version-space",
+  "base_metric": 20,
+  "target_maximum_width": 40,
+  "dimensions": [
+    {
+      "id": "data",
+      "baseline": "strictPIT",
+      "alternative": "latestVintage",
+      "alternative_effect": 40,
+      "description": "Latest revised data replaces the decision-time vintage."
+    },
+    {
+      "id": "model",
+      "baseline": "decisionTimeModel",
+      "alternative": "latestRiskModel",
+      "alternative_effect": 10,
+      "description": "A current risk or pricing model rewrites the historical estimate."
+    },
+    {
+      "id": "search",
+      "baseline": "registeredSearch",
+      "alternative": "adaptiveHiddenSearch",
+      "alternative_effect": 30,
+      "description": "Unreported adaptive trials influence the selected strategy."
+    },
+    {
+      "id": "execution",
+      "baseline": "conservativeExecution",
+      "alternative": "optimisticExecution",
+      "alternative_effect": 15,
+      "description": "Full fills and optimistic costs replace conservative execution."
+    },
+    {
+      "id": "universe",
+      "baseline": "pointInTimeUniverse",
+      "alternative": "survivorUniverse",
+      "alternative_effect": 5,
+      "description": "The latest surviving universe is used in the historical study."
+    }
+  ],
+  "interactions": [
+    {
+      "requires": ["data", "search"],
+      "effect": 25,
+      "description": "Adaptive search exploits the revised data more than either change alone."
+    },
+    {
+      "requires": ["execution", "universe"],
+      "effect": 5,
+      "description": "Optimistic fills compound the survivor-universe advantage."
+    }
+  ],
+  "channels": [
+    {
+      "id": "pitDataReceipt",
+      "cost": 2,
+      "restricts": ["data"],
+      "description": "Forces the data coordinate to the strict decision-time vintage."
+    },
+    {
+      "id": "modelVersionReceipt",
+      "cost": 2,
+      "restricts": ["model"],
+      "description": "Binds the exact historical model version."
+    },
+    {
+      "id": "searchLedger",
+      "cost": 2,
+      "restricts": ["search"],
+      "description": "Forces the search coordinate to the registered history."
+    },
+    {
+      "id": "executionReceipt",
+      "cost": 2,
+      "restricts": ["execution"],
+      "description": "Binds conservative execution and cost semantics."
+    },
+    {
+      "id": "universeSnapshot",
+      "cost": 1,
+      "restricts": ["universe"],
+      "description": "Binds the historical security universe."
+    },
+    {
+      "id": "unifiedResearchBundle",
+      "cost": 8,
+      "restricts": ["data", "model", "search", "execution", "universe"],
+      "description": "One integrated attestation binds every research coordinate."
+    }
+  ]
+}

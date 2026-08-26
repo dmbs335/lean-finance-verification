@@ -1,0 +1,7 @@
+validated_source_commit=047f2b91a3aaeb593919af1d24268754c55d9129
+validated_tree=8e7cc5a7bd8a711070b0caadceac2597a5e155b4
+python=3.12
+version_space_tests=success
+deterministic_reproduction=success
+curriculum=success
+lean_build=success
