@@ -1,0 +1,322 @@
+name: One-shot temporal and formula validation
+
+on:
+  push:
+    branches:
+      - feature/temporal-noninterference-formula-contract
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/temporal-noninterference-formula-contract
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Integrate temporal and formula modules into repository contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          def append_import(path_text, import_line):
+              path = Path(path_text)
+              text = path.read_text(encoding='utf-8')
+              if import_line not in text:
+                  if text and not text.endswith('\n'):
+                      text += '\n'
+                  text += import_line + '\n'
+                  path.write_text(text, encoding='utf-8')
+
+          append_import(
+              'LeanFinance/Epistemic.lean',
+              'import LeanFinance.Epistemic.TemporalNoninterference',
+          )
+          append_import('LeanFinance.lean', 'import LeanFinance.Formula')
+
+          index = Path('learning-app/index.html')
+          html = index.read_text(encoding='utf-8')
+          if 'data/causality.js' not in html:
+              needle = '<script src="data/curriculum.js"></script>'
+              if needle not in html:
+                  raise SystemExit('curriculum script tag not found')
+              html = html.replace(
+                  needle,
+                  '<script src="data/causality.js"></script>' + needle,
+                  1,
+              )
+
+          lesson_count = 0
+          prefix = 'window.LFV_ACADEMY.lessons.push(...'
+          for data_path in sorted(Path('learning-app/data').glob('*.js')):
+              if data_path.name in {'meta.js', 'curriculum.js'}:
+                  continue
+              raw = data_path.read_text(encoding='utf-8').strip()
+              if raw.startswith(prefix) and raw.endswith(');'):
+                  lesson_count += len(json.loads(raw[len(prefix):-2]))
+          html = re.sub(r'\d+개 레슨', f'{lesson_count}개 레슨', html)
+          index.write_text(html, encoding='utf-8')
+
+          meta = Path('learning-app/data/meta.js')
+          raw = meta.read_text(encoding='utf-8').strip()
+          meta_prefix = 'window.LFV_ACADEMY = '
+          if not raw.startswith(meta_prefix) or not raw.endswith(';'):
+              raise SystemExit('unexpected meta.js wrapper')
+          data = json.loads(raw[len(meta_prefix):-1])
+
+          coverage_additions = [
+              {
+                  'id': 'temporal-noninterference',
+                  'label': 'Temporal noninterference',
+                  'paths': [
+                      'LeanFinance/Epistemic/TemporalNoninterference.lean',
+                      'tools/temporal_noninterference/',
+                  ],
+              },
+              {
+                  'id': 'formula-contract',
+                  'label': 'Proof-carrying formula contract',
+                  'paths': [
+                      'LeanFinance/Formula.lean',
+                      'LeanFinance/Formula/',
+                      'tools/formula_contract/',
+                  ],
+              },
+          ]
+          existing_coverage = {area['id'] for area in data['coverageAreas']}
+          for area in coverage_additions:
+              if area['id'] not in existing_coverage:
+                  data['coverageAreas'].append(area)
+
+          def insert_after(values, anchor, item):
+              if item in values:
+                  return
+              position = values.index(anchor) + 1 if anchor in values else len(values)
+              values.insert(position, item)
+
+          for learning_path in data['paths']:
+              ids = learning_path['lessonIds']
+              if learning_path['id'] == 'evidence-theory':
+                  insert_after(ids, 'trace-refinement', 'temporal-noninterference')
+                  insert_after(ids, 'certificate-composition', 'formula-application-contract')
+              elif learning_path['id'] == 'hidden-investment-laws':
+                  insert_after(ids, 'version-space', 'temporal-noninterference')
+                  insert_after(ids, 'certificate-composition', 'formula-application-contract')
+              elif learning_path['id'] == 'researcher':
+                  insert_after(ids, 'trace-refinement', 'temporal-noninterference')
+                  insert_after(ids, 'certificate-composition', 'formula-application-contract')
+              elif learning_path['id'] == 'bounded-agent':
+                  insert_after(ids, 'certificate-composition', 'formula-application-contract')
+
+          if not any(
+              learning_path['id'] == 'causal-financial-computation'
+              for learning_path in data['paths']
+          ):
+              data['paths'].append({
+                  'id': 'causal-financial-computation',
+                  'label': 'Causal Financial Computation',
+                  'description': (
+                      'PIT lineage에서 future-extension noninterference와 '
+                      'proof-carrying formula application까지 연결합니다.'
+                  ),
+                  'lessonIds': [
+                      'pit-lineage',
+                      'trace-refinement',
+                      'temporal-noninterference',
+                      'certificate-composition',
+                      'formula-application-contract',
+                      'generated-ci',
+                  ],
+              })
+          meta.write_text(
+              meta_prefix + json.dumps(data, ensure_ascii=False, indent=2) + ';\n',
+              encoding='utf-8',
+          )
+
+          checker = Path('tools/learning_app/check_curriculum.py')
+          source = checker.read_text(encoding='utf-8')
+
+          required_app_token = '"learning-app/data/composition.js",'
+          if '"learning-app/data/causality.js"' not in source:
+              if required_app_token not in source:
+                  raise SystemExit('required app-file anchor missing')
+              source = source.replace(
+                  required_app_token,
+                  required_app_token + '\n    "learning-app/data/causality.js",',
+                  1,
+              )
+
+          coverage_start = source.index('REQUIRED_COVERAGE_IDS')
+          coverage_end = source.index('}', coverage_start)
+          coverage_block = source[coverage_start:coverage_end]
+          if '"temporal-noninterference"' not in coverage_block:
+              anchor = '"composition",'
+              if anchor not in coverage_block:
+                  raise SystemExit('coverage anchor missing')
+              coverage_block = coverage_block.replace(
+                  anchor,
+                  anchor + ' "temporal-noninterference", "formula-contract",',
+                  1,
+              )
+              source = (
+                  source[:coverage_start]
+                  + coverage_block
+                  + source[coverage_end:]
+              )
+
+          tool_start = source.index('REQUIRED_TOOL_DIRS')
+          tool_end = source.index('}', tool_start)
+          tool_block = source[tool_start:tool_end]
+          if '"tools/temporal_noninterference"' not in tool_block:
+              anchor = '"tools/certificate_composition"'
+              if anchor not in tool_block:
+                  raise SystemExit('tool-directory anchor missing')
+              tool_block = tool_block.replace(
+                  anchor,
+                  anchor + ', "tools/temporal_noninterference", '
+                  '"tools/formula_contract"',
+                  1,
+              )
+              source = source[:tool_start] + tool_block + source[tool_end:]
+
+          asset_token = '"data/composition.js"'
+          if '"data/causality.js"' not in source:
+              if asset_token not in source:
+                  raise SystemExit('browser asset anchor missing')
+              source = source.replace(
+                  asset_token,
+                  asset_token + ',"data/causality.js"',
+                  1,
+              )
+          checker.write_text(source, encoding='utf-8')
+
+          lean_ci = Path('.github/workflows/lean.yml')
+          ci_text = lean_ci.read_text(encoding='utf-8')
+          if 'Test temporal noninterference benchmark' not in ci_text:
+              anchor = '      - name: Test point-in-time data study\n'
+              if anchor not in ci_text:
+                  raise SystemExit('Lean CI insertion anchor missing')
+              additions = '''      - name: Test temporal noninterference benchmark
+                run: python -m unittest discover -s tools/temporal_noninterference/tests -v
+              - name: Test proof-carrying formula contracts
+                run: python -m unittest discover -s tools/formula_contract/tests -v
+          '''
+              ci_text = ci_text.replace(anchor, additions + anchor, 1)
+              lean_ci.write_text(ci_text, encoding='utf-8')
+
+          learning_readme = Path('learning-app/README.md')
+          learning_text = learning_readme.read_text(encoding='utf-8')
+          marker = '## Causal financial computation\n'
+          if marker not in learning_text:
+              learning_text += '''
+
+## Causal financial computation
+
+The academy includes two source-linked research lessons for temporal
+noninterference and proof-carrying formula application. They connect PIT lineage,
+trace refinement, certificate composition, unit/domain contracts, implementation
+identity, and artifact binding under one causal-computation path.
+'''
+              learning_readme.write_text(learning_text, encoding='utf-8')
+
+          root_readme = Path('README.md')
+          root_text = root_readme.read_text(encoding='utf-8')
+          root_marker = '## Causal computation and formula application\n'
+          if root_marker not in root_text:
+              root_text += '''
+
+## Causal computation and formula application
+
+`LeanFinance/Epistemic/TemporalNoninterference.lean` and
+`tools/temporal_noninterference/` test whether future-only extensions can rewrite
+past-visible financial outputs. `LeanFinance/Formula/` and
+`tools/formula_contract/` distinguish mathematical formula validity from correct
+application with registered units, availability cutoffs, domain preconditions,
+implementation hashes, and input/output artifact bindings.
+
+These layers turn financial calculations into proof-carrying applications rather
+than untyped numeric functions.
+'''
+              root_readme.write_text(root_text, encoding='utf-8')
+          PY
+      - name: Test exact temporal and formula analyses
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tools/temporal_noninterference/tests -v
+          python -m unittest discover -s tools/formula_contract/tests -v
+          temporal_first="$(mktemp)"
+          temporal_second="$(mktemp)"
+          formula_first="$(mktemp)"
+          formula_second="$(mktemp)"
+          python -m tools.temporal_noninterference analyze \
+            --model examples/temporal_noninterference/future_extension.json \
+            --out "$temporal_first"
+          python -m tools.temporal_noninterference analyze \
+            --model examples/temporal_noninterference/future_extension.json \
+            --out "$temporal_second"
+          cmp "$temporal_first" "$temporal_second"
+          python -m tools.temporal_noninterference verify \
+            --model examples/temporal_noninterference/future_extension.json \
+            --report "$temporal_first"
+          python -m tools.formula_contract analyze \
+            --model examples/formula_contract/hedge_scale.json \
+            --out "$formula_first"
+          python -m tools.formula_contract analyze \
+            --model examples/formula_contract/hedge_scale.json \
+            --out "$formula_second"
+          cmp "$formula_first" "$formula_second"
+          python -m tools.formula_contract verify \
+            --model examples/formula_contract/hedge_scale.json \
+            --report "$formula_first"
+      - name: Validate academy and JavaScript
+        run: |
+          python -m tools.learning_app.check_curriculum
+          python -m unittest discover -s tools/learning_app/tests -v
+          node --check learning-app/data/causality.js
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+      - name: Commit validated integration and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add LeanFinance/Epistemic.lean \
+            LeanFinance.lean \
+            learning-app/index.html \
+            learning-app/data/meta.js \
+            tools/learning_app/check_curriculum.py \
+            .github/workflows/lean.yml \
+            learning-app/README.md \
+            README.md
+          validated_tree="$(git write-tree)"
+          mkdir -p .github/validation
+          cat > .github/validation/temporal-formula-green.txt <<EOF
+          validated_source_commit=${GITHUB_SHA}
+          validated_tree=${validated_tree}
+          python=3.12
+          temporal_tests=success
+          formula_contract_tests=success
+          deterministic_reproduction=success
+          curriculum=success
+          lean_build=success
+          EOF
+          rm .github/workflows/one-shot-temporal-formula-validation.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Integrate and validate causal formula contracts'
+          git push origin HEAD:feature/temporal-noninterference-formula-contract
