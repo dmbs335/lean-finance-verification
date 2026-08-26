@@ -1,0 +1,56 @@
+name: Proof-Carrying Formula Contract CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: formula-contract-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test proof-carrying formula contracts
+        run: python -m unittest discover -s tools/formula_contract/tests -v
+      - name: Recompute and verify formula report
+        shell: bash
+        run: |
+          set -euo pipefail
+          first="$(mktemp)"
+          second="$(mktemp)"
+          python -m tools.formula_contract analyze \
+            --model examples/formula_contract/hedge_scale.json \
+            --out "$first"
+          python -m tools.formula_contract analyze \
+            --model examples/formula_contract/hedge_scale.json \
+            --out "$second"
+          cmp "$first" "$second"
+          python -m tools.formula_contract verify \
+            --model examples/formula_contract/hedge_scale.json \
+            --report "$first"
+      - name: Validate academy contract
+        run: |
+          python -m tools.learning_app.check_curriculum
+          python -m unittest discover -s tools/learning_app/tests -v
+          node --check learning-app/data/formula.js
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
