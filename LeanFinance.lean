@@ -13,5 +13,6 @@ import LeanFinance.Portfolio
 import LeanFinance.Control
 import LeanFinance.Statistics
 import LeanFinance.Execution
+import LeanFinance.Formula
 import LeanFinance.ResearchAgent
 import LeanFinance.Generated
