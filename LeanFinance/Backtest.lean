@@ -3,6 +3,8 @@ import LeanFinance.Backtest.Provenance
 import LeanFinance.Backtest.FeatureLineage
 import LeanFinance.Backtest.Decision
 import LeanFinance.Backtest.NoFutureInformation
+import LeanFinance.Backtest.TemporalNoninterference
+import LeanFinance.Backtest.TemporalNoninterferenceExample
 import LeanFinance.Backtest.SearchLedger
 import LeanFinance.Backtest.Reproducibility
 import LeanFinance.Backtest.Certificate
