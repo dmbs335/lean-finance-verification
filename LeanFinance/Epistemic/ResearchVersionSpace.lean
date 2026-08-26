@@ -240,19 +240,18 @@ theorem exact_range_collapses_of_identification
   have metricIsLower :
       space.LowerBound cutoff evidence metric (metric world) := by
     intro other otherAllowed
-    exact le_of_eq
-      (identified world other worldAllowed otherAllowed)
+    have same := identified world other worldAllowed otherAllowed
+    simpa [same]
   have metricIsUpper :
       space.UpperBound cutoff evidence metric (metric world) := by
     intro other otherAllowed
-    exact le_of_eq
-      (identified other world otherAllowed worldAllowed)
+    have same := identified other world otherAllowed worldAllowed
+    simpa [same]
   have metricLeLower : metric world ≤ exactRange.lower :=
     exactRange.lowerIsGreatest.2 (metric world) metricIsLower
   have upperLeMetric : exactRange.upper ≤ metric world :=
     exactRange.upperIsLeast.2 (metric world) metricIsUpper
-  exact le_antisymm exactRange.ordered
-    (le_trans upperLeMetric metricLeLower)
+  grind
 
 end ResearchVersionSpace
 
