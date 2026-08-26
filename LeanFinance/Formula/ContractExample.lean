@@ -90,8 +90,8 @@ def validCertificate : FormulaApplicationCertificate :=
 
 theorem valid_scale_is_three_quarters :
     validApplication.claimedNumerator = 3 ∧
-      validApplication.claimedDenominator = 4 := by
-  rfl
+      validApplication.claimedDenominator = 4 :=
+  ⟨rfl, rfl⟩
 
 def futureCurrentRisk : FormulaInput :=
   { currentRisk with availableAt := 11 }
