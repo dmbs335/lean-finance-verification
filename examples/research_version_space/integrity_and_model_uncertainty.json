@@ -1,0 +1,152 @@
+{
+  "schema_version": "lfv-research-version-space-v1",
+  "name": "data-model-search-execution-universe-version-space",
+  "worlds": [
+    {
+      "id": "honestConservative",
+      "classification": "legitimate",
+      "data_vintage": "pit-v1",
+      "model_version": "risk-model-conservative",
+      "search_history": "registered-search",
+      "execution_semantics": "causal-execution",
+      "universe_version": "dated-universe",
+      "alpha_bps": 30,
+      "risk_bps": 40
+    },
+    {
+      "id": "honestCentral",
+      "classification": "legitimate",
+      "data_vintage": "pit-v1",
+      "model_version": "risk-model-central",
+      "search_history": "registered-search",
+      "execution_semantics": "causal-execution",
+      "universe_version": "dated-universe",
+      "alpha_bps": 40,
+      "risk_bps": 30
+    },
+    {
+      "id": "honestOptimistic",
+      "classification": "legitimate",
+      "data_vintage": "pit-v1",
+      "model_version": "risk-model-optimistic",
+      "search_history": "registered-search",
+      "execution_semantics": "causal-execution",
+      "universe_version": "dated-universe",
+      "alpha_bps": 50,
+      "risk_bps": 25
+    },
+    {
+      "id": "futureDataLeak",
+      "classification": "integrity-distortion",
+      "data_vintage": "latest-revised-data",
+      "model_version": "risk-model-central",
+      "search_history": "registered-search",
+      "execution_semantics": "causal-execution",
+      "universe_version": "dated-universe",
+      "alpha_bps": 120,
+      "risk_bps": 20
+    },
+    {
+      "id": "latestModelRewrite",
+      "classification": "integrity-distortion",
+      "data_vintage": "pit-v1",
+      "model_version": "latest-risk-model-v2",
+      "search_history": "registered-search",
+      "execution_semantics": "causal-execution",
+      "universe_version": "dated-universe",
+      "alpha_bps": 65,
+      "risk_bps": 10
+    },
+    {
+      "id": "hiddenAdaptiveSearch",
+      "classification": "integrity-distortion",
+      "data_vintage": "pit-v1",
+      "model_version": "risk-model-central",
+      "search_history": "hidden-adaptive-search",
+      "execution_semantics": "causal-execution",
+      "universe_version": "dated-universe",
+      "alpha_bps": 100,
+      "risk_bps": 28
+    },
+    {
+      "id": "optimisticExecution",
+      "classification": "integrity-distortion",
+      "data_vintage": "pit-v1",
+      "model_version": "risk-model-central",
+      "search_history": "registered-search",
+      "execution_semantics": "full-fill-zero-latency",
+      "universe_version": "dated-universe",
+      "alpha_bps": 90,
+      "risk_bps": 18
+    },
+    {
+      "id": "survivorshipUniverse",
+      "classification": "integrity-distortion",
+      "data_vintage": "pit-v1",
+      "model_version": "risk-model-central",
+      "search_history": "registered-search",
+      "execution_semantics": "causal-execution",
+      "universe_version": "latest-survivors-only",
+      "alpha_bps": 80,
+      "risk_bps": 22
+    }
+  ],
+  "channels": [
+    {
+      "id": "pitDataReceipt",
+      "cost": 3,
+      "description": "Excludes post-decision and latest-revised data worlds.",
+      "excludes_worlds": ["futureDataLeak"]
+    },
+    {
+      "id": "modelVintageReceipt",
+      "cost": 2,
+      "description": "Binds the risk and pricing model version available at the decision.",
+      "excludes_worlds": ["latestModelRewrite"]
+    },
+    {
+      "id": "searchLedger",
+      "cost": 2,
+      "description": "Excludes hidden adaptive trial-selection histories.",
+      "excludes_worlds": ["hiddenAdaptiveSearch"]
+    },
+    {
+      "id": "executionReceipt",
+      "cost": 3,
+      "description": "Excludes optimistic full-fill and zero-latency execution semantics.",
+      "excludes_worlds": ["optimisticExecution"]
+    },
+    {
+      "id": "universeSnapshot",
+      "cost": 2,
+      "description": "Excludes latest-survivor universe reconstruction.",
+      "excludes_worlds": ["survivorshipUniverse"]
+    },
+    {
+      "id": "modelCalibrationReceipt",
+      "cost": 5,
+      "description": "Selects the central legitimate model and excludes a post-decision model rewrite.",
+      "excludes_worlds": [
+        "honestConservative",
+        "honestOptimistic",
+        "latestModelRewrite"
+      ]
+    },
+    {
+      "id": "unifiedResearchBundle",
+      "cost": 14,
+      "description": "One integrated integrity attestation excluding every declared distortion world while preserving legitimate model uncertainty.",
+      "excludes_worlds": [
+        "futureDataLeak",
+        "latestModelRewrite",
+        "hiddenAdaptiveSearch",
+        "optimisticExecution",
+        "survivorshipUniverse"
+      ]
+    }
+  ],
+  "target": {
+    "maximum_alpha_width_bps": 20,
+    "maximum_risk_width_bps": 15
+  }
+}
