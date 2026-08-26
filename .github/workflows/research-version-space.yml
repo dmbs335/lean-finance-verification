@@ -1,0 +1,56 @@
+name: Unified Research Version Space CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: research-version-space-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test exact research version-space analysis
+        run: python -m unittest discover -s tools/research_version_space/tests -v
+      - name: Recompute and verify controlled report
+        shell: bash
+        run: |
+          set -euo pipefail
+          first="$(mktemp)"
+          second="$(mktemp)"
+          python -m tools.research_version_space analyze \
+            --model examples/research_version_space/five_dimensions.json \
+            --out "$first"
+          python -m tools.research_version_space analyze \
+            --model examples/research_version_space/five_dimensions.json \
+            --out "$second"
+          cmp "$first" "$second"
+          python -m tools.research_version_space verify \
+            --model examples/research_version_space/five_dimensions.json \
+            --report "$first"
+      - name: Validate academy contract
+        run: |
+          python -m tools.learning_app.check_curriculum
+          python -m unittest discover -s tools/learning_app/tests -v
+          node --check learning-app/data/research-version-space.js
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
