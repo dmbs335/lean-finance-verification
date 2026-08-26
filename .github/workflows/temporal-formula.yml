@@ -1,0 +1,70 @@
+name: Temporal and Formula Contract CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: temporal-formula-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test temporal noninterference benchmark
+        run: python -m unittest discover -s tools/temporal_noninterference/tests -v
+      - name: Test proof-carrying formula contracts
+        run: python -m unittest discover -s tools/formula_contract/tests -v
+      - name: Recompute temporal and formula reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          temporal_first="$(mktemp)"
+          temporal_second="$(mktemp)"
+          formula_first="$(mktemp)"
+          formula_second="$(mktemp)"
+          python -m tools.temporal_noninterference analyze \
+            --model examples/temporal_noninterference/future_extension.json \
+            --out "$temporal_first"
+          python -m tools.temporal_noninterference analyze \
+            --model examples/temporal_noninterference/future_extension.json \
+            --out "$temporal_second"
+          cmp "$temporal_first" "$temporal_second"
+          python -m tools.temporal_noninterference verify \
+            --model examples/temporal_noninterference/future_extension.json \
+            --report "$temporal_first"
+          python -m tools.formula_contract analyze \
+            --model examples/formula_contract/hedge_scale.json \
+            --out "$formula_first"
+          python -m tools.formula_contract analyze \
+            --model examples/formula_contract/hedge_scale.json \
+            --out "$formula_second"
+          cmp "$formula_first" "$formula_second"
+          python -m tools.formula_contract verify \
+            --model examples/formula_contract/hedge_scale.json \
+            --report "$formula_first"
+      - name: Validate academy contract
+        run: |
+          python -m tools.learning_app.check_curriculum
+          python -m unittest discover -s tools/learning_app/tests -v
+          node --check learning-app/data/causality.js
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
