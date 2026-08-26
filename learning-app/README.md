@@ -4,7 +4,9 @@
 
 Run `python -m http.server 8000` from the repository root and open `http://localhost:8000/learning-app/`.
 
-The curriculum contains six tracks and 39 lessons. It now spans finance and market models, proof-carrying backtests, temporal noninterference, proof-carrying formula applications, evidence separation, robust synthesis, certifiable-alpha uncertainty, evidence-adjusted portfolios, certifiability–crowding, epistemic liquidation, preregistered matched event studies, certificate composition, signed evidence infrastructure, privacy receipts, and fail-closed research-agent orchestration.
+The curriculum contains six tracks and 40 lessons. It now spans finance and market models, proof-carrying backtests, temporal noninterference, proof-carrying formula applications, PnL explain closure, evidence separation, robust synthesis, certifiable-alpha uncertainty, evidence-adjusted portfolios, certifiability–crowding, epistemic liquidation, preregistered matched event studies, certificate composition, signed evidence infrastructure, privacy receipts, and fail-closed research-agent orchestration.
+
+The PnL lesson distinguishes exact local first/second-order arithmetic from temporal availability, portfolio/market/model binding, non-market components, and the realized-minus-reconstructed residual. It classifies controlled explanations as `CLOSED`, `PARTIAL`, or `OPEN` without claiming direct GS Quant runtime conformance.
 
 Every lesson states both what the referenced source can prove or mechanically check and what remains an empirical, cryptographic, model-completeness, provider, or operational assumption.
 
