@@ -7,7 +7,7 @@ window.LFV_ACADEMY.lessons.push(...[
     "subtitle":"데이터·모델·탐색·실행·universe 불확실성을 하나의 admissible-world calculus로 합칩니다.",
     "difficulty":"연구",
     "minutes":44,
-    "covers":["epistemic","model-family","alpha-research","backtest","research-version-space"],
+    "covers":["epistemic","model-family","alpha-research","backtest"],
     "prerequisites":["version-space","alpha-uncertainty","temporal-noninterference","formula-contract"],
     "outcomes":[
       "research world를 D-M-S-X-U 다섯 좌표로 표현한다.",
