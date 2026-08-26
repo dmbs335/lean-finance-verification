@@ -43,6 +43,8 @@ jobs:
         run: python -m unittest discover -s tools/robust_evidence/tests -v
       - name: Test action-semantics version-space synthesis
         run: python -m unittest discover -s tools/model_family_synth/tests -v
+      - name: Test unified research version-space synthesis
+        run: python -m unittest discover -s tools/research_version_space/tests -v
       - name: Test multi-claim evidence synthesis
         run: python -m unittest discover -s tools/multiclaim_synth/tests -v
       - name: Test symbolic evidence synthesis and attack corpus
