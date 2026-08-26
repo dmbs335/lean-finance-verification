@@ -1,0 +1,108 @@
+name: One-shot temporal formula post validation
+
+on:
+  push:
+    branches:
+      - feature/temporal-noninterference-formula-contract
+
+permissions:
+  contents: write
+
+jobs:
+  normalize-and-validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/temporal-noninterference-formula-contract
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Normalize main Lean CI integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('.github/workflows/lean.yml')
+          text = path.read_text(encoding='utf-8')
+          patterns = [
+              r'\n\s*- name: Test temporal noninterference benchmark\n\s*run: python -m unittest discover -s tools/temporal_noninterference/tests -v\n',
+              r'\n\s*- name: Test proof-carrying formula contracts\n\s*run: python -m unittest discover -s tools/formula_contract/tests -v\n',
+          ]
+          for pattern in patterns:
+              text = re.sub(pattern, '\n', text)
+          anchor = '      - name: Test point-in-time data study\n'
+          if anchor not in text:
+              raise SystemExit('point-in-time CI anchor missing')
+          block = (
+              '      - name: Test temporal noninterference benchmark\n'
+              '        run: python -m unittest discover -s tools/temporal_noninterference/tests -v\n'
+              '      - name: Test proof-carrying formula contracts\n'
+              '        run: python -m unittest discover -s tools/formula_contract/tests -v\n'
+          )
+          text = text.replace(anchor, block + anchor, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Parse every workflow as YAML
+        shell: bash
+        run: |
+          set -euo pipefail
+          ruby -e 'require "yaml"; Dir[".github/workflows/*.{yml,yaml}"].sort.each { |f| YAML.load_file(f, aliases: true); puts "parsed #{f}" }'
+      - name: Revalidate exact tools and academy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tools/temporal_noninterference/tests -v
+          python -m unittest discover -s tools/formula_contract/tests -v
+          temporal="$(mktemp)"
+          formula="$(mktemp)"
+          python -m tools.temporal_noninterference analyze \
+            --model examples/temporal_noninterference/future_extension.json \
+            --out "$temporal"
+          python -m tools.temporal_noninterference verify \
+            --model examples/temporal_noninterference/future_extension.json \
+            --report "$temporal"
+          python -m tools.formula_contract analyze \
+            --model examples/formula_contract/hedge_scale.json \
+            --out "$formula"
+          python -m tools.formula_contract verify \
+            --model examples/formula_contract/hedge_scale.json \
+            --report "$formula"
+          python -m tools.learning_app.check_curriculum
+          python -m unittest discover -s tools/learning_app/tests -v
+          node --check learning-app/data/causality.js
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+      - name: Commit normalized green tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A
+          validated_tree="$(git write-tree)"
+          mkdir -p .github/validation
+          cat > .github/validation/temporal-formula-green-v2.txt <<EOF
+          validated_source_commit=${GITHUB_SHA}
+          validated_tree=${validated_tree}
+          python=3.12
+          workflow_yaml_parse=success
+          temporal_tests=success
+          formula_contract_tests=success
+          curriculum=success
+          lean_build=success
+          EOF
+          rm -f .github/workflows/one-shot-temporal-formula-validation.yml
+          rm .github/workflows/one-shot-temporal-formula-post-validation.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Normalize and validate causal formula integration'
+          git push origin HEAD:feature/temporal-noninterference-formula-contract
