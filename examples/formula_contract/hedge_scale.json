@@ -1,0 +1,104 @@
+{
+  "schema_version": "lfv-formula-contract-v1",
+  "name": "proof-carrying-hedge-scale-applications",
+  "formula": {
+    "id": "hedge-scale-percent-v1",
+    "kind": "hedge_scale_percent_v1",
+    "expression_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "implementation_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "output_unit": "scalar"
+  },
+  "applications": [
+    {
+      "id": "validHedgeScale",
+      "decision_at": 10,
+      "formula_id": "hedge-scale-percent-v1",
+      "expression_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "implementation_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "inputs": [
+        {"role": "current_risk", "artifact_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": 120},
+        {"role": "hedge_risk", "artifact_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": -80},
+        {"role": "risk_percentage", "artifact_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "available_at": 7, "valuation_at": 8, "model_id": "registered-parameter", "model_version": "v1", "unit": "percent", "value": 50}
+      ],
+      "claimed_result": {"numerator": 3, "denominator": 4}
+    },
+    {
+      "id": "futureRiskInput",
+      "decision_at": 10,
+      "formula_id": "hedge-scale-percent-v1",
+      "expression_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "implementation_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "inputs": [
+        {"role": "current_risk", "artifact_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "available_at": 11, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": 120},
+        {"role": "hedge_risk", "artifact_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": -80},
+        {"role": "risk_percentage", "artifact_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "available_at": 7, "valuation_at": 8, "model_id": "registered-parameter", "model_version": "v1", "unit": "percent", "value": 50}
+      ],
+      "claimed_result": {"numerator": 3, "denominator": 4}
+    },
+    {
+      "id": "currencyUnitMismatch",
+      "decision_at": 10,
+      "formula_id": "hedge-scale-percent-v1",
+      "expression_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "implementation_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "inputs": [
+        {"role": "current_risk", "artifact_sha256": "1010101010101010101010101010101010101010101010101010101010101010", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": 120},
+        {"role": "hedge_risk", "artifact_sha256": "2020202020202020202020202020202020202020202020202020202020202020", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "eur_risk", "value": -80},
+        {"role": "risk_percentage", "artifact_sha256": "3030303030303030303030303030303030303030303030303030303030303030", "available_at": 7, "valuation_at": 8, "model_id": "registered-parameter", "model_version": "v1", "unit": "percent", "value": 50}
+      ],
+      "claimed_result": {"numerator": 3, "denominator": 4}
+    },
+    {
+      "id": "modelVersionMismatch",
+      "decision_at": 10,
+      "formula_id": "hedge-scale-percent-v1",
+      "expression_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "implementation_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "inputs": [
+        {"role": "current_risk", "artifact_sha256": "4040404040404040404040404040404040404040404040404040404040404040", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": 120},
+        {"role": "hedge_risk", "artifact_sha256": "5050505050505050505050505050505050505050505050505050505050505050", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v2", "unit": "usd_risk", "value": -80},
+        {"role": "risk_percentage", "artifact_sha256": "6060606060606060606060606060606060606060606060606060606060606060", "available_at": 7, "valuation_at": 8, "model_id": "registered-parameter", "model_version": "v1", "unit": "percent", "value": 50}
+      ],
+      "claimed_result": {"numerator": 3, "denominator": 4}
+    },
+    {
+      "id": "zeroHedgeRisk",
+      "decision_at": 10,
+      "formula_id": "hedge-scale-percent-v1",
+      "expression_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "implementation_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "inputs": [
+        {"role": "current_risk", "artifact_sha256": "7070707070707070707070707070707070707070707070707070707070707070", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": 120},
+        {"role": "hedge_risk", "artifact_sha256": "8080808080808080808080808080808080808080808080808080808080808080", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": 0},
+        {"role": "risk_percentage", "artifact_sha256": "9090909090909090909090909090909090909090909090909090909090909090", "available_at": 7, "valuation_at": 8, "model_id": "registered-parameter", "model_version": "v1", "unit": "percent", "value": 50}
+      ],
+      "claimed_result": {"numerator": 0, "denominator": 1}
+    },
+    {
+      "id": "resultRelabeled",
+      "decision_at": 10,
+      "formula_id": "hedge-scale-percent-v1",
+      "expression_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "implementation_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "inputs": [
+        {"role": "current_risk", "artifact_sha256": "abababababababababababababababababababababababababababababababab", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": 120},
+        {"role": "hedge_risk", "artifact_sha256": "bcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbcbc", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": -80},
+        {"role": "risk_percentage", "artifact_sha256": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd", "available_at": 7, "valuation_at": 8, "model_id": "registered-parameter", "model_version": "v1", "unit": "percent", "value": 50}
+      ],
+      "claimed_result": {"numerator": 1, "denominator": 2}
+    },
+    {
+      "id": "formulaHashMismatch",
+      "decision_at": 10,
+      "formula_id": "hedge-scale-percent-v1",
+      "expression_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "implementation_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "inputs": [
+        {"role": "current_risk", "artifact_sha256": "dededededededededededededededededededededededededededededededede", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": 120},
+        {"role": "hedge_risk", "artifact_sha256": "efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef", "available_at": 8, "valuation_at": 8, "model_id": "risk-model", "model_version": "v1", "unit": "usd_risk", "value": -80},
+        {"role": "risk_percentage", "artifact_sha256": "1212121212121212121212121212121212121212121212121212121212121212", "available_at": 7, "valuation_at": 8, "model_id": "registered-parameter", "model_version": "v1", "unit": "percent", "value": 50}
+      ],
+      "claimed_result": {"numerator": 3, "denominator": 4}
+    }
+  ]
+}
