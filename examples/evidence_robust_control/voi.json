@@ -1,0 +1,45 @@
+{
+  "schema_version": "lfv-evidence-robust-control-v1",
+  "name": "evidence-conditioned-robust-control-and-capital",
+  "current_models": ["bear", "base", "bull"],
+  "actions": [
+    {
+      "id": "hold",
+      "execution_cost_bps": 0,
+      "model_values_bps": {"bear": 1, "base": 2, "bull": 2}
+    },
+    {
+      "id": "increase",
+      "execution_cost_bps": 1,
+      "model_values_bps": {"bear": -8, "base": 8, "bull": 15}
+    },
+    {
+      "id": "reduce",
+      "execution_cost_bps": 1,
+      "model_values_bps": {"bear": 5, "base": 0, "bull": -3}
+    }
+  ],
+  "queries": [
+    {
+      "id": "independentMacro",
+      "cost_bps": 1,
+      "observations": {
+        "stable": ["base", "bull"],
+        "stress": ["bear"]
+      }
+    },
+    {
+      "id": "sameVendor",
+      "cost_bps": 1,
+      "observations": {
+        "unchanged": ["bear", "base", "bull"]
+      }
+    }
+  ],
+  "capital_rule": {
+    "robust_value_before_bps": 1,
+    "robust_value_after_bps": 3,
+    "crowding_cost_before_bps": 1,
+    "crowding_cost_after_bps": 2
+  }
+}
