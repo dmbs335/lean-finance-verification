@@ -17,6 +17,7 @@ REQUIRED_APP_FILES = (
     "learning-app/data/finance.js", "learning-app/data/alpha.js",
     "learning-app/data/research.js", "learning-app/data/event-study.js",
     "learning-app/data/composition.js", "learning-app/data/temporal.js",
+    "learning-app/data/research-version-space.js",
     "learning-app/data/backtest.js", "learning-app/data/epistemic.js",
     "learning-app/data/robust.js", "learning-app/data/infrastructure.js",
     "learning-app/data/curriculum.js", "learning-app/app/core.js",
@@ -41,8 +42,9 @@ REQUIRED_TOOL_DIRS = {
     "tools/evidence_portfolio", "tools/certifiability_crowding",
     "tools/epistemic_liquidation", "tools/epistemic_event_study",
     "tools/certificate_composition", "tools/temporal_noninterference",
-    "tools/research_agent", "tools/pit_study", "tools/pit_vendor_import",
-    "tools/external_quorum", "tools/selective_receipt", "tools/zk_receipt",
+    "tools/research_version_space", "tools/research_agent", "tools/pit_study",
+    "tools/pit_vendor_import", "tools/external_quorum",
+    "tools/selective_receipt", "tools/zk_receipt",
 }
 
 
@@ -181,7 +183,7 @@ def validate_curriculum(repository_root: Path) -> dict[str, Any]:
         _require(isinstance(learning_path.get("description"), str) and learning_path["description"], f"{label}.description missing")
     for tool_dir in REQUIRED_TOOL_DIRS: _require((root / tool_dir).is_dir(), f"missing required tool directory: {tool_dir}")
     html = (root / "learning-app/index.html").read_text(encoding="utf-8")
-    assets = ("styles/base.css","styles/layout.css","styles/components.css","data/meta.js","data/orientation.js","data/finance.js","data/alpha.js","data/research.js","data/event-study.js","data/composition.js","data/temporal.js","data/backtest.js","data/epistemic.js","data/robust.js","data/infrastructure.js","data/curriculum.js","app/core.js","app/render-a.js","app/render-b.js","app/main.js")
+    assets = ("styles/base.css","styles/layout.css","styles/components.css","data/meta.js","data/orientation.js","data/finance.js","data/alpha.js","data/research.js","data/event-study.js","data/composition.js","data/temporal.js","data/research-version-space.js","data/backtest.js","data/epistemic.js","data/robust.js","data/infrastructure.js","data/curriculum.js","app/core.js","app/render-a.js","app/render-b.js","app/main.js")
     for asset in assets:
         attribute = "href" if asset.endswith(".css") else "src"; _require(f'{attribute}="{asset}"' in html, f"index.html must load {asset}")
     _require(not re.search(r'<(?:script|link)[^>]+https?://', html, re.IGNORECASE), "external scripts/styles forbidden")
