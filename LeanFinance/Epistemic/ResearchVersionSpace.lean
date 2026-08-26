@@ -251,6 +251,10 @@ theorem exact_range_collapses_of_identification
     exactRange.lowerIsGreatest.2 (metric world) metricIsLower
   have upperLeMetric : exactRange.upper ≤ metric world :=
     exactRange.upperIsLeast.2 (metric world) metricIsUpper
+  have lowerLeUpper : exactRange.lower ≤ exactRange.upper :=
+    exactRange.ordered
+  have upperLeLower : exactRange.upper ≤ exactRange.lower :=
+    le_trans upperLeMetric metricLeLower
   grind
 
 end ResearchVersionSpace
