@@ -1,0 +1,269 @@
+name: One-shot research version-space validation
+
+on:
+  push:
+    branches:
+      - feature/unified-research-version-space
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feature/unified-research-version-space
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Integrate version-space modules into repository contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          epistemic = Path('LeanFinance/Epistemic.lean')
+          text = epistemic.read_text(encoding='utf-8')
+          line = 'import LeanFinance.Epistemic.ResearchVersionSpace\n'
+          if line not in text:
+              text += line
+              epistemic.write_text(text, encoding='utf-8')
+
+          index = Path('learning-app/index.html')
+          html = index.read_text(encoding='utf-8')
+          if 'data/version-space.js' not in html:
+              needle = '<script src="data/curriculum.js"></script>'
+              if needle not in html:
+                  raise SystemExit('curriculum script tag not found')
+              html = html.replace(
+                  needle,
+                  '<script src="data/version-space.js"></script>' + needle,
+                  1,
+              )
+              match = re.search(r'(\d+)개 레슨', html)
+              if match:
+                  count = int(match.group(1)) + 1
+                  html = html[:match.start()] + f'{count}개 레슨' + html[match.end():]
+          index.write_text(html, encoding='utf-8')
+
+          meta = Path('learning-app/data/meta.js')
+          raw = meta.read_text(encoding='utf-8').strip()
+          prefix = 'window.LFV_ACADEMY = '
+          if not raw.startswith(prefix) or not raw.endswith(';'):
+              raise SystemExit('unexpected meta.js wrapper')
+          data = json.loads(raw[len(prefix):-1])
+          if not any(area['id'] == 'research-version-space' for area in data['coverageAreas']):
+              data['coverageAreas'].append({
+                  'id': 'research-version-space',
+                  'label': 'Unified research version space',
+                  'paths': [
+                      'LeanFinance/Epistemic/ResearchVersionSpace.lean',
+                      'tools/research_version_space/',
+                  ],
+              })
+
+          def insert_after(values, anchor, item):
+              if item in values:
+                  return
+              position = values.index(anchor) + 1 if anchor in values else len(values)
+              values.insert(position, item)
+
+          for learning_path in data['paths']:
+              if learning_path['id'] in {
+                  'evidence-theory',
+                  'hidden-investment-laws',
+                  'researcher',
+              }:
+                  insert_after(
+                      learning_path['lessonIds'],
+                      'proof-carrying-formula',
+                      'unified-research-version-space',
+                  )
+          if not any(path['id'] == 'research-version-space' for path in data['paths']):
+              data['paths'].append({
+                  'id': 'research-version-space',
+                  'label': 'Unified Research Version Space',
+                  'description': (
+                      'Data, model, search, execution, and universe worlds를 '
+                      'evidence-conditioned range로 통합합니다.'
+                  ),
+                  'lessonIds': [
+                      'temporal-noninterference',
+                      'alpha-uncertainty',
+                      'proof-carrying-formula',
+                      'unified-research-version-space',
+                      'generated-ci',
+                  ],
+              })
+          meta.write_text(
+              prefix + json.dumps(data, ensure_ascii=False, indent=2) + ';\n',
+              encoding='utf-8',
+          )
+
+          checker = Path('tools/learning_app/check_curriculum.py')
+          source = checker.read_text(encoding='utf-8')
+          if 'learning-app/data/version-space.js' not in source:
+              anchor = '"learning-app/data/causal-formula.js",'
+              if anchor not in source:
+                  raise SystemExit('checker app-file anchor missing')
+              source = source.replace(
+                  anchor,
+                  anchor + '\n    "learning-app/data/version-space.js",',
+                  1,
+              )
+          if '"research-version-space"' not in source:
+              pattern = re.compile(
+                  r'("causal-formula"\s*,\s*)("research-agent")'
+              )
+              source, count = pattern.subn(
+                  r'\1"research-version-space", \2', source, count=1
+              )
+              if count != 1:
+                  raise SystemExit('checker coverage anchor missing')
+          if '"tools/research_version_space"' not in source:
+              anchor = '"tools/causal_formula_contract"'
+              if anchor not in source:
+                  raise SystemExit('checker tool anchor missing')
+              source = source.replace(
+                  anchor,
+                  anchor + ', "tools/research_version_space"',
+                  1,
+              )
+          if '"data/version-space.js"' not in source:
+              anchor = '"data/causal-formula.js"'
+              if anchor not in source:
+                  raise SystemExit('checker asset anchor missing')
+              source = source.replace(
+                  anchor,
+                  anchor + ',"data/version-space.js"',
+                  1,
+              )
+          checker.write_text(source, encoding='utf-8')
+
+          learning_readme = Path('learning-app/README.md')
+          text = learning_readme.read_text(encoding='utf-8')
+          pattern = re.compile(
+              r'six tracks, (\d+) lessons, and (\d+) goal-oriented paths'
+          )
+          match = pattern.search(text)
+          if match and 'Unified Research Version Space' not in text:
+              replacement = (
+                  f'six tracks, {int(match.group(1)) + 1} lessons, and '
+                  f'{int(match.group(2)) + 1} goal-oriented paths'
+              )
+              text = text[:match.start()] + replacement + text[match.end():]
+              text += (
+                  '\n\n## Unified Research Version Space\n\n'
+                  'The version-space lesson unifies data vintage, model '
+                  'version, adaptive search, execution semantics, and universe '
+                  'state. It connects exact endpoint witnesses and evidence '
+                  'refinement to certifiable alpha and risk intervals.\n'
+              )
+          learning_readme.write_text(text, encoding='utf-8')
+
+          readme = Path('README.md')
+          text = readme.read_text(encoding='utf-8')
+          marker = '### Unified research version spaces\n'
+          if marker not in text:
+              section = '''### Unified research version spaces
+
+`LeanFinance/Epistemic/ResearchVersionSpace.lean` and `tools/research_version_space/` model complete research worlds across data vintage, model version, search history, execution semantics, and universe state. Stronger evidence is set inclusion over admissible worlds. Lean proves exact alpha/risk endpoints contract under refinement, while the finite solver synthesizes the minimum evidence needed to meet registered interval widths and preserves legitimate residual model uncertainty.
+
+'''
+              insertion = text.find('## Repository layout')
+              if insertion < 0:
+                  raise SystemExit('README repository-layout marker missing')
+              text = text[:insertion] + section + text[insertion:]
+          readme.write_text(text, encoding='utf-8')
+
+          lean_ci = Path('.github/workflows/lean.yml')
+          source = lean_ci.read_text(encoding='utf-8')
+          if 'Test unified research version spaces' not in source:
+              anchors = [
+                  '      - name: Test temporal noninterference and formula contracts\n',
+                  '      - name: Test proof-carrying research agent and candidate gates\n',
+              ]
+              anchor = next((item for item in anchors if item in source), None)
+              if anchor is None:
+                  raise SystemExit('Lean CI insertion anchor missing')
+              if anchor.startswith('      - name: Test temporal'):
+                  position = source.index(anchor) + len(anchor)
+                  run_line_end = source.index('\n', position) + 1
+                  step = (
+                      '      - name: Test unified research version spaces\n'
+                      '        run: python -m unittest discover -s '
+                      'tools/research_version_space/tests -v\n'
+                  )
+                  source = source[:run_line_end] + step + source[run_line_end:]
+              else:
+                  step = (
+                      '      - name: Test unified research version spaces\n'
+                      '        run: python -m unittest discover -s '
+                      'tools/research_version_space/tests -v\n'
+                  )
+                  source = source.replace(anchor, step + anchor, 1)
+          lean_ci.write_text(source, encoding='utf-8')
+          PY
+      - name: Test exact research version spaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tools/research_version_space/tests -v
+          first="$(mktemp)"
+          second="$(mktemp)"
+          python -m tools.research_version_space analyze \
+            --model examples/research_version_space/integrity_and_model_uncertainty.json \
+            --out "$first"
+          python -m tools.research_version_space analyze \
+            --model examples/research_version_space/integrity_and_model_uncertainty.json \
+            --out "$second"
+          cmp "$first" "$second"
+          python -m tools.research_version_space verify \
+            --model examples/research_version_space/integrity_and_model_uncertainty.json \
+            --report "$first"
+      - name: Validate learning app
+        run: |
+          python -m tools.learning_app.check_curriculum
+          python -m unittest discover -s tools/learning_app/tests -v
+          node --check learning-app/data/version-space.js
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+      - name: Commit validated integration and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add LeanFinance/Epistemic.lean \
+            learning-app/index.html \
+            learning-app/data/meta.js \
+            tools/learning_app/check_curriculum.py \
+            learning-app/README.md \
+            README.md \
+            .github/workflows/lean.yml
+          validated_tree="$(git write-tree)"
+          mkdir -p .github/validation
+          cat > .github/validation/research-version-space-green.txt <<EOF
+          validated_source_commit=${GITHUB_SHA}
+          validated_tree=${validated_tree}
+          python=3.12
+          version_space_tests=success
+          deterministic_reproduction=success
+          curriculum=success
+          lean_build=success
+          EOF
+          rm .github/workflows/one-shot-research-version-space-validation.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Integrate and validate unified research version spaces'
+          git push origin HEAD:feature/unified-research-version-space
