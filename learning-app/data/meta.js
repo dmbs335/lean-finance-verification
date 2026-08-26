@@ -302,6 +302,15 @@ window.LFV_ACADEMY = {
         "LeanFinance/Epistemic/CertificateComposition.lean",
         "tools/certificate_composition/"
       ]
+    },
+    {
+      "id": "research-version-space",
+      "label": "Unified research version space",
+      "paths": [
+        "LeanFinance/Epistemic/ResearchVersionSpace.lean",
+        "LeanFinance/Epistemic/ResearchVersionSpaceExample.lean",
+        "tools/research_version_space/"
+      ]
     }
   ],
   "paths": [
@@ -370,6 +379,7 @@ window.LFV_ACADEMY = {
         "trace-refinement",
         "evidence-debt",
         "version-space",
+        "research-version-space",
         "connectivity-robustness",
         "multi-claim",
         "certificate-composition",
@@ -400,6 +410,7 @@ window.LFV_ACADEMY = {
         "certifiable-alpha",
         "fake-alpha",
         "alpha-uncertainty",
+        "research-version-space",
         "evidence-adjusted-portfolio",
         "certifiability-crowding",
         "epistemic-liquidation",
@@ -445,6 +456,7 @@ window.LFV_ACADEMY = {
         "non-amplification",
         "evidence-debt",
         "version-space",
+        "research-version-space",
         "connectivity-robustness",
         "multi-claim",
         "certificate-composition",
@@ -470,6 +482,18 @@ window.LFV_ACADEMY = {
         "multi-claim",
         "certificate-composition",
         "generated-ci"
+      ]
+    },
+    {
+      "id": "research-version-space",
+      "label": "Unified Research Version Space",
+      "description": "데이터·모델·탐색·실행·universe uncertainty를 하나의 admissible-world calculus로 분석합니다.",
+      "lessonIds": [
+        "version-space",
+        "temporal-noninterference",
+        "formula-contract",
+        "alpha-uncertainty",
+        "research-version-space"
       ]
     }
   ],
