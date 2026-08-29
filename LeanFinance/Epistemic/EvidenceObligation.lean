@@ -37,7 +37,7 @@ def SeparatorSignatureSubsumedBy
           Separates channel evidenceChannel honestHistory largerAttack
 
 /-- Separator-signature equality is reflexive. -/
-theorem sameSeparatorSignature_refl
+theorem globalSameSeparatorSignature_refl
     {Channel : Type u}
     {History : Type v}
     {Observation : Type w}
@@ -49,7 +49,7 @@ theorem sameSeparatorSignature_refl
   exact Iff.rfl
 
 /-- Separator-signature equality is symmetric. -/
-theorem sameSeparatorSignature_symm
+theorem globalSameSeparatorSignature_symm
     {Channel : Type u}
     {History : Type v}
     {Observation : Type w}
@@ -63,7 +63,7 @@ theorem sameSeparatorSignature_symm
   exact (same honestHistory honestReference evidenceChannel).symm
 
 /-- Separator-signature equality is transitive. -/
-theorem sameSeparatorSignature_trans
+theorem globalSameSeparatorSignature_trans
     {Channel : Type u}
     {History : Type v}
     {Observation : Type w}
@@ -129,10 +129,14 @@ theorem sameSeparatorSignature_iff_mutual_subsumption
     · intro honestHistory honestReference evidenceChannel separates
       exact
         (same honestHistory honestReference evidenceChannel).mpr separates
-  · intro mutual honestHistory honestReference evidenceChannel
+  · intro subsumptions
+    unfold SameSeparatorSignature
+    intro honestHistory honestReference evidenceChannel
     constructor
-    · exact mutual.1 honestHistory honestReference evidenceChannel
-    · exact mutual.2 honestHistory honestReference evidenceChannel
+    · intro separates
+      exact subsumptions.1 honestHistory honestReference evidenceChannel separates
+    · intro separates
+      exact subsumptions.2 honestHistory honestReference evidenceChannel separates
 
 /-- A set of previously known attacks is represented as a history predicate.
 A new attack is epistemically novel when no known attack has the same separator

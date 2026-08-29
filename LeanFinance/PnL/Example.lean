@@ -4,73 +4,91 @@ namespace LeanFinance.PnL.Example
 
 open LeanFinance.PnL
 
-def quadraticModel : QuadraticValue :=
-  { constant := 0
-    linear := 10
-    quadratic := 2 }
+def binding : AttributionBinding :=
+  { portfolioHash := "portfolio-example"
+    marketDataBeforeHash := "market-before"
+    marketDataAfterHash := "market-after"
+    modelId := "quadratic-example"
+    modelVersion := "v1"
+    valuationBefore := 0
+    valuationAfter := 2 }
 
-theorem controlled_realized_change_is_twenty_eight :
-    quadraticModel.realizedChange 0 2 = 28 := by
+def quadraticFactor : LocalQuadraticAttribution :=
+  { factorId := "controlled-quadratic"
+    baseValue := 0
+    firstSensitivity := 10
+    halfSecondSensitivity := 2
+    marketMove := 2
+    claimedFirstOrderPnl := 20
+    claimedSecondOrderPnl := 8
+    availableAt := 2
+    binding := binding }
+
+theorem controlled_first_order_is_twenty :
+    quadraticFactor.firstOrderPnl = 20 := by
+  decide
+
+theorem controlled_second_order_is_eight :
+    quadraticFactor.secondOrderPnl = 8 := by
   decide
 
 theorem controlled_attribution_closes_exactly :
-    quadraticModel.realizedChange 0 2 =
-      quadraticModel.firstOrder 0 2 +
-        quadraticModel.secondOrder 2 :=
-  quadraticModel.exact_quadratic_closure 0 2
+    quadraticFactor.modeledAfterValue - quadraticFactor.baseValue =
+      quadraticFactor.explainedPnl :=
+  quadraticFactor.exact_local_quadratic_closure
 
-def closedExplanation : Explanation :=
-  { realizedPnL := 28
-    attributions := [20, 8]
-    residual := 0
-    residualTolerance := 0
-    localGreeksValid := true
-    localMarketMoveValid := true
-    localResultValid := true
-    positionBound := true
-    modelBound := true
-    valuationTimeBound := true
-    formulaBound := true
-    accounting := by decide }
+def zeroNonMarket : NonMarketPnl :=
+  { carry := 0
+    trades := 0
+    cashflows := 0
+    transactionCost := 0
+    modelRevision := 0 }
+
+def closedExplanation : PnlExplain :=
+  { explanationId := "quadratic-closed"
+    decisionAt := 2
+    tolerance := 0
+    binding := binding
+    factors := [quadraticFactor]
+    nonMarket := zeroNonMarket
+    result :=
+      { realizedPnl := 28
+        generatedAt := 2
+        binding := binding } }
 
 theorem exact_quadratic_explanation_is_closed :
-    closedExplanation.status = .closed := by
+    closedExplanation.Closed := by
+  unfold PnlExplain.Closed PnlExplain.LocalAndBindingValid
   decide
 
-def partialExplanation : Explanation :=
-  { realizedPnL := 35
-    attributions := [20, 8]
-    residual := 7
-    residualTolerance := 3
-    localGreeksValid := true
-    localMarketMoveValid := true
-    localResultValid := true
-    positionBound := true
-    modelBound := true
-    valuationTimeBound := true
-    formulaBound := true
-    accounting := by decide }
+def partialExplanation : PnlExplain :=
+  { closedExplanation with
+    explanationId := "quadratic-partial"
+    tolerance := 3
+    result :=
+      { realizedPnl := 35
+        generatedAt := 2
+        binding := binding } }
 
 theorem material_residual_is_partial :
-    partialExplanation.status = .partial := by
+    partialExplanation.Partial := by
+  unfold PnlExplain.Partial PnlExplain.LocalAndBindingValid
   decide
 
-def modelSubstitutedExplanation : Explanation :=
-  { realizedPnL := 28
-    attributions := [20, 8]
-    residual := 0
-    residualTolerance := 0
-    localGreeksValid := true
-    localMarketMoveValid := true
-    localResultValid := true
-    positionBound := true
-    modelBound := false
-    valuationTimeBound := true
-    formulaBound := true
-    accounting := by decide }
+def substitutedBinding : AttributionBinding :=
+  { binding with modelVersion := "v2" }
+
+def substitutedFactor : LocalQuadraticAttribution :=
+  { quadraticFactor with binding := substitutedBinding }
+
+def modelSubstitutedExplanation : PnlExplain :=
+  { closedExplanation with
+    explanationId := "quadratic-open-model-substitution"
+    factors := [substitutedFactor] }
 
 theorem zero_residual_with_model_mismatch_is_open :
-    modelSubstitutedExplanation.status = .open := by
+    modelSubstitutedExplanation.Open := by
+  unfold PnlExplain.Open PnlExplain.LocalAndBindingValid
   decide
 
 end LeanFinance.PnL.Example

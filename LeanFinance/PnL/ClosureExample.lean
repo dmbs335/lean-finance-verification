@@ -69,7 +69,9 @@ theorem controlled_residual_is_one :
 
 def closedCertificate : PnlExplainClosureCertificate :=
   { explain := closedExplanation
-    closed := by decide }
+    closed := by
+      unfold PnlExplain.Closed PnlExplain.LocalAndBindingValid
+      decide }
 
 def partialExplanation : PnlExplain :=
   { closedExplanation with
@@ -81,6 +83,7 @@ def partialExplanation : PnlExplain :=
 
 theorem material_residual_is_partial :
     partialExplanation.Partial := by
+  unfold PnlExplain.Partial PnlExplain.LocalAndBindingValid
   decide
 
 def substitutedBinding : AttributionBinding :=
@@ -108,6 +111,7 @@ theorem local_formula_correctness_does_not_imply_global_binding :
 
 theorem binding_failure_keeps_explanation_open :
     openExplanation.Open := by
+  unfold PnlExplain.Open PnlExplain.LocalAndBindingValid
   decide
 
 end LeanFinance.PnL.ClosureExample

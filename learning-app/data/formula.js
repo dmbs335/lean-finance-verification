@@ -4,7 +4,7 @@ window.LFV_ACADEMY.lessons.push(...[
     "title":"Proof-Carrying Formula Contract",
     "subtitle":"수식의 대수적 정확성과 실제 금융 적용의 시점·단위·모델·artifact binding을 분리합니다.",
     "difficulty":"연구","minutes":40,
-    "covers":["backtest","composition"],
+    "covers":["formula-contract","backtest","composition"],
     "prerequisites":["temporal-noninterference","certificate-composition"],
     "outcomes":["formula correctness와 application correctness를 구분한다.","hedge scale의 preregistration·unit·time·model·domain obligation을 검사한다.","exact rational output을 input/output artifact에 binding한다."],
     "concepts":["formula definition","application contract","unit signature","domain precondition","implementation hash","result binding"],

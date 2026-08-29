@@ -125,8 +125,8 @@ theorem robustSelected_survives_any_single_channel_failure :
     allSingleChannelFailures_complete
     robustSelected_verifies_all_single_channel_failures_on_list
 
-/-- Kernel computation checks all 512 channel subsets and all ten single-channel
-    failure scenarios. -/
+/-- Native decision checks all 512 channel subsets and all ten single-channel
+    failure scenarios without materializing an enormous reduction proof term. -/
 theorem singleChannelCheckerCostMinimal :
     ∀ candidate : RobustCandidate,
       robustBoundedVerifiesBool
@@ -136,7 +136,7 @@ theorem singleChannelCheckerCostMinimal :
           survivesAllSingleChannelFailure = true →
         selectionCost resilientModel (robustDecode robustSelected) ≤
           selectionCost resilientModel (robustDecode candidate) := by
-  decide
+  native_decide
 
 theorem robustSelected_is_minimum_cost_single_channel_resilient
     (candidate : RobustCandidate)
@@ -209,8 +209,8 @@ theorem robustSelected_survives_any_single_domain_failure :
     allSingleDomainFailures_complete
     robustSelected_verifies_all_single_domain_failures_on_list
 
-/-- Kernel computation independently checks the same 512 candidates against
-    all eight independent-domain scenarios. -/
+/-- Native decision independently checks the same 512 candidates against all
+    eight independent-domain scenarios. -/
 theorem singleDomainCheckerCostMinimal :
     ∀ candidate : RobustCandidate,
       robustBoundedVerifiesBool
@@ -220,7 +220,7 @@ theorem singleDomainCheckerCostMinimal :
           (survivesDomainFailure independentDomain) = true →
         selectionCost resilientModel (robustDecode robustSelected) ≤
           selectionCost resilientModel (robustDecode candidate) := by
-  decide
+  native_decide
 
 theorem robustSelected_is_minimum_cost_single_domain_resilient
     (candidate : RobustCandidate)

@@ -68,7 +68,7 @@ theorem exact_local_quadratic_closure
     factor.modeledAfterValue - factor.baseValue = factor.explainedPnl := by
   change factor.baseValue + factor.explainedPnl - factor.baseValue =
     factor.explainedPnl
-  exact add_sub_cancel_left factor.baseValue factor.explainedPnl
+  omega
 
 /-- The implementation-reported first- and second-order terms match the exact
     registered local quadratic expression. -/

@@ -37,9 +37,20 @@ class BuildResult:
     lean_source: str
 
 
-def _raw_file_descriptor(spec: ExperimentSpec, relative: str) -> dict[str, Any]:
+def _source_bytes(path: Path) -> bytes:
+    """Return a platform-independent UTF-8 representation of source text."""
+    text = path.read_bytes().decode("utf-8")
+    return text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+
+
+def _raw_file_descriptor(
+    spec: ExperimentSpec,
+    relative: str,
+    *,
+    canonical_source: bool = False,
+) -> dict[str, Any]:
     path = spec.resolve(relative)
-    raw = path.read_bytes()
+    raw = _source_bytes(path) if canonical_source else path.read_bytes()
     return {
         "path": logical_path(spec.root, path),
         "size": len(raw),
@@ -79,7 +90,7 @@ def _artifact_descriptor(
 
 def compute_code_artifact(spec: ExperimentSpec) -> dict[str, Any]:
     files = [
-        _raw_file_descriptor(spec, relative)
+        _raw_file_descriptor(spec, relative, canonical_source=True)
         for relative in sorted(spec.code.paths)
     ]
     return _artifact_descriptor(

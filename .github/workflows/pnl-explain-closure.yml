@@ -27,8 +27,24 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+      - name: Install pinned GS Quant runtime
+        run: python -m pip install gs-quant==2.1.6
       - name: Test PnL-explain closure
         run: python -m unittest discover -s tools/pnl_explain_closure/tests -v
+      - name: Execute and replay pinned GS Quant conformance
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$(mktemp)"
+          python -m tools.pnl_explain_closure gs-quant-conformance \
+            --model examples/pnl_explain_closure/gs_quant_conformance.json \
+            --out "$report"
+          cmp \
+            "$report" \
+            examples/pnl_explain_closure/generated/gs-quant-conformance.canonical.json
+          python -m tools.pnl_explain_closure verify-gs-quant-conformance \
+            --model examples/pnl_explain_closure/gs_quant_conformance.json \
+            --report examples/pnl_explain_closure/generated/gs-quant-conformance.canonical.json
       - name: Recompute and verify controlled report
         shell: bash
         run: |

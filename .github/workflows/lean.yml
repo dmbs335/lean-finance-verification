@@ -19,7 +19,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
         with:
@@ -29,50 +29,10 @@ jobs:
           python-version: "3.12"
       - name: Record OpenSSL verifier version
         run: openssl version -a
-      - name: Test Python reference adapter
-        run: python -m unittest discover -s tools/lfv_adapter/tests -v
-      - name: Test exact evidence synthesizer
-        run: python -m unittest discover -s tools/evidence_synth/tests -v
-      - name: Test workflow counterexample-guided synthesis
-        run: python -m unittest discover -s tools/workflow_cegis/tests -v
-      - name: Test observed attack-trace refinement
-        run: python -m unittest discover -s tools/trace_refinement/tests -v
-      - name: Test evidence-obligation taxonomy
-        run: python -m unittest discover -s tools/evidence_taxonomy/tests -v
-      - name: Test robust evidence synthesis
-        run: python -m unittest discover -s tools/robust_evidence/tests -v
-      - name: Test action-semantics version-space synthesis
-        run: python -m unittest discover -s tools/model_family_synth/tests -v
-      - name: Test multi-claim evidence synthesis
-        run: python -m unittest discover -s tools/multiclaim_synth/tests -v
-      - name: Test symbolic evidence synthesis and attack corpus
-        run: python -m unittest discover -s tools/symbolic_evidence/tests -v
-      - name: Test fake-alpha benchmark
-        run: python -m unittest discover -s tools/fake_alpha_benchmark/tests -v
-      - name: Test certifiable-alpha interval synthesis
-        run: python -m unittest discover -s tools/certifiable_alpha_interval/tests -v
-      - name: Test evidence-adjusted portfolio synthesis
-        run: python -m unittest discover -s tools/evidence_portfolio/tests -v
-      - name: Test certifiability-crowding law and alpha-death taxonomy
-        run: python -m unittest discover -s tools/certifiability_crowding/tests -v
-      - name: Test epistemic-liquidation dynamics and dependency overlap
-        run: python -m unittest discover -s tools/epistemic_liquidation/tests -v
-      - name: Test preregistered epistemic event study
-        run: python -m unittest discover -s tools/epistemic_event_study/tests -v
-      - name: Test proof-carrying research agent and candidate gates
-        run: python -m unittest discover -s tools/research_agent/tests -v
-      - name: Test temporal noninterference and semantic fuzzer
-        run: python -m unittest discover -s tools/temporal_noninterference/tests -v
-      - name: Test point-in-time data study
-        run: python -m unittest discover -s tools/pit_study/tests -v
-      - name: Test signed PIT vendor import
-        run: python -m unittest discover -s tools/pit_vendor_import/tests -v
-      - name: Test signed external evidence quorum
-        run: python -m unittest discover -s tools/external_quorum/tests -v
-      - name: Test selective-disclosure execution receipts
-        run: python -m unittest discover -s tools/selective_receipt/tests -v
-      - name: Test experimental zero-count ZK receipts
-        run: python -m unittest discover -s tools/zk_receipt/tests -v
+      - name: Test all Python tools
+        run: python -m unittest discover -s tools -p 'test_*.py' -v
+      - name: Verify repository manifest
+        run: python -m tools.repository_manifest check
       - name: Check evidence taxonomy reproducibility
         run: >-
           python -m tools.evidence_taxonomy check-generated
@@ -147,3 +107,44 @@ jobs:
         with:
           build: true
           test: false
+      - name: Compile generated proof modules independently
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r module; do
+            lake build "$module"
+          done <<'MODULES'
+          LeanFinance.Generated.ReferenceAdapter
+          LeanFinance.Generated.EvidenceSynthesis
+          LeanFinance.Generated.WorkflowSearch
+          LeanFinance.Generated.WorkflowEvidence
+          LeanFinance.Generated.WorkflowCEGIS
+          LeanFinance.Generated.ObservedCostModelTampering.Search
+          LeanFinance.Generated.ObservedCostModelTampering.Evidence
+          LeanFinance.Generated.ObservedCostModelTampering.CEGIS
+          LeanFinance.Generated.ObservedCostModelTampering.TraceRefinement
+          LeanFinance.Generated.ObservedCostModelTampering.ConservativeRefinement
+          LeanFinance.Generated.ObservedCostModelTampering.EvidenceDebt
+          LeanFinance.Generated.ObservedCostModelTampering.Connectivity
+          LeanFinance.Generated.ObservedCostModelTampering.RobustSynthesis
+          LeanFinance.Generated.ObservedCostModelTampering.Taxonomy
+          LeanFinance.Generated.ObservedCostModelTampering.ObservationBoundary
+          LeanFinance.Generated.ObservedCostModelTampering.TransitionSeparation
+          MODULES
+
+  windows-portability:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Test cross-platform artifact identity
+        run: python -m unittest discover -s tools/lfv_adapter/tests -v
+      - name: Test learning curriculum integration
+        run: python -m unittest discover -s tools/learning_app/tests -v
+      - name: Test repository manifest portability
+        run: python -m unittest tools.test_repository_manifest -v

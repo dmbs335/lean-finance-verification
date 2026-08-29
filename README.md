@@ -244,7 +244,11 @@ Run an individual Python suite:
 python -m unittest discover -s tools/research_agent/tests -v
 ```
 
-The main GitHub Actions workflow runs every Python suite, canonical/generated artifact reproduction, cryptographic fixtures, and the complete Lean build.
+The main GitHub Actions workflow runs every Python suite, canonical/generated
+artifact reproduction, cryptographic fixtures, and the complete Lean build.
+Generated proof bundles are also compiled independently after their
+reproducibility checks so a future umbrella-import change cannot silently hide
+one of them.
 
 ## Representative commands
 

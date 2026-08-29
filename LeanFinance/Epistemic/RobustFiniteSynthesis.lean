@@ -61,7 +61,7 @@ def checkRobustFaults
       checkRobustFaults model faultModel selected connectivity rest
 
 /-- Fully executable robust bounded verification checker. -/
-def robustBoundedVerifiesBool
+def finiteFaultRobustBoundedVerifiesBool
     {History : Type u}
     {Channel : Type v}
     {Observation : Type w}
@@ -120,7 +120,7 @@ theorem checkRobustFaults_sound
       · exact ih acceptedParts.2 fault memberTail withinRank
 
 /-- Checker acceptance implies robust semantic verification. -/
-theorem robustBoundedVerifiesBool_sound
+theorem finiteFaultRobustBoundedVerifiesBool_sound
     {History : Type u}
     {Channel : Type v}
     {Observation : Type w}
@@ -131,7 +131,7 @@ theorem robustBoundedVerifiesBool_sound
     (selected : List Channel)
     (connectivity : Nat)
     (accepted :
-      robustBoundedVerifiesBool
+      finiteFaultRobustBoundedVerifiesBool
         model faultModel selected connectivity = true) :
     RobustBoundedSelectionVerifies
       model faultModel selected connectivity := by
@@ -181,7 +181,7 @@ theorem checkRobustFaults_complete
       · simp [checkRobustFaults, withinRank, tailAccepted]
 
 /-- The finite checker is complete for the declared robust semantics. -/
-theorem robustBoundedVerifiesBool_complete
+theorem finiteFaultRobustBoundedVerifiesBool_complete
     {History : Type u}
     {Channel : Type v}
     {Observation : Type w}
@@ -194,7 +194,7 @@ theorem robustBoundedVerifiesBool_complete
     (verified :
       RobustBoundedSelectionVerifies
         model faultModel selected connectivity) :
-    robustBoundedVerifiesBool
+    finiteFaultRobustBoundedVerifiesBool
       model faultModel selected connectivity = true := by
   apply checkRobustFaults_complete
   exact verified
@@ -285,9 +285,9 @@ theorem selectedCostLeOfRobustCandidate
       selectionCost model (decode candidate) := by
   apply Nat.le_of_not_gt
   intro cheaper
-  exact
+  exact RobustBoundedCounterexample.notRobustlyVerifies
     (certificate.lowerCostCounterexample candidate cheaper)
-      .notRobustlyVerifies candidateVerifies
+    candidateVerifies
 
 end RobustSynthesisCertificate
 

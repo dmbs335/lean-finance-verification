@@ -93,14 +93,14 @@ def sameDomainDuplicates : Candidate :=
   ⟨3, by decide⟩
 
 theorem selected_checker_accepts :
-    robustBoundedVerifiesBool
+    finiteFaultRobustBoundedVerifiesBool
       model faultModel (decode selected) 2 = true := by
   decide
 
 theorem selected_robustly_verifies :
     RobustBoundedSelectionVerifies
       model faultModel (decode selected) 2 :=
-  robustBoundedVerifiesBool_sound
+  finiteFaultRobustBoundedVerifiesBool_sound
     model faultModel (decode selected) 2
     selected_checker_accepts
 
@@ -108,7 +108,7 @@ theorem selected_robustly_verifies :
 theorem same_domain_duplicates_connectivity_one :
     RobustBoundedSelectionVerifies
       model faultModel (decode sameDomainDuplicates) 1 :=
-  robustBoundedVerifiesBool_sound
+  finiteFaultRobustBoundedVerifiesBool_sound
     model faultModel (decode sameDomainDuplicates) 1
     (by decide)
 
@@ -119,10 +119,10 @@ theorem same_domain_duplicates_not_connectivity_two :
       model faultModel (decode sameDomainDuplicates) 2 := by
   intro verified
   have accepted :=
-    robustBoundedVerifiesBool_complete
+    finiteFaultRobustBoundedVerifiesBool_complete
       model faultModel (decode sameDomainDuplicates) 2 verified
   have rejected :
-      robustBoundedVerifiesBool
+      finiteFaultRobustBoundedVerifiesBool
         model faultModel (decode sameDomainDuplicates) 2 ≠ true := by
     decide
   exact rejected accepted
@@ -138,7 +138,7 @@ theorem duplicate_cost_two :
 /-- Kernel computation checks all eight evidence subsets. -/
 theorem checkerAcceptedCostMinimal :
     ∀ candidate : Candidate,
-      robustBoundedVerifiesBool
+      finiteFaultRobustBoundedVerifiesBool
           model faultModel (decode candidate) 2 = true →
         selectionCost model (decode selected) ≤
           selectionCost model (decode candidate) := by
@@ -154,7 +154,7 @@ theorem selected_is_minimum_cost_robust_portfolio
     selectionCost model (decode selected) ≤
       selectionCost model (decode candidate) :=
   checkerAcceptedCostMinimal candidate
-    (robustBoundedVerifiesBool_complete
+    (finiteFaultRobustBoundedVerifiesBool_complete
       model faultModel (decode candidate) 2 candidateVerifies)
 
 /-- A cheaper same-provider duplicate design is sufficient without faults but

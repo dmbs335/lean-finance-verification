@@ -302,6 +302,24 @@ window.LFV_ACADEMY = {
         "LeanFinance/Epistemic/CertificateComposition.lean",
         "tools/certificate_composition/"
       ]
+    },
+    {
+      "id": "formula-contract",
+      "label": "Proof-carrying formula contracts",
+      "paths": [
+        "LeanFinance/Formula.lean",
+        "LeanFinance/Formula/",
+        "tools/formula_contract/"
+      ]
+    },
+    {
+      "id": "pnl-explain",
+      "label": "Proof-carrying PnL explanation",
+      "paths": [
+        "LeanFinance/PnL.lean",
+        "LeanFinance/PnL/",
+        "tools/pnl_explain_closure/"
+      ]
     }
   ],
   "paths": [
@@ -332,6 +350,8 @@ window.LFV_ACADEMY = {
         "hidden-state-inference",
         "strategy-ecology",
         "supply-chain",
+        "formula-contract",
+        "pnl-explain-closure",
         "certifiable-alpha",
         "fake-alpha",
         "alpha-uncertainty",

@@ -8,8 +8,10 @@ import unittest
 from pathlib import Path
 
 from tools.lfv_adapter.bundle import build_from_spec, verify_bundle
+from tools.lfv_adapter.bundle_build import compute_code_artifact
 from tools.lfv_adapter.canonical import canonical_bytes
 from tools.lfv_adapter.errors import ValidationError
+from tools.lfv_adapter.spec import load_experiment_spec
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
@@ -31,6 +33,21 @@ class BundleTests(unittest.TestCase):
         second = build_from_spec(FIXTURE / "experiment.json", allow_local_anchor=True)
         self.assertEqual(canonical_bytes(first.bundle), canonical_bytes(second.bundle))
         self.assertEqual(first.lean_source, second.lean_source)
+
+    def test_code_identity_is_independent_of_platform_line_endings(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            copied = Path(temporary) / "fixture"
+            shutil.copytree(FIXTURE, copied)
+            spec_path = copied / "experiment.json"
+            original = load_experiment_spec(spec_path)
+            expected = compute_code_artifact(original)
+
+            strategy_path = copied / "strategy.py"
+            source = strategy_path.read_text(encoding="utf-8")
+            strategy_path.write_bytes(source.replace("\n", "\r\n").encode("utf-8"))
+            actual = compute_code_artifact(load_experiment_spec(spec_path))
+
+            self.assertEqual(expected, actual)
 
 
     def test_bundle_digest_detects_metadata_tampering(self) -> None:

@@ -7,30 +7,34 @@ window.LFV_ACADEMY.lessons.push(...[
     "subtitle":"1·2차 risk attribution, non-market PnL, residual과 same-pipeline binding을 하나의 closure certificate로 묶습니다.",
     "difficulty":"연구",
     "minutes":42,
-    "covers":["formula-contract","composition","backtest"],
+    "covers":["pnl-explain","formula-contract","composition","backtest"],
     "prerequisites":["formula-contract","certificate-composition","temporal-noninterference"],
     "outcomes":[
       "GS Quant-style 1·2차 attribution을 local quadratic formula로 해석한다.",
+      "다중 포지션의 유지·부분 청산 경로를 실제 공개 메서드와 exact checker로 대조한다.",
       "accounting identity와 bounded explanatory closure를 구분한다.",
       "동일 portfolio·market snapshot·model version binding이 왜 별도 의무인지 설명한다.",
       "CLOSED, PARTIAL, OPEN 상태를 exact checker로 재현한다."
     ],
-    "concepts":["Taylor attribution","first order","second order","residual bound","PnL closure","model revision","same-pipeline binding"],
+    "concepts":["Taylor attribution","first order","second order","partial exit","portfolio transition","residual bound","PnL closure","model revision","same-pipeline binding"],
     "why":"각 risk term의 산술이 맞아도 서로 다른 portfolio나 model snapshot에서 가져오면 전체 PnL 설명은 거짓일 수 있다. 작은 residual만으로 cross-object substitution을 정당화할 수 없다.",
     "assurance":{
       "proves":["선언된 local quadratic integer model의 exact closure","controlled cases의 formula·time·binding·residual gate와 CLOSED certificate consequences"],
-      "notProves":["실제 pricing function의 전역 quadratic성","higher-order Taylor remainder의 실증 상한","GS Quant runtime 직접 conformance"]
+      "notProves":["실제 pricing function의 전역 quadratic성","higher-order Taylor remainder의 실증 상한","production portfolio 객체와 Goldman Sachs 내부 서비스의 의미론"]
     },
     "sources":[
       "LeanFinance/PnL/Closure.lean",
       "LeanFinance/PnL/ClosureExample.lean",
       "tools/pnl_explain_closure/",
-      "examples/pnl_explain_closure/controlled.json"
+      "examples/pnl_explain_closure/controlled.json",
+      "examples/pnl_explain_closure/gs_quant_conformance.json",
+      "examples/pnl_explain_closure/generated/gs-quant-conformance.canonical.json"
     ],
     "docs":["docs/PNL_EXPLAIN_CLOSURE.md"],
     "commands":[
       "python -m unittest discover -s tools/pnl_explain_closure/tests -v",
-      "python -m tools.pnl_explain_closure analyze --model examples/pnl_explain_closure/controlled.json --out /tmp/pnl-explain-closure.json"
+      "python -m tools.pnl_explain_closure analyze --model examples/pnl_explain_closure/controlled.json --out /tmp/pnl-explain-closure.json",
+      "python -m tools.pnl_explain_closure gs-quant-conformance --model examples/pnl_explain_closure/gs_quant_conformance.json --out /tmp/gs-quant-pnl-conformance.json"
     ],
     "challenge":{
       "prompt":"모든 1·2차 attribution 산술이 맞고 residual도 0이지만 한 factor가 다른 portfolio hash를 가리킨다. 상태는?",

@@ -31,6 +31,11 @@ LFV\0ARTIFACT\0V1\0<artifact-kind>\0<schema-id>\0<canonical-json-bytes>
 
 Consequently, equal payloads used as a dataset and a result do not receive the same artifact identity. SHA-256 and SHA-512 use the Python standard library. BLAKE3 is accepted only when the optional `blake3` package is installed.
 
+Source-code artifacts use UTF-8 with every CRLF or CR line ending normalized
+to LF before size and digest computation. Dataset artifacts remain byte-exact.
+This keeps registered source identity stable across Windows and Unix checkouts
+without changing the evidentiary meaning of raw input data.
+
 ## Reference fixture flow
 
 From the repository root:

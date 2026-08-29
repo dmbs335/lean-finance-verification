@@ -13,7 +13,14 @@ second order = 1/2 × scaling × previous risk × (Δmarket)^2
 
 The public method returns cumulative per-attribute series. Its docstring describes the result as risk attributions explaining PnL, but the public method does not itself emit a total realized-PnL closure certificate, an explicit residual bound, or cross-object digest bindings.
 
-This repository records the mapping as `STATIC_REVIEW_THEORY_MAPPED`. The controlled fixture does not import or execute the GS Quant runtime.
+The five closure-state fixtures remain `STATIC_REVIEW_THEORY_MAPPED` and do not
+import GS Quant. A separate pinned conformance fixture executes the public GS
+Quant 2.1.6 method on controlled local inputs and binds the method source,
+fixture, runtime output, and LFV recomputation in a replayable report.
+The v2 fixture contains three positions and permits separate `results` and
+`exit_results` snapshots on one date. It therefore directly exercises partial
+portfolio exits instead of treating every date as an all-retained or all-exited
+single-position state.
 
 Pinned upstream reference:
 
@@ -164,6 +171,14 @@ python -m tools.pnl_explain_closure analyze \
 python -m tools.pnl_explain_closure verify \
   --model examples/pnl_explain_closure/controlled.json \
   --report /tmp/pnl-explain-closure.json
+
+python -m pip install gs-quant==2.1.6
+python -m tools.pnl_explain_closure gs-quant-conformance \
+  --model examples/pnl_explain_closure/gs_quant_conformance.json \
+  --out /tmp/gs-quant-pnl-conformance.json
+python -m tools.pnl_explain_closure verify-gs-quant-conformance \
+  --model examples/pnl_explain_closure/gs_quant_conformance.json \
+  --report examples/pnl_explain_closure/generated/gs-quant-conformance.canonical.json
 ```
 
 ## Assurance boundary
@@ -180,16 +195,23 @@ python -m tools.pnl_explain_closure verify \
 - non-market reconstruction;
 - residual and tolerance status;
 - temporal and identity gates;
-- deterministic report recomputation and tamper rejection.
+- deterministic report recomputation and tamper rejection;
+- pinned GS Quant version and normalized method-source binding;
+- direct first-order, second-order, multi-position aggregation, same-date
+  retained/exit, zero-risk skip, portfolio transition, and fractional-output
+  runtime comparison against independent exact-rational LFV recomputation;
+- fail-closed portfolio-topology validation: no overlapping current/exit
+  position, orphan exit, or silently dropped previous position.
 
 ### Not established
 
 - correctness or calibration of real sensitivities;
 - a bound on higher-order Taylor remainder;
-- direct conformance of the live GS Quant runtime;
+- behavior on production portfolio and risk-result object implementations;
 - completeness of the attribution basis;
 - truth of external portfolio, model, or market-data metadata;
-- Goldman Sachs internal or server-side semantics not present in the public repository.
+- Goldman Sachs internal or remote server-side semantics not present in the
+  public repository.
 
 ## Next extension
 

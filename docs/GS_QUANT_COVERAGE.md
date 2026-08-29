@@ -70,9 +70,12 @@ The LFV contract checks formula/implementation identity, units, valuation time, 
 gs_quant.backtests.backtest_objects.BackTest.pnl_explain
   STATIC_REVIEW
   THEORY_MAPPED
+  DIRECT_TESTED on controlled local inputs
+  ADAPTER_BOUND to version, method source, model, and output digests
   controlled closure cases: yes
-  direct runtime: not executed
-  adapter binding: not started
+  direct runtime: GS Quant 2.1.6 executed
+  adapter binding: deterministic replay implemented
+  portfolio topology: multi-instrument aggregation and same-day partial exits
 ```
 
 Mapped public arithmetic:
@@ -96,11 +99,12 @@ LFV adds obligations not emitted by the controlled upstream mapping:
 
 | Coverage area | Previous | Current | Delta |
 |---|---|---|---|
-| Direct upstream runtime | 0 | 0 | 0 |
-| Direct upstream APIs executed | 0 | 0 | 0 |
+| Direct upstream runtime | 0 | GS Quant 2.1.6 controlled execution | +1 pinned runtime |
+| Direct upstream APIs executed | 0 | 1 | + `BackTest.pnl_explain` |
 | Upstream symbols statically mapped | GenericDataSource family | + `BackTest.pnl_explain` | +1 symbol |
-| Controlled PnL cases | 0 | 5 | +5 |
-| PnL regression tests | 0 | 9 | +9 |
+| Controlled closure cases | 0 | 5 | +5 |
+| Direct runtime topology | single instrument | 3 instruments, retained + exited on the same date | mixed path added |
+| PnL regression tests | 21 | 26 | +5 |
 | PnL closure states | none | CLOSED / PARTIAL / OPEN | +3 states |
 | Lean PnL modules | 0 | 2 source modules + umbrella | new |
 | Global binding counterexamples | 0 | portfolio substitution | +1 class |
@@ -120,10 +124,12 @@ LFV adds obligations not emitted by the controlled upstream mapping:
 - residual and tolerance classification;
 - temporal and cross-object binding gates;
 - deterministic replay and tamper rejection.
+- rejection of overlapping current/exit positions, unaccounted previous
+  positions, duplicate date/location snapshots, and weakened path coverage.
 
 ### Not established
 
-- conformance of the live GS Quant runtime;
+- conformance of remote Marquee services or Goldman Sachs internal packages;
 - correctness or calibration of real risk sensitivities;
 - completeness of the attribution basis;
 - higher-order Taylor remainder bounds;
@@ -131,6 +137,16 @@ LFV adds obligations not emitted by the controlled upstream mapping:
 - unit correspondence with live GS Quant risk objects;
 - Goldman Sachs internal or server-side semantics.
 
-## Next direct-coverage milestone
+## Direct-coverage implementation
 
-Build a read-only adapter that executes the pinned public `BackTest.pnl_explain` path on a local controlled `BackTest` object, captures risk and market-data inputs, canonicalizes the returned attribution series, and compares it with the LFV recomputation. Only after this step may `BackTest.pnl_explain` advance from `THEORY_MAPPED` to `DIRECT_TESTED` or `ADAPTER_BOUND`.
+`tools.pnl_explain_closure gs-quant-conformance` executes the pinned public
+`BackTest.pnl_explain` method against a local controlled object. The adapter
+binds GS Quant version 2.1.6 and the normalized method-source digest. The v2
+fixture executes first-order, second-order, multi-instrument aggregation,
+same-date retained/exit positions, full exit, portfolio transition, zero-risk
+skip, and fractional cumulative-output paths,
+canonicalizes cumulative outputs as exact rational strings, and compares them
+with an independent LFV `Fraction` recomputation. Version drift, source
+substitution, missing metrics, arithmetic divergence, and report tampering fail
+closed. CI also compares the replay byte-for-byte with
+`examples/pnl_explain_closure/generated/gs-quant-conformance.canonical.json`.

@@ -1,4 +1,4 @@
-import Mathlib
+import LeanFinance.Core
 
 namespace LeanFinance.Formula
 
@@ -57,9 +57,9 @@ theorem additive_approximation_error_bound
           (left.specified + right.specified) =
         (left.implemented - left.specified) +
           (right.implemented - right.specified) := by
-    ring
+    omega
   rw [rearrange]
-  exact le_trans
+  exact Nat.le_trans
     (Int.natAbs_add_le
       (left.implemented - left.specified)
       (right.implemented - right.specified))
